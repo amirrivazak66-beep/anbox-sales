@@ -176,7 +176,7 @@
                 <!-- LEADS PAGE -->
                 <div class="page" id="leads">
                     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-                        <h2 style="color: #1B3A5C;">مدیریت لیدها (17 فیلد)</h2>
+                        <h2 style="color: #1B3A5C;">مدیریت لیدها</h2>
                     </div>
                     
                     <div class="toolbar">
@@ -238,23 +238,31 @@
     <div id="leadModal" class="modal">
         <div class="modal-content">
             <div class="modal-header">
-                <div class="modal-title">افزودن لید جدید (17 فیلد)</div>
+                <div class="modal-title">افزودن لید جدید</div>
                 <button class="close-btn" onclick="closeLeadModal()">✕</button>
             </div>
             <form id="leadForm" onsubmit="saveLead(event)">
                 <div class="form-grid">
-                    <!-- Row 1: قدیمی/جدید، مبدأ لید، نام شرکت -->
+                    <!-- Row 1: نوع لید، مبدأ لید، نام شرکت -->
                     <div class="form-group">
-                        <label class="form-label">قدیمی/جدید</label>
-                        <select name="old_new" class="form-input">
+                        <label class="form-label">نوع لید *</label>
+                        <select name="lead_type" class="form-input" required>
                             <option>انتخاب کنید</option>
-                            <option>قدیمی</option>
-                            <option>جدید</option>
+                            <option>گرم</option>
+                            <option>سرد</option>
                         </select>
                     </div>
                     <div class="form-group">
                         <label class="form-label">مبدأ لید *</label>
-                        <input type="text" name="lead_source" class="form-input" required>
+                        <select name="lead_source" class="form-input" required>
+                            <option>انتخاب کنید</option>
+                            <option>سرچ اینترنتی</option>
+                            <option>تماس مشتری</option>
+                            <option>بانک اطلاعاتی</option>
+                            <option>دایره طلایی</option>
+                            <option>پیامک تبلیغاتی</option>
+                            <option>سوشیال مدیا</option>
+                        </select>
                     </div>
                     <div class="form-group">
                         <label class="form-label">نام شرکت *</label>
@@ -279,15 +287,19 @@
                         </select>
                     </div>
                     <div class="form-group">
-                        <label class="form-label">دلیل انتخاب</label>
-                        <input type="text" name="selection_reason" class="form-input">
+                        <label class="form-label">دلیل انتخاب شرکت</label>
+                        <select name="selection_reason" class="form-input">
+                            <option>انتخاب کنید</option>
+                            <option>جغرافیا</option>
+                            <option>شرکت</option>
+                        </select>
                     </div>
                     <div class="form-group">
                         <label class="form-label">شماره تماس *</label>
                         <input type="tel" name="phone" class="form-input" required>
                     </div>
 
-                    <!-- Row 3: نام فرد تماس، سمت فرد تماس، کانال تماس -->
+                    <!-- Row 3: نام فرد تماس، سمت فرد تماس، تعداد مرسولات -->
                     <div class="form-group">
                         <label class="form-label">نام فرد تماس *</label>
                         <input type="text" name="contact_name" class="form-input" required>
@@ -297,23 +309,11 @@
                         <input type="text" name="contact_position" class="form-input">
                     </div>
                     <div class="form-group">
-                        <label class="form-label">کانال تماس</label>
-                        <select name="communication_channel" class="form-input">
-                            <option>انتخاب کنید</option>
-                            <option>سرچ اینترنتی</option>
-                            <option>تماس مشتری</option>
-                            <option>بانک اطلاعاتی</option>
-                            <option>دایره طلایی</option>
-                            <option>پیامک تبلیغاتی</option>
-                            <option>سوشیال مدیا</option>
-                        </select>
+                        <label class="form-label">تعداد مرسولات ارسالی</label>
+                        <input type="number" name="shipment_count" class="form-input" min="0">
                     </div>
 
-                    <!-- Row 4: وضعیت پاسخ، مرحله فروش، تناسب با آن باکس -->
-                    <div class="form-group">
-                        <label class="form-label">وضعیت پاسخ</label>
-                        <input type="text" name="response_status" class="form-input">
-                    </div>
+                    <!-- Row 4: مرحله فروش، تناسب با آن باکس، شرکت همکار -->
                     <div class="form-group">
                         <label class="form-label">مرحله فروش *</label>
                         <select name="sales_stage" class="form-input" required>
@@ -334,6 +334,14 @@
                             <option>تناسب با نرخ</option>
                             <option>ارسال ترکیبی</option>
                             <option>ارسال مرسولات کم حجم</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">شرکت همکار کار می‌کند</label>
+                        <select name="partner_works" class="form-input">
+                            <option>انتخاب کنید</option>
+                            <option>بله</option>
+                            <option>خیر</option>
                         </select>
                     </div>
 
@@ -362,6 +370,19 @@
                         </select>
                     </div>
                     <div class="form-group">
+                        <label class="form-label">کارشناس فروش</label>
+                        <select name="sales_expert" class="form-input">
+                            <option>انتخاب کنید</option>
+                            <option>امیرحسین ریواز</option>
+                            <option>مجتبی رنجبر</option>
+                            <option>ندا شریفی</option>
+                            <option>سمن خوشکلام</option>
+                            <option>پرستو احمدی</option>
+                        </select>
+                    </div>
+
+                    <!-- Row 6: وضعیت لید -->
+                    <div class="form-group">
                         <label class="form-label">وضعیت لید</label>
                         <select name="lead_status" class="form-input">
                             <option>در حال پیگیری</option>
@@ -372,14 +393,6 @@
                             <option>در حال تست</option>
                         </select>
                     </div>
-
-                    <!-- Row 6: پیام اولیه (Full) -->
-                    <div class="form-group form-grid full">
-                        <label class="form-label">پیام اولیه تماس</label>
-                        <textarea name="initial_message" class="form-input" style="min-height: 70px; resize: vertical;"></textarea>
-                    </div>
-
-                    <!-- Row 7: یادداشت‌ها (Full) -->
                     <div class="form-group form-grid full">
                         <label class="form-label">یادداشت‌ها</label>
                         <textarea name="notes" class="form-input" style="min-height: 70px; resize: vertical;"></textarea>
@@ -439,6 +452,14 @@
             'در حال عقد قرارداد',
             'در حال مذاکره',
             'در حال تست'
+        ];
+
+        const SALES_EXPERTS = [
+            'امیرحسین ریواز',
+            'مجتبی رنجبر',
+            'ندا شریفی',
+            'سمن خوشکلام',
+            'پرستو احمدی'
         ];
 
         let currentUser = null;
@@ -674,7 +695,7 @@
                         if (row['نام شرکت'] && row['شماره تماس']) {
                             const lead = {
                                 id: Date.now() + Math.random(),
-                                old_new: row['قدیمی / جدید'] || 'جدید',
+                                lead_type: row['نوع لید'] || 'سرد',
                                 lead_source: row['مبدأ لید'] || '',
                                 company_name: row['نام شرکت'],
                                 industry: row['صنعت'] || '',
@@ -682,13 +703,13 @@
                                 phone: row['شماره تماس'],
                                 contact_name: row['نام فرد تماس'] || '',
                                 contact_position: row['سمت فرد تماس'] || '',
-                                communication_channel: row['کانال تماس'] || '',
-                                initial_message: row['پیام اولیه تماس'] || '',
-                                response_status: row['وضعیت پاسخ'] || '',
+                                shipment_count: row['تعداد مرسولات ارسالی'] || '',
                                 sales_stage: '1',
                                 anbox_fit: row['تناسب با آن باکس'] || '',
+                                partner_works: row['شرکت همکار کار می‌کند'] || '',
                                 main_obstacle: row['مانع اصلی'] || '',
                                 next_action: row['اقدام بعدی'] || '',
+                                sales_expert: row['کارشناس فروش'] || '',
                                 lead_status: 'در حال پیگیری',
                                 notes: row['یادداشت‌ها'] || '',
                                 created_by: currentUser,
