@@ -3,22 +3,22 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>داشبورد V2 | آن‌باکس</title>
+    <title>داشبورد V3 | آن‌باکس</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.min.js"></script>
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; }
         body { font-family: Tahoma, 'Segoe UI', sans-serif; background: #F0F4F8; color: #1E293B; min-height: 100vh; }
         
-        /* LOGIN PAGE */
+        /* LOGIN */
         .login-container { display: flex; align-items: center; justify-content: center; min-height: 100vh; background: linear-gradient(135deg, #1B3A5C, #2563EB); }
         .login-box { background: #fff; padding: 40px; border-radius: 12px; box-shadow: 0 10px 40px rgba(0,0,0,.2); width: 100%; max-width: 400px; }
         .login-logo { text-align: center; font-size: 48px; margin-bottom: 20px; }
         .login-title { text-align: center; font-size: 24px; font-weight: 700; color: #1B3A5C; margin-bottom: 30px; }
         .form-group { margin-bottom: 20px; }
         .form-label { display: block; font-size: 14px; font-weight: 600; margin-bottom: 8px; color: #1B3A5C; }
-        .form-input { width: 100%; padding: 12px; border: 1px solid #E2E8F0; border-radius: 8px; font-size: 14px; font-family: Tahoma; }
-        .form-input:focus { outline: none; border-color: #2563EB; box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1); }
-        .login-button { width: 100%; padding: 12px; background: #2563EB; color: #fff; border: none; border-radius: 8px; font-size: 16px; font-weight: 700; cursor: pointer; transition: all .2s; }
+        .form-input, select { width: 100%; padding: 12px; border: 1px solid #E2E8F0; border-radius: 8px; font-size: 14px; font-family: Tahoma; }
+        .form-input:focus, select:focus { outline: none; border-color: #2563EB; box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1); }
+        .login-button { width: 100%; padding: 12px; background: #2563EB; color: #fff; border: none; border-radius: 8px; font-size: 16px; font-weight: 700; cursor: pointer; }
         .login-button:hover { background: #1B5BB3; }
         .login-error { background: #FEE2E2; color: #DC2626; padding: 12px; border-radius: 8px; margin-bottom: 20px; font-size: 14px; display: none; }
         
@@ -37,26 +37,22 @@
         .main { margin-right: 250px; flex: 1; }
         .header { background: #fff; border-bottom: 1px solid #E2E8F0; padding: 15px 30px; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 100; }
         .header-title { font-size: 18px; font-weight: 700; color: #1B3A5C; }
-        .content { padding: 30px; max-width: 1400px; margin: 0 auto; }
+        .content { padding: 30px; max-width: 1600px; margin: 0 auto; }
         .page { display: none; }
         .page.active { display: block; }
         .card { background: #fff; border-radius: 12px; border: 1px solid #E2E8F0; padding: 20px; margin-bottom: 20px; box-shadow: 0 1px 3px rgba(0,0,0,.05); }
         .card-title { font-size: 16px; font-weight: 700; margin-bottom: 15px; color: #1B3A5C; }
-        .stats-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; margin-bottom: 20px; }
-        .stat-box { background: linear-gradient(135deg, #1B3A5C, #2563EB); color: #fff; padding: 20px; border-radius: 12px; text-align: center; }
-        .stat-value { font-size: 28px; font-weight: 700; }
-        .stat-label { font-size: 12px; opacity: .8; margin-top: 5px; }
-        .kpi-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; }
-        .kpi-box { background: #F8FAFC; border-radius: 10px; padding: 15px; text-align: center; border: 1px solid #E2E8F0; }
-        .kpi-icon { font-size: 24px; }
-        .kpi-value { font-size: 22px; font-weight: 700; margin: 10px 0; color: #2563EB; }
-        .kpi-label { font-size: 12px; color: #64748B; }
-        .leaderboard-row { display: flex; align-items: center; padding: 12px; border-bottom: 1px solid #E2E8F0; gap: 15px; }
-        .rank { width: 30px; font-weight: 700; color: #2563EB; }
-        .name { flex: 1; font-weight: 600; }
-        .score { color: #2563EB; font-weight: 700; }
         
-        /* LEAD MANAGEMENT */
+        /* PIPELINE */
+        .pipeline-grid { display: grid; grid-template-columns: repeat(6, 1fr); gap: 15px; margin-bottom: 20px; }
+        .pipeline-box { background: linear-gradient(135deg, #F8FAFC, #E2E8F0); padding: 15px; border-radius: 10px; text-align: center; border: 1px solid #E2E8F0; }
+        .pipeline-stage { font-size: 12px; color: #64748B; margin-bottom: 5px; }
+        .pipeline-count { font-size: 24px; font-weight: 700; color: #2563EB; }
+        .pipeline-percent { font-size: 11px; color: #94A3B8; margin-top: 5px; }
+        .progress-bar { width: 100%; height: 6px; background: #E2E8F0; border-radius: 3px; margin-top: 8px; overflow: hidden; }
+        .progress-fill { height: 100%; background: linear-gradient(90deg, #2563EB, #1B5BB3); }
+        
+        /* LEAD FORM */
         .toolbar { display: flex; gap: 10px; margin-bottom: 20px; flex-wrap: wrap; align-items: center; }
         .btn { padding: 10px 20px; background: #2563EB; color: #fff; border: none; border-radius: 8px; cursor: pointer; font-weight: 700; font-family: Tahoma; transition: all .2s; }
         .btn:hover { background: #1B5BB3; }
@@ -64,26 +60,22 @@
         .btn.danger { background: #DC2626; }
         .search-box { padding: 10px 15px; border: 1px solid #E2E8F0; border-radius: 8px; width: 250px; font-family: Tahoma; }
         
-        .modal { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,.5); z-index: 2000; align-items: center; justify-content: center; }
+        .modal { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,.5); z-index: 2000; align-items: center; justify-content: center; overflow-y: auto; }
         .modal.active { display: flex; }
-        .modal-content { background: #fff; border-radius: 12px; padding: 30px; max-width: 700px; width: 90%; max-height: 90vh; overflow-y: auto; }
+        .modal-content { background: #fff; border-radius: 12px; padding: 30px; max-width: 900px; width: 90%; margin: 20px auto; }
         .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
         .modal-title { font-size: 18px; font-weight: 700; color: #1B3A5C; }
         .close-btn { font-size: 24px; cursor: pointer; background: none; border: none; color: #64748B; }
         .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
         .form-grid.full { grid-template-columns: 1fr; }
         
-        .lead-table { width: 100%; border-collapse: collapse; margin-top: 20px; font-size: 13px; }
+        /* TABLE */
+        .lead-table { width: 100%; border-collapse: collapse; margin-top: 20px; font-size: 12px; }
         .lead-table th { background: #F1F5F9; padding: 12px; text-align: right; font-weight: 700; color: #1B3A5C; border-bottom: 2px solid #E2E8F0; }
-        .lead-table td { padding: 12px; border-bottom: 1px solid #E2E8F0; }
+        .lead-table td { padding: 10px; border-bottom: 1px solid #E2E8F0; }
         .lead-table tr:hover { background: #F8FAFC; }
-        .badge { display: inline-block; padding: 4px 12px; border-radius: 20px; font-size: 11px; font-weight: 700; }
-        .badge.hot { background: #FEE2E2; color: #DC2626; }
-        .badge.warm { background: #FEF3C7; color: #D97706; }
-        .badge.cold { background: #DBEAFE; color: #2563EB; }
-        
-        .action-btns { display: flex; gap: 5px; }
-        .action-btns button { padding: 4px 8px; font-size: 11px; }
+        .stage-badge { display: inline-block; padding: 4px 10px; border-radius: 20px; font-size: 10px; font-weight: 700; background: #DBEAFE; color: #2563EB; }
+        .stage-select { padding: 6px; border: 1px solid #E2E8F0; border-radius: 6px; font-size: 11px; }
         
         .notification { position: fixed; top: 20px; left: 50%; transform: translateX(-50%); background: #16A34A; color: #fff; padding: 12px 24px; border-radius: 8px; z-index: 9999; font-weight: 600; display: none; }
         .notification.show { display: block; }
@@ -92,13 +84,9 @@
         @media(max-width: 768px) {
             .sidebar { width: 100%; height: auto; position: relative; }
             .main { margin-right: 0; }
-            .stats-grid { grid-template-columns: repeat(2, 1fr); }
-            .kpi-grid { grid-template-columns: 1fr; }
+            .pipeline-grid { grid-template-columns: repeat(2, 1fr); }
             .form-grid { grid-template-columns: 1fr; }
-            .toolbar { flex-direction: column; }
-            .search-box { width: 100%; }
-            .lead-table { font-size: 11px; }
-            .lead-table th, .lead-table td { padding: 8px; }
+            .lead-table { font-size: 10px; }
         }
     </style>
 </head>
@@ -111,11 +99,11 @@
             <div class="login-error" id="loginError"></div>
             <div class="form-group">
                 <label class="form-label">نام کاربری</label>
-                <input type="text" id="username" class="form-input" placeholder="نام کاربری را وارد کنید">
+                <input type="text" id="username" class="form-input" placeholder="نام کاربری">
             </div>
             <div class="form-group">
                 <label class="form-label">رمز عبور</label>
-                <input type="password" id="password" class="form-input" placeholder="رمز عبور را وارد کنید">
+                <input type="password" id="password" class="form-input" placeholder="رمز عبور">
             </div>
             <button class="login-button" onclick="handleLogin()">ورود</button>
         </div>
@@ -135,94 +123,48 @@
             <div class="nav-menu">
                 <div class="nav-item active" onclick="switchPage(event, 'dashboard')">📊 داشبورد</div>
                 <div class="nav-item" onclick="switchPage(event, 'leads')">📋 لیدها</div>
+                <div class="nav-item" onclick="switchPage(event, 'pipeline')">🔄 Pipeline</div>
                 <div class="nav-item" onclick="switchPage(event, 'reports')">📈 گزارش‌ها</div>
-                <div class="nav-item" onclick="switchPage(event, 'analytics')">📉 تحلیلات</div>
                 <div class="nav-item" onclick="switchPage(event, 'settings')">⚙️ تنظیمات</div>
             </div>
         </div>
 
         <div class="main">
             <div class="header">
-                <div class="header-title">داشبورد V2 | آن‌باکس</div>
-                <div>🔔 (۳) | 👤 <span id="headerUsername">مجتبی</span></div>
+                <div class="header-title">داشبورد | آن‌باکس</div>
+                <div>👤 <span id="headerUsername">مجتبی</span></div>
             </div>
 
             <div class="content">
                 <!-- DASHBOARD PAGE -->
                 <div class="page active" id="dashboard">
-                    <h2 style="margin-bottom: 20px; color: #1B3A5C;">خلاصه کارایی</h2>
-                    <div class="stats-grid">
-                        <div class="stat-box">
-                            <div class="stat-value" id="stat-total">۲۵۳</div>
-                            <div class="stat-label">لیدهای کل</div>
-                        </div>
-                        <div class="stat-box">
-                            <div class="stat-value" id="stat-hot">۳۵</div>
-                            <div class="stat-label">🔴 Hot لیدها</div>
-                        </div>
-                        <div class="stat-box">
-                            <div class="stat-value" id="stat-warm">۸۵</div>
-                            <div class="stat-label">🟡 Warm لیدها</div>
-                        </div>
-                        <div class="stat-box">
-                            <div class="stat-value" id="stat-cold">۱۳۳</div>
-                            <div class="stat-label">🔵 Cold لیدها</div>
+                    <h2 style="margin-bottom: 20px; color: #1B3A5C;">مدیریت Sales Pipeline</h2>
+                    
+                    <div class="card">
+                        <div class="card-title">📊 وضعیت Pipeline</div>
+                        <div class="pipeline-grid" id="pipelineGrid">
+                            <!-- Dynamic Content -->
                         </div>
                     </div>
 
                     <div class="card">
-                        <div class="card-title">🎯 اهداف امروز</div>
-                        <div class="kpi-grid">
-                            <div class="kpi-box">
-                                <div class="kpi-icon">📞</div>
-                                <div class="kpi-value">۶/۸</div>
-                                <div class="kpi-label">تماس با لید</div>
+                        <div class="card-title">📈 آمار کلی</div>
+                        <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px;">
+                            <div style="text-align: center; padding: 20px; background: #F8FAFC; border-radius: 8px;">
+                                <div style="font-size: 24px; font-weight: 700; color: #2563EB;" id="stat-total">0</div>
+                                <div style="font-size: 12px; color: #64748B; margin-top: 5px;">کل لیدها</div>
                             </div>
-                            <div class="kpi-box">
-                                <div class="kpi-icon">🔄</div>
-                                <div class="kpi-value">۳/۵</div>
-                                <div class="kpi-label">فالوآپ</div>
+                            <div style="text-align: center; padding: 20px; background: #F8FAFC; border-radius: 8px;">
+                                <div style="font-size: 24px; font-weight: 700; color: #DC2626;" id="stat-hot">0</div>
+                                <div style="font-size: 12px; color: #64748B; margin-top: 5px;">🔴 لیدهای گرم</div>
                             </div>
-                            <div class="kpi-box">
-                                <div class="kpi-icon">📋</div>
-                                <div class="kpi-value">۴/۵</div>
-                                <div class="kpi-label">اطلاعات دریافتی</div>
+                            <div style="text-align: center; padding: 20px; background: #F8FAFC; border-radius: 8px;">
+                                <div style="font-size: 24px; font-weight: 700; color: #D97706;" id="stat-warm">0</div>
+                                <div style="font-size: 12px; color: #64748B; margin-top: 5px;">🟡 لیدهای گرم</div>
                             </div>
-                        </div>
-                    </div>
-
-                    <div class="card">
-                        <div class="card-title">🏆 Leaderboard هفتگی</div>
-                        <div id="leaderboard">
-                            <div class="leaderboard-row">
-                                <div class="rank">#۱</div>
-                                <div class="name">مجتبی رنجبر</div>
-                                <div class="score">۹۸۰ نقطه</div>
-                                <div>📈</div>
-                            </div>
-                            <div class="leaderboard-row">
-                                <div class="rank">#۲</div>
-                                <div class="name">ندا شریفی</div>
-                                <div class="score">۸۵۰ نقطه</div>
-                                <div>➡️</div>
-                            </div>
-                            <div class="leaderboard-row">
-                                <div class="rank">#۳</div>
-                                <div class="name">سمن خوشکلام</div>
-                                <div class="score">۷۲۰ نقطه</div>
-                                <div>➡️</div>
-                            </div>
-                            <div class="leaderboard-row">
-                                <div class="rank">#۴</div>
-                                <div class="name">پرستو احمدی</div>
-                                <div class="score">۶۵۰ نقطه</div>
-                                <div>📉</div>
-                            </div>
-                            <div class="leaderboard-row">
-                                <div class="rank">#۵</div>
-                                <div class="name">امیرحسین ریواز</div>
-                                <div class="score">۵۸۰ نقطه</div>
-                                <div>📉</div>
+                            <div style="text-align: center; padding: 20px; background: #F8FAFC; border-radius: 8px;">
+                                <div style="font-size: 24px; font-weight: 700; color: #2563EB;" id="stat-qualified">0</div>
+                                <div style="font-size: 12px; color: #64748B; margin-top: 5px;">✅ Qualified</div>
                             </div>
                         </div>
                     </div>
@@ -231,7 +173,7 @@
                 <!-- LEADS PAGE -->
                 <div class="page" id="leads">
                     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-                        <h2 style="color: #1B3A5C;">مدیریت لیدها</h2>
+                        <h2 style="color: #1B3A5C;">مدیریت لیدها (17 فیلد)</h2>
                     </div>
                     
                     <div class="toolbar">
@@ -242,9 +184,20 @@
                     </div>
 
                     <div class="card">
-                        <div class="card-title">لیدهای شما</div>
                         <div id="leadsContainer" style="text-align: center; padding: 40px; color: #94A3B8;">
                             ⏳ بارگذاری لیدها...
+                        </div>
+                    </div>
+                </div>
+
+                <!-- PIPELINE PAGE -->
+                <div class="page" id="pipeline">
+                    <h2 style="margin-bottom: 20px; color: #1B3A5C;">مراحل فروش (Pipeline)</h2>
+                    
+                    <div class="card">
+                        <div class="card-title">🔄 توزیع لیدها در مراحل</div>
+                        <div id="pipelineDetails" style="display: grid; gap: 20px;">
+                            <!-- Dynamic Content -->
                         </div>
                     </div>
                 </div>
@@ -253,26 +206,12 @@
                 <div class="page" id="reports">
                     <h2 style="margin-bottom: 20px; color: #1B3A5C;">گزارش‌ها</h2>
                     <div class="card">
-                        <div class="card-title">گزارش‌های شما</div>
-                        <div style="margin-top: 20px; padding: 20px; background: #F8FAFC; border-radius: 8px;">
-                            <div style="font-weight: 600; margin-bottom: 10px;">گزارش‌های موجود:</div>
-                            <div style="color: #64748B; font-size: 12px; line-height: 1.8;">
-                                • گزارش روزانه KPI<br>
-                                • گزارش ماهیانه عملکرد<br>
-                                • گزارش Leaderboard<br>
-                                • گزارش لیدهای Hot/Warm/Cold
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- ANALYTICS PAGE -->
-                <div class="page" id="analytics">
-                    <h2 style="margin-bottom: 20px; color: #1B3A5C;">تحلیلات</h2>
-                    <div class="card">
-                        <div class="card-title">تحلیلات پیشرفته</div>
-                        <div style="text-align: center; padding: 40px; color: #94A3B8;">
-                            📊 فاز ۵ — تحلیلات بهبود‌یافته به زودی
+                        <div class="card-title">📈 گزارش‌های سیستم</div>
+                        <div style="color: #64748B; font-size: 13px; line-height: 1.8;">
+                            • گزارش Pipeline<br>
+                            • گزارش لیدهای Hot/Warm<br>
+                            • گزارش مرحله‌ای فروش<br>
+                            • گزارش تبدیل (Conversion)
                         </div>
                     </div>
                 </div>
@@ -281,12 +220,11 @@
                 <div class="page" id="settings">
                     <h2 style="margin-bottom: 20px; color: #1B3A5C;">تنظیمات</h2>
                     <div class="card">
-                        <div class="card-title">مدیریت اطلاعات</div>
+                        <div class="card-title">اطلاعات کاربری</div>
                         <div style="margin-bottom: 15px;">
                             <label class="form-label">نام کاربری</label>
                             <input type="text" id="settingsUsername" class="form-input" disabled>
                         </div>
-                        <button class="btn">ذخیره تنظیمات</button>
                     </div>
                 </div>
             </div>
@@ -297,63 +235,145 @@
     <div id="leadModal" class="modal">
         <div class="modal-content">
             <div class="modal-header">
-                <div class="modal-title">افزودن لید جدید</div>
+                <div class="modal-title">افزودن لید جدید (17 فیلد)</div>
                 <button class="close-btn" onclick="closeLeadModal()">✕</button>
             </div>
             <form id="leadForm" onsubmit="saveLead(event)">
                 <div class="form-grid">
+                    <!-- Row 1 -->
+                    <div class="form-group">
+                        <label class="form-label">قدیمی/جدید</label>
+                        <select name="old_new" class="form-input">
+                            <option>انتخاب کنید</option>
+                            <option>قدیمی</option>
+                            <option>جدید</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">مبدأ لید *</label>
+                        <input type="text" name="lead_source" class="form-input" placeholder="مثل: سرچ اینترنتی" required>
+                    </div>
+
+                    <!-- Row 2 -->
                     <div class="form-group form-grid full">
                         <label class="form-label">نام شرکت *</label>
                         <input type="text" name="company_name" class="form-input" required>
                     </div>
+
+                    <!-- Row 3 -->
                     <div class="form-group">
-                        <label class="form-label">نام تماس گیر *</label>
-                        <input type="text" name="contact_name" class="form-input" required>
+                        <label class="form-label">صنعت *</label>
+                        <select name="industry" class="form-input" required>
+                            <option>انتخاب کنید</option>
+                            <option>دارویی</option>
+                            <option>بانک</option>
+                            <option>فروشگاه اینترنتی</option>
+                            <option>خودرویی</option>
+                            <option>لوازم خانگی</option>
+                            <option>سازمانی</option>
+                            <option>لوازم آرایشی</option>
+                            <option>لوازم آشپزخانه</option>
+                            <option>لوازم جانبی</option>
+                            <option>فروشگاه حضوری</option>
+                        </select>
                     </div>
                     <div class="form-group">
-                        <label class="form-label">موبایل *</label>
+                        <label class="form-label">دلیل انتخاب شرکت</label>
+                        <input type="text" name="selection_reason" class="form-input" placeholder="مثل: جغرافیا">
+                    </div>
+
+                    <!-- Row 4 -->
+                    <div class="form-group">
+                        <label class="form-label">شماره تماس *</label>
                         <input type="tel" name="phone" class="form-input" required>
                     </div>
                     <div class="form-group">
-                        <label class="form-label">ایمیل</label>
-                        <input type="email" name="email" class="form-input">
+                        <label class="form-label">نام فرد تماس *</label>
+                        <input type="text" name="contact_name" class="form-input" required>
+                    </div>
+
+                    <!-- Row 5 -->
+                    <div class="form-group">
+                        <label class="form-label">سمت فرد تماس</label>
+                        <input type="text" name="contact_position" class="form-input" placeholder="مثل: مدیر انبار">
                     </div>
                     <div class="form-group">
-                        <label class="form-label">شهر</label>
-                        <input type="text" name="city" class="form-input">
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label">صنعت</label>
-                        <select name="industry" class="form-input">
+                        <label class="form-label">کانال تماس</label>
+                        <select name="communication_channel" class="form-input">
                             <option>انتخاب کنید</option>
-                            <option>تولید</option>
-                            <option>خدمات</option>
-                            <option>فروش</option>
-                            <option>فناوری</option>
-                            <option>حمل‌و‌نقل</option>
+                            <option>سرچ اینترنتی</option>
+                            <option>تماس مشتری</option>
+                            <option>بانک اطلاعاتی</option>
+                            <option>دایره طلایی</option>
+                            <option>پیامک تبلیغاتی</option>
+                            <option>سوشیال مدیا</option>
                         </select>
                     </div>
+
+                    <!-- Row 6 -->
+                    <div class="form-group form-grid full">
+                        <label class="form-label">پیام اولیه تماس</label>
+                        <textarea name="initial_message" class="form-input" style="min-height: 80px; resize: vertical;" placeholder="پیام اولیه..."></textarea>
+                    </div>
+
+                    <!-- Row 7 -->
                     <div class="form-group">
-                        <label class="form-label">منبع</label>
-                        <select name="source" class="form-input">
+                        <label class="form-label">وضعیت پاسخ</label>
+                        <input type="text" name="response_status" class="form-input" placeholder="مثل: منتظر پاسخ">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">مرحله فروش *</label>
+                        <select name="sales_stage" class="form-input" required>
+                            <option value="1">1. لیدسازی</option>
+                            <option value="2">2. تماس اولیه و امکان سنجی</option>
+                            <option value="3">3. ارسال نرخ نامه</option>
+                            <option value="4">4. جلسه مذاکره</option>
+                            <option value="5">5. ارسال پروپوزال</option>
+                            <option value="6">6. عقد قرارداد</option>
+                        </select>
+                    </div>
+
+                    <!-- Row 8 -->
+                    <div class="form-group">
+                        <label class="form-label">تناسب با آن باکس</label>
+                        <select name="anbox_fit" class="form-input">
                             <option>انتخاب کنید</option>
-                            <option>تماس مستقیم</option>
-                            <option>سایت</option>
-                            <option>رفع کننده</option>
-                            <option>شبکه اجتماعی</option>
-                            <option>ایمیل</option>
+                            <option>ارسال مرسوله روزانه</option>
+                            <option>تناسب با SLA</option>
+                            <option>تناسب با نرخ</option>
+                            <option>ارسال ترکیبی</option>
+                            <option>ارسال مرسولات کم حجم</option>
                         </select>
                     </div>
                     <div class="form-group">
-                        <label class="form-label">وضعیت</label>
-                        <select name="status" class="form-input">
-                            <option>جدید</option>
-                            <option>درحال بررسی</option>
-                            <option>فعال</option>
-                            <option>غیر فعال</option>
+                        <label class="form-label">مانع اصلی</label>
+                        <input type="text" name="main_obstacle" class="form-input" placeholder="مثل: عدم توافق نرخ">
+                    </div>
+
+                    <!-- Row 9 -->
+                    <div class="form-group form-grid full">
+                        <label class="form-label">اقدام بعدی</label>
+                        <textarea name="next_action" class="form-input" style="min-height: 60px; resize: vertical;" placeholder="اقدام بعدی..."></textarea>
+                    </div>
+
+                    <!-- Row 10 -->
+                    <div class="form-group">
+                        <label class="form-label">وضعیت لید</label>
+                        <select name="lead_status" class="form-input">
+                            <option>گرم</option>
+                            <option>سرد</option>
+                            <option>در حال پیگیری</option>
+                            <option>در حال مذاکره</option>
+                            <option>در حال عقد قرارداد</option>
+                            <option>در حال تست</option>
                         </select>
+                    </div>
+                    <div class="form-group form-grid full">
+                        <label class="form-label">یادداشت‌ها</label>
+                        <textarea name="notes" class="form-input" style="min-height: 60px; resize: vertical;" placeholder="یادداشت‌های اضافی..."></textarea>
                     </div>
                 </div>
+
                 <div style="display: flex; gap: 10px; margin-top: 20px;">
                     <button type="submit" class="btn">ذخیره</button>
                     <button type="button" class="btn secondary" onclick="closeLeadModal()">لغو</button>
@@ -366,13 +386,22 @@
 
     <script>
         const USERS = {
-            'mojabi': { name: 'مجتبی رنجبر', password: 'pass123', role: 'expert' },
-            'neda': { name: 'ندا شریفی', password: 'pass123', role: 'expert' },
-            'saman': { name: 'سمن خوشکلام', password: 'pass123', role: 'expert' },
-            'parasto': { name: 'پرستو احمدی', password: 'pass123', role: 'expert' },
-            'amirhossein': { name: 'امیرحسین ریواز', password: 'sales2025', role: 'manager' },
-            'admin': { name: 'ادمین سیستم', password: 'admin2025', role: 'admin' }
+            'mojabi': { name: 'مجتبی رنجبر', password: 'pass123' },
+            'neda': { name: 'ندا شریفی', password: 'pass123' },
+            'saman': { name: 'سمن خوشکلام', password: 'pass123' },
+            'parasto': { name: 'پرستو احمدی', password: 'pass123' },
+            'amirhossein': { name: 'امیرحسین ریواز', password: 'sales2025' },
+            'admin': { name: 'ادمین سیستم', password: 'admin2025' }
         };
+
+        const SALES_STAGES = [
+            { id: 1, name: 'لیدسازی' },
+            { id: 2, name: 'تماس اولیه و امکان سنجی' },
+            { id: 3, name: 'ارسال نرخ نامه' },
+            { id: 4, name: 'جلسه مذاکره' },
+            { id: 5, name: 'ارسال پروپوزال' },
+            { id: 6, name: 'عقد قرارداد' }
+        ];
 
         let currentUser = null;
         let leads = [];
@@ -384,6 +413,7 @@
                 currentUser = savedUser;
                 showDashboard();
                 loadLeads();
+                updateDashboard();
             }
         });
 
@@ -409,6 +439,7 @@
             localStorage.setItem('currentUser', username);
             showDashboard();
             loadLeads();
+            updateDashboard();
         }
 
         function showDashboard() {
@@ -428,7 +459,6 @@
             document.getElementById('dashboardPage').style.display = 'none';
             document.getElementById('username').value = '';
             document.getElementById('password').value = '';
-            document.getElementById('loginError').style.display = 'none';
             showNotification('👋 شما خارج شدید');
         }
 
@@ -439,27 +469,22 @@
             document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active'));
             e.target.classList.add('active');
             
-            if (page === 'leads') {
-                loadLeads();
-            }
+            if (page === 'leads') loadLeads();
+            if (page === 'pipeline') renderPipelineDetails();
         }
 
         function calculateScore(lead) {
             let score = 50;
-            
-            if (lead.industry === 'تولید') score += 20;
-            if (lead.source === 'تماس مستقیم') score += 15;
-            if (lead.status === 'فعال') score += 25;
-            if (lead.phone) score += 5;
-            if (lead.email) score += 5;
-            
+            if (lead.industry) score += 10;
+            if (parseInt(lead.sales_stage) >= 4) score += 30;
+            if (parseInt(lead.sales_stage) >= 5) score += 20;
             return Math.min(100, score);
         }
 
-        function getScoreBadge(score) {
-            if (score >= 85) return { type: 'hot', label: '🔴 Hot', emoji: '🔴' };
-            if (score >= 50) return { type: 'warm', label: '🟡 Warm', emoji: '🟡' };
-            return { type: 'cold', label: '🔵 Cold', emoji: '🔵' };
+        function getLeadStatus(score) {
+            if (score >= 85) return { type: 'hot', emoji: '🔴' };
+            if (score >= 60) return { type: 'warm', emoji: '🟡' };
+            return { type: 'cold', emoji: '🔵' };
         }
 
         function openLeadModal() {
@@ -479,7 +504,7 @@
             lead.created_by = currentUser;
             lead.created_at = new Date().toLocaleString('fa-IR');
             lead.score = calculateScore(lead);
-            lead.badge = getScoreBadge(lead.score);
+            lead.status = getLeadStatus(lead.score);
             
             leads.push(lead);
             localStorage.setItem('leads_' + currentUser, JSON.stringify(leads));
@@ -487,7 +512,7 @@
             showNotification('✅ لید با موفقیت ذخیره شد');
             closeLeadModal();
             loadLeads();
-            updateDashboardStats();
+            updateDashboard();
         }
 
         function loadLeads() {
@@ -510,7 +535,7 @@
         function renderLeads() {
             const container = document.getElementById('leadsContainer');
             if (filteredLeads.length === 0) {
-                container.innerHTML = '<div style="text-align: center; padding: 40px; color: #94A3B8;">هنوز لیدی ثبت نشده است</div>';
+                container.innerHTML = '<div style="text-align: center; padding: 40px; color: #94A3B8;">لیدی موجود نیست</div>';
                 return;
             }
 
@@ -519,10 +544,10 @@
                     <thead>
                         <tr>
                             <th>نام شرکت</th>
+                            <th>صنعت</th>
                             <th>تماس گیر</th>
                             <th>موبایل</th>
-                            <th>صنعت</th>
-                            <th>Score</th>
+                            <th>مرحله</th>
                             <th>وضعیت</th>
                             <th>اقدام</th>
                         </tr>
@@ -531,19 +556,21 @@
             `;
             
             filteredLeads.forEach(lead => {
+                const stage = SALES_STAGES.find(s => s.id == lead.sales_stage);
                 html += `
                     <tr>
-                        <td>${lead.company_name}</td>
+                        <td><strong>${lead.company_name}</strong></td>
+                        <td>${lead.industry}</td>
                         <td>${lead.contact_name}</td>
                         <td>${lead.phone}</td>
-                        <td>${lead.industry || '-'}</td>
-                        <td><span class="badge ${lead.badge.type}">${lead.badge.emoji} ${lead.score}</span></td>
-                        <td>${lead.status}</td>
                         <td>
-                            <div class="action-btns">
-                                <button class="btn secondary" onclick="editLead(${lead.id})">ویرایش</button>
-                                <button class="btn danger" onclick="deleteLead(${lead.id})">حذف</button>
-                            </div>
+                            <select class="stage-select" onchange="updateStage(${lead.id}, this.value)">
+                                ${SALES_STAGES.map(s => `<option value="${s.id}" ${s.id == lead.sales_stage ? 'selected' : ''}>${s.id}. ${s.name}</option>`).join('')}
+                            </select>
+                        </td>
+                        <td><span class="stage-badge">${lead.status.emoji} ${lead.lead_status}</span></td>
+                        <td>
+                            <button class="btn danger" style="padding: 4px 8px; font-size: 10px;" onclick="deleteLead(${lead.id})">حذف</button>
                         </td>
                     </tr>
                 `;
@@ -553,18 +580,26 @@
             container.innerHTML = html;
         }
 
+        function updateStage(id, newStage) {
+            const lead = leads.find(l => l.id === id);
+            if (lead) {
+                lead.sales_stage = newStage;
+                lead.score = calculateScore(lead);
+                lead.status = getLeadStatus(lead.score);
+                localStorage.setItem('leads_' + currentUser, JSON.stringify(leads));
+                showNotification('✅ مرحله به‌روزرسانی شد');
+                updateDashboard();
+            }
+        }
+
         function deleteLead(id) {
             if (confirm('آیا مطمئن هستید؟')) {
                 leads = leads.filter(l => l.id !== id);
                 localStorage.setItem('leads_' + currentUser, JSON.stringify(leads));
                 showNotification('✅ لید حذف شد');
                 loadLeads();
-                updateDashboardStats();
+                updateDashboard();
             }
-        }
-
-        function editLead(id) {
-            showNotification('⚠️ ویرایش در نسخه بعدی');
         }
 
         function handleExcelUpload(event) {
@@ -584,19 +619,28 @@
                         if (row['نام شرکت'] && row['موبایل']) {
                             const lead = {
                                 id: Date.now() + Math.random(),
-                                company_name: row['نام شرکت'] || '',
-                                contact_name: row['نام تماس گیر'] || '',
-                                phone: row['موبایل'] || '',
-                                email: row['ایمیل'] || '',
-                                city: row['شهر'] || '',
+                                old_new: row['قدیمی / جدید'] || 'جدید',
+                                lead_source: row['مبدأ لید'] || '',
+                                company_name: row['نام شرکت'],
                                 industry: row['صنعت'] || '',
-                                source: 'Excel Import',
-                                status: 'جدید',
+                                selection_reason: row['دلیل انتخاب شرکت'] || '',
+                                phone: row['شماره تماس'],
+                                contact_name: row['نام فرد تماس'] || '',
+                                contact_position: row['سمت فرد تماس'] || '',
+                                communication_channel: row['کانال تماس'] || '',
+                                initial_message: row['پیام اولیه تماس'] || '',
+                                response_status: row['وضعیت پاسخ'] || '',
+                                sales_stage: '1',
+                                anbox_fit: row['تناسب با آن باکس'] || '',
+                                main_obstacle: row['مانع اصلی'] || '',
+                                next_action: row['اقدام بعدی'] || '',
+                                lead_status: 'سرد',
+                                notes: row['یادداشت‌ها'] || '',
                                 created_by: currentUser,
                                 created_at: new Date().toLocaleString('fa-IR')
                             };
                             lead.score = calculateScore(lead);
-                            lead.badge = getScoreBadge(lead.score);
+                            lead.status = getLeadStatus(lead.score);
                             leads.push(lead);
                             imported++;
                         }
@@ -605,7 +649,7 @@
                     localStorage.setItem('leads_' + currentUser, JSON.stringify(leads));
                     showNotification(`✅ ${imported} لید آپلود شد`);
                     loadLeads();
-                    updateDashboardStats();
+                    updateDashboard();
                     document.getElementById('excelInput').value = '';
                 } catch (err) {
                     showNotification('❌ خطا در پردازش فایل', 'error');
@@ -614,15 +658,56 @@
             reader.readAsArrayBuffer(file);
         }
 
-        function updateDashboardStats() {
-            const hot = leads.filter(l => l.badge?.type === 'hot').length;
-            const warm = leads.filter(l => l.badge?.type === 'warm').length;
-            const cold = leads.filter(l => l.badge?.type === 'cold').length;
-            
+        function updateDashboard() {
             document.getElementById('stat-total').textContent = leads.length;
-            document.getElementById('stat-hot').textContent = hot;
-            document.getElementById('stat-warm').textContent = warm;
-            document.getElementById('stat-cold').textContent = cold;
+            document.getElementById('stat-hot').textContent = leads.filter(l => l.status?.type === 'hot').length;
+            document.getElementById('stat-warm').textContent = leads.filter(l => l.status?.type === 'warm').length;
+            document.getElementById('stat-qualified').textContent = leads.filter(l => parseInt(l.sales_stage) >= 5).length;
+            
+            renderPipeline();
+        }
+
+        function renderPipeline() {
+            const grid = document.getElementById('pipelineGrid');
+            let html = '';
+            const total = leads.length || 1;
+
+            SALES_STAGES.forEach(stage => {
+                const count = leads.filter(l => parseInt(l.sales_stage) === stage.id).length;
+                const percent = Math.round((count / total) * 100);
+                html += `
+                    <div class="pipeline-box">
+                        <div class="pipeline-stage">${stage.name}</div>
+                        <div class="pipeline-count">${count}</div>
+                        <div class="progress-bar">
+                            <div class="progress-fill" style="width: ${percent}%"></div>
+                        </div>
+                        <div class="pipeline-percent">${percent}%</div>
+                    </div>
+                `;
+            });
+
+            grid.innerHTML = html;
+        }
+
+        function renderPipelineDetails() {
+            const details = document.getElementById('pipelineDetails');
+            let html = '';
+
+            SALES_STAGES.forEach(stage => {
+                const stageLeads = leads.filter(l => parseInt(l.sales_stage) === stage.id);
+                html += `
+                    <div style="padding: 15px; background: #F8FAFC; border-radius: 8px; border-right: 4px solid #2563EB;">
+                        <h3 style="margin-bottom: 10px; color: #1B3A5C;">Stage ${stage.id}: ${stage.name}</h3>
+                        <div style="font-size: 12px; color: #64748B;">
+                            <strong>تعداد:</strong> ${stageLeads.length} لید<br>
+                            <strong>شرکت‌ها:</strong> ${stageLeads.map(l => l.company_name).join(', ') || 'هیچ‌کدام'}
+                        </div>
+                    </div>
+                `;
+            });
+
+            details.innerHTML = html;
         }
 
         function showNotification(msg, type = 'success') {
