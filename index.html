@@ -810,3 +810,19 @@
     </script>
 </body>
 </html>
+<!-- بعد از team-tab div اضافه کن -->
+<div id="checklist-tab" class="tab-content" style="display: none;">
+  <div class="card">
+    <div class="card-title">✅ چک‌لیست روزانه</div>
+    <div style="margin-bottom: 20px;">
+      <div style="font-size: 14px; font-weight: 700; margin-bottom: 10px;">
+        پیشرفت: <span id="checklist-progress">0</span>/10
+      </div>
+      <div class="progress-bar">
+        <div class="progress-fill" id="checklist-bar" style="width: 0%; background: linear-gradient(90deg, #16A34A, #22C55E);"></div>
+      </div>
+    </div>
+    <div id="checklist-items"></div>
+    <button class="btn" style="margin-top: 15px;" onclick="saveChecklist()">💾 ذخیره</button>
+  </div>
+</div>
