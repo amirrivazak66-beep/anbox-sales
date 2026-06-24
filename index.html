@@ -7,9 +7,28 @@
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; }
         body { font-family: Tahoma, 'Segoe UI', sans-serif; background: #F0F4F8; color: #1E293B; min-height: 100vh; }
+        
+        /* LOGIN PAGE */
+        .login-container { display: flex; align-items: center; justify-content: center; min-height: 100vh; background: linear-gradient(135deg, #1B3A5C, #2563EB); }
+        .login-box { background: #fff; padding: 40px; border-radius: 12px; box-shadow: 0 10px 40px rgba(0,0,0,.2); width: 100%; max-width: 400px; }
+        .login-logo { text-align: center; font-size: 48px; margin-bottom: 20px; }
+        .login-title { text-align: center; font-size: 24px; font-weight: 700; color: #1B3A5C; margin-bottom: 30px; }
+        .form-group { margin-bottom: 20px; }
+        .form-label { display: block; font-size: 14px; font-weight: 600; margin-bottom: 8px; color: #1B3A5C; }
+        .form-input { width: 100%; padding: 12px; border: 1px solid #E2E8F0; border-radius: 8px; font-size: 14px; font-family: Tahoma; }
+        .form-input:focus { outline: none; border-color: #2563EB; box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1); }
+        .login-button { width: 100%; padding: 12px; background: #2563EB; color: #fff; border: none; border-radius: 8px; font-size: 16px; font-weight: 700; cursor: pointer; transition: all .2s; }
+        .login-button:hover { background: #1B5BB3; }
+        .login-error { background: #FEE2E2; color: #DC2626; padding: 12px; border-radius: 8px; margin-bottom: 20px; font-size: 14px; display: none; }
+        
+        /* DASHBOARD */
+        .dashboard-container { display: flex; min-height: 100vh; }
         .sidebar { width: 250px; background: #1B3A5C; color: #fff; padding: 20px; position: fixed; height: 100vh; overflow-y: auto; z-index: 1000; }
         .logo { display: flex; align-items: center; gap: 10px; margin-bottom: 30px; }
         .logo-text { font-size: 14px; font-weight: 700; }
+        .user-info { background: rgba(255,255,255,.1); padding: 12px; border-radius: 8px; margin-bottom: 20px; font-size: 12px; }
+        .user-name { font-weight: 700; margin-bottom: 5px; }
+        .logout-btn { width: 100%; padding: 8px; background: #DC2626; color: #fff; border: none; border-radius: 6px; font-size: 12px; cursor: pointer; margin-top: 10px; }
         .nav-menu { display: flex; flex-direction: column; gap: 5px; }
         .nav-item { padding: 12px 15px; border-radius: 8px; cursor: pointer; font-size: 13px; transition: all .2s; }
         .nav-item:hover { background: rgba(255,255,255,.1); }
@@ -46,154 +65,184 @@
     </style>
 </head>
 <body>
-    <div class="sidebar">
-        <div class="logo">
-            <div class="logo-text">📦 آن‌باکس</div>
-        </div>
-        <div class="nav-menu">
-            <div class="nav-item active" onclick="switchPage(event, 'dashboard')">📊 داشبورد</div>
-            <div class="nav-item" onclick="switchPage(event, 'leads')">📋 لیدها</div>
-            <div class="nav-item" onclick="switchPage(event, 'reports')">📈 گزارش‌ها</div>
-            <div class="nav-item" onclick="switchPage(event, 'analytics')">📉 تحلیلات</div>
-            <div class="nav-item" onclick="switchPage(event, 'settings')">⚙️ تنظیمات</div>
+    <!-- LOGIN PAGE -->
+    <div id="loginPage" class="login-container">
+        <div class="login-box">
+            <div class="login-logo">📦</div>
+            <div class="login-title">آن‌باکس</div>
+            <div class="login-error" id="loginError"></div>
+            <div class="form-group">
+                <label class="form-label">نام کاربری</label>
+                <input type="text" id="username" class="form-input" placeholder="نام کاربری را وارد کنید">
+            </div>
+            <div class="form-group">
+                <label class="form-label">رمز عبور</label>
+                <input type="password" id="password" class="form-input" placeholder="رمز عبور را وارد کنید">
+            </div>
+            <button class="login-button" onclick="handleLogin()">ورود</button>
+            <div style="text-align: center; margin-top: 20px; font-size: 12px; color: #64748B;">
+                <div>نام کاربری: mojabi</div>
+                <div>رمز عبور: pass123</div>
+            </div>
         </div>
     </div>
 
-    <div class="main">
-        <div class="header">
-            <div class="header-title">داشبورد V2 | آن‌باکس</div>
-            <div>🔔 (۳) | 👤 مجتبی</div>
+    <!-- DASHBOARD -->
+    <div id="dashboardPage" class="dashboard-container" style="display: none;">
+        <div class="sidebar">
+            <div class="logo">
+                <div class="logo-text">📦 آن‌باکس</div>
+            </div>
+            <div class="user-info">
+                <div class="user-name" id="sidebarUsername">مجتبی</div>
+                <div style="font-size: 11px; opacity: 0.8;">فعال</div>
+                <button class="logout-btn" onclick="handleLogout()">خروج</button>
+            </div>
+            <div class="nav-menu">
+                <div class="nav-item active" onclick="switchPage(event, 'dashboard')">📊 داشبورد</div>
+                <div class="nav-item" onclick="switchPage(event, 'leads')">📋 لیدها</div>
+                <div class="nav-item" onclick="switchPage(event, 'reports')">📈 گزارش‌ها</div>
+                <div class="nav-item" onclick="switchPage(event, 'analytics')">📉 تحلیلات</div>
+                <div class="nav-item" onclick="switchPage(event, 'settings')">⚙️ تنظیمات</div>
+            </div>
         </div>
 
-        <div class="content">
-            <div class="page active" id="dashboard">
-                <h2 style="margin-bottom: 20px; color: #1B3A5C;">خلاصه کارایی</h2>
-                <div class="stats-grid">
-                    <div class="stat-box">
-                        <div class="stat-value">۲۵۳</div>
-                        <div class="stat-label">لیدهای فعال</div>
-                    </div>
-                    <div class="stat-box">
-                        <div class="stat-value">۲۷٪</div>
-                        <div class="stat-label">نرخ تبدیل</div>
-                    </div>
-                    <div class="stat-box">
-                        <div class="stat-value">۸۵</div>
-                        <div class="stat-label">میانگین Score</div>
-                    </div>
-                    <div class="stat-box">
-                        <div class="stat-value">۲۵M</div>
-                        <div class="stat-label">درآمد ماه</div>
-                    </div>
-                </div>
-
-                <div class="card">
-                    <div class="card-title">🎯 اهداف امروز</div>
-                    <div class="kpi-grid">
-                        <div class="kpi-box">
-                            <div class="kpi-icon">📞</div>
-                            <div class="kpi-value">۶/۸</div>
-                            <div class="kpi-label">تماس با لید</div>
-                        </div>
-                        <div class="kpi-box">
-                            <div class="kpi-icon">🔄</div>
-                            <div class="kpi-value">۳/۵</div>
-                            <div class="kpi-label">فالوآپ</div>
-                        </div>
-                        <div class="kpi-box">
-                            <div class="kpi-icon">📋</div>
-                            <div class="kpi-value">۴/۵</div>
-                            <div class="kpi-label">اطلاعات دریافتی</div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="card">
-                    <div class="card-title">🏆 Leaderboard هفتگی</div>
-                    <div id="leaderboard">
-                        <div class="leaderboard-row">
-                            <div class="rank">#۱</div>
-                            <div class="name">مجتبی رنجبر</div>
-                            <div class="score">۹۸۰ نقطه</div>
-                            <div>📈</div>
-                        </div>
-                        <div class="leaderboard-row">
-                            <div class="rank">#۲</div>
-                            <div class="name">ندا شریفی</div>
-                            <div class="score">۸۵۰ نقطه</div>
-                            <div>➡️</div>
-                        </div>
-                        <div class="leaderboard-row">
-                            <div class="rank">#۳</div>
-                            <div class="name">سمن خوشکلام</div>
-                            <div class="score">۷۲۰ نقطه</div>
-                            <div>➡️</div>
-                        </div>
-                        <div class="leaderboard-row">
-                            <div class="rank">#۴</div>
-                            <div class="name">پرستو احمدی</div>
-                            <div class="score">۶۵۰ نقطه</div>
-                            <div>📉</div>
-                        </div>
-                        <div class="leaderboard-row">
-                            <div class="rank">#۵</div>
-                            <div class="name">امیرحسین ریواز</div>
-                            <div class="score">۵۸۰ نقطه</div>
-                            <div>📉</div>
-                        </div>
-                    </div>
-                </div>
+        <div class="main">
+            <div class="header">
+                <div class="header-title">داشبورد V2 | آن‌باکس</div>
+                <div>🔔 (۳) | 👤 <span id="headerUsername">مجتبی</span></div>
             </div>
 
-            <div class="page" id="leads">
-                <h2 style="margin-bottom: 20px; color: #1B3A5C;">مدیریت لیدها</h2>
-                <div class="card">
-                    <div class="card-title">لیدهای شما</div>
-                    <div style="text-align: center; padding: 40px; color: #94A3B8;">
-                        📋 فاز ۲ — لیدها به زودی اضافه می‌شوند
+            <div class="content">
+                <div class="page active" id="dashboard">
+                    <h2 style="margin-bottom: 20px; color: #1B3A5C;">خلاصه کارایی</h2>
+                    <div class="stats-grid">
+                        <div class="stat-box">
+                            <div class="stat-value">۲۵۳</div>
+                            <div class="stat-label">لیدهای فعال</div>
+                        </div>
+                        <div class="stat-box">
+                            <div class="stat-value">۲۷٪</div>
+                            <div class="stat-label">نرخ تبدیل</div>
+                        </div>
+                        <div class="stat-box">
+                            <div class="stat-value">۸۵</div>
+                            <div class="stat-label">میانگین Score</div>
+                        </div>
+                        <div class="stat-box">
+                            <div class="stat-value">۲۵M</div>
+                            <div class="stat-label">درآمد ماه</div>
+                        </div>
                     </div>
-                </div>
-            </div>
 
-            <div class="page" id="reports">
-                <h2 style="margin-bottom: 20px; color: #1B3A5C;">گزارش‌ها</h2>
-                <div class="card">
-                    <div class="card-title">گزارش‌های شما</div>
-                    <div style="margin-top: 20px; padding: 20px; background: #F8FAFC; border-radius: 8px;">
-                        <div style="font-weight: 600; margin-bottom: 10px;">گزارش‌های موجود:</div>
-                        <div style="color: #64748B; font-size: 12px; line-height: 1.8;">
-                            • گزارش روزانه KPI<br>
-                            • گزارش ماهیانه عملکرد<br>
-                            • گزارش Leaderboard<br>
-                            • گزارش تحلیل لیدها (فاز ۲)
+                    <div class="card">
+                        <div class="card-title">🎯 اهداف امروز</div>
+                        <div class="kpi-grid">
+                            <div class="kpi-box">
+                                <div class="kpi-icon">📞</div>
+                                <div class="kpi-value">۶/۸</div>
+                                <div class="kpi-label">تماس با لید</div>
+                            </div>
+                            <div class="kpi-box">
+                                <div class="kpi-icon">🔄</div>
+                                <div class="kpi-value">۳/۵</div>
+                                <div class="kpi-label">فالوآپ</div>
+                            </div>
+                            <div class="kpi-box">
+                                <div class="kpi-icon">📋</div>
+                                <div class="kpi-value">۴/۵</div>
+                                <div class="kpi-label">اطلاعات دریافتی</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-title">🏆 Leaderboard هفتگی</div>
+                        <div id="leaderboard">
+                            <div class="leaderboard-row">
+                                <div class="rank">#۱</div>
+                                <div class="name">مجتبی رنجبر</div>
+                                <div class="score">۹۸۰ نقطه</div>
+                                <div>📈</div>
+                            </div>
+                            <div class="leaderboard-row">
+                                <div class="rank">#۲</div>
+                                <div class="name">ندا شریفی</div>
+                                <div class="score">۸۵۰ نقطه</div>
+                                <div>➡️</div>
+                            </div>
+                            <div class="leaderboard-row">
+                                <div class="rank">#۳</div>
+                                <div class="name">سمن خوشکلام</div>
+                                <div class="score">۷۲۰ نقطه</div>
+                                <div>➡️</div>
+                            </div>
+                            <div class="leaderboard-row">
+                                <div class="rank">#۴</div>
+                                <div class="name">پرستو احمدی</div>
+                                <div class="score">۶۵۰ نقطه</div>
+                                <div>📉</div>
+                            </div>
+                            <div class="leaderboard-row">
+                                <div class="rank">#۵</div>
+                                <div class="name">امیرحسین ریواز</div>
+                                <div class="score">۵۸۰ نقطه</div>
+                                <div>📉</div>
+                            </div>
                         </div>
                     </div>
                 </div>
-            </div>
 
-            <div class="page" id="analytics">
-                <h2 style="margin-bottom: 20px; color: #1B3A5C;">تحلیلات</h2>
-                <div class="card">
-                    <div class="card-title">تحلیلات پیشرفته</div>
-                    <div style="text-align: center; padding: 40px; color: #94A3B8;">
-                        📊 فاز ۴ — تحلیلات بهبود‌یافته به زودی
+                <div class="page" id="leads">
+                    <h2 style="margin-bottom: 20px; color: #1B3A5C;">مدیریت لیدها</h2>
+                    <div class="card">
+                        <div class="card-title">لیدهای شما</div>
+                        <div style="text-align: center; padding: 40px; color: #94A3B8;">
+                            📋 فاز ۳ — لیدها به زودی اضافه می‌شوند
+                        </div>
                     </div>
                 </div>
-            </div>
 
-            <div class="page" id="settings">
-                <h2 style="margin-bottom: 20px; color: #1B3A5C;">تنظیمات</h2>
-                <div class="card">
-                    <div class="card-title">مدیریت اطلاعات</div>
-                    <div style="margin-bottom: 15px;">
-                        <label style="display: block; font-size: 13px; font-weight: 600; margin-bottom: 5px;">نام کاربری</label>
-                        <input type="text" style="width: 100%; padding: 10px; border: 1px solid #E2E8F0; border-radius: 8px;" placeholder="نام کاربری">
+                <div class="page" id="reports">
+                    <h2 style="margin-bottom: 20px; color: #1B3A5C;">گزارش‌ها</h2>
+                    <div class="card">
+                        <div class="card-title">گزارش‌های شما</div>
+                        <div style="margin-top: 20px; padding: 20px; background: #F8FAFC; border-radius: 8px;">
+                            <div style="font-weight: 600; margin-bottom: 10px;">گزارش‌های موجود:</div>
+                            <div style="color: #64748B; font-size: 12px; line-height: 1.8;">
+                                • گزارش روزانه KPI<br>
+                                • گزارش ماهیانه عملکرد<br>
+                                • گزارش Leaderboard<br>
+                                • گزارش تحلیل لیدها (فاز ۳)
+                            </div>
+                        </div>
                     </div>
-                    <div style="margin-bottom: 15px;">
-                        <label style="display: block; font-size: 13px; font-weight: 600; margin-bottom: 5px;">رمز عبور</label>
-                        <input type="password" style="width: 100%; padding: 10px; border: 1px solid #E2E8F0; border-radius: 8px;" placeholder="رمز عبور جدید">
+                </div>
+
+                <div class="page" id="analytics">
+                    <h2 style="margin-bottom: 20px; color: #1B3A5C;">تحلیلات</h2>
+                    <div class="card">
+                        <div class="card-title">تحلیلات پیشرفته</div>
+                        <div style="text-align: center; padding: 40px; color: #94A3B8;">
+                            📊 فاز ۵ — تحلیلات بهبود‌یافته به زودی
+                        </div>
                     </div>
-                    <button style="padding: 10px 20px; background: #2563EB; color: #fff; border: none; border-radius: 8px; cursor: pointer; font-weight: 700;">ذخیره تنظیمات</button>
+                </div>
+
+                <div class="page" id="settings">
+                    <h2 style="margin-bottom: 20px; color: #1B3A5C;">تنظیمات</h2>
+                    <div class="card">
+                        <div class="card-title">مدیریت اطلاعات</div>
+                        <div style="margin-bottom: 15px;">
+                            <label style="display: block; font-size: 13px; font-weight: 600; margin-bottom: 5px;">نام کاربری</label>
+                            <input type="text" id="settingsUsername" style="width: 100%; padding: 10px; border: 1px solid #E2E8F0; border-radius: 8px;" placeholder="نام کاربری" disabled>
+                        </div>
+                        <div style="margin-bottom: 15px;">
+                            <label style="display: block; font-size: 13px; font-weight: 600; margin-bottom: 5px;">رمز عبور جدید</label>
+                            <input type="password" style="width: 100%; padding: 10px; border: 1px solid #E2E8F0; border-radius: 8px;" placeholder="رمز عبور جدید">
+                        </div>
+                        <button style="padding: 10px 20px; background: #2563EB; color: #fff; border: none; border-radius: 8px; cursor: pointer; font-weight: 700;">ذخیره تنظیمات</button>
+                    </div>
                 </div>
             </div>
         </div>
@@ -202,6 +251,70 @@
     <div class="notification" id="notification"></div>
 
     <script>
+        // Users database (mock)
+        const USERS = {
+            'mojabi': { name: 'مجتبی رنجبر', password: 'pass123', role: 'expert' },
+            'neda': { name: 'ندا شریفی', password: 'pass123', role: 'expert' },
+            'saman': { name: 'سمن خوشکلام', password: 'pass123', role: 'expert' },
+            'parasto': { name: 'پرستو احمدی', password: 'pass123', role: 'expert' },
+            'amirhossein': { name: 'امیرحسین ریواز', password: 'sales2025', role: 'manager' },
+            'admin': { name: 'ادمین سیستم', password: 'admin2025', role: 'admin' }
+        };
+
+        let currentUser = null;
+
+        // Check if user already logged in
+        window.addEventListener('DOMContentLoaded', () => {
+            const savedUser = localStorage.getItem('currentUser');
+            if (savedUser) {
+                currentUser = savedUser;
+                showDashboard();
+            }
+        });
+
+        function handleLogin() {
+            const username = document.getElementById('username').value.trim();
+            const password = document.getElementById('password').value;
+            const errorEl = document.getElementById('loginError');
+
+            if (!username || !password) {
+                errorEl.textContent = '❌ نام کاربری و رمز عبور را وارد کنید';
+                errorEl.style.display = 'block';
+                return;
+            }
+
+            const user = USERS[username];
+            if (!user || user.password !== password) {
+                errorEl.textContent = '❌ نام کاربری یا رمز عبور نادرست است';
+                errorEl.style.display = 'block';
+                return;
+            }
+
+            currentUser = username;
+            localStorage.setItem('currentUser', username);
+            showDashboard();
+        }
+
+        function showDashboard() {
+            const user = USERS[currentUser];
+            document.getElementById('loginPage').style.display = 'none';
+            document.getElementById('dashboardPage').style.display = 'flex';
+            document.getElementById('sidebarUsername').textContent = user.name;
+            document.getElementById('headerUsername').textContent = user.name;
+            document.getElementById('settingsUsername').value = currentUser;
+            showNotification('✅ خوش آمدید ' + user.name);
+        }
+
+        function handleLogout() {
+            localStorage.removeItem('currentUser');
+            currentUser = null;
+            document.getElementById('loginPage').style.display = 'flex';
+            document.getElementById('dashboardPage').style.display = 'none';
+            document.getElementById('username').value = '';
+            document.getElementById('password').value = '';
+            showNotification('👋 شما خارج شدید');
+        }
+
         function switchPage(e, page) {
             e.preventDefault();
             document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
@@ -210,7 +323,12 @@
             e.target.classList.add('active');
         }
 
-        console.log('Dashboard loaded successfully');
+        function showNotification(msg) {
+            const el = document.getElementById('notification');
+            el.textContent = msg;
+            el.classList.add('show');
+            setTimeout(() => el.classList.remove('show'), 3000);
+        }
     </script>
 </body>
 </html>
