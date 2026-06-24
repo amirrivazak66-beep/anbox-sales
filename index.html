@@ -4,11 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>داشبورد V2 | آن‌باکس</title>
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; }
         body { font-family: Tahoma, 'Segoe UI', sans-serif; background: #F0F4F8; color: #1E293B; min-height: 100vh; }
-        .container { display: flex; min-height: 100vh; }
         .sidebar { width: 250px; background: #1B3A5C; color: #fff; padding: 20px; position: fixed; height: 100vh; overflow-y: auto; z-index: 1000; }
         .logo { display: flex; align-items: center; gap: 10px; margin-bottom: 30px; }
         .logo-text { font-size: 14px; font-weight: 700; }
@@ -19,7 +17,6 @@
         .main { margin-right: 250px; flex: 1; }
         .header { background: #fff; border-bottom: 1px solid #E2E8F0; padding: 15px 30px; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 100; }
         .header-title { font-size: 18px; font-weight: 700; color: #1B3A5C; }
-        .header-right { display: flex; align-items: center; gap: 20px; }
         .content { padding: 30px; max-width: 1400px; margin: 0 auto; }
         .page { display: none; }
         .page.active { display: block; }
@@ -38,11 +35,10 @@
         .rank { width: 30px; font-weight: 700; color: #2563EB; }
         .name { flex: 1; font-weight: 600; }
         .score { color: #2563EB; font-weight: 700; }
-        .notification { position: fixed; top: 20px; left: 50%; transform: translateX(-50%); background: #16A34A; color: #fff; padding: 12px 24px; border-radius: 8px; z-index: 9999; font-weight: 600; box-shadow: 0 4px 12px rgba(0,0,0,.15); display: none; }
-        .notification.active { display: block; }
-        .notification.error { background: #DC2626; }
+        .notification { position: fixed; top: 20px; left: 50%; transform: translateX(-50%); background: #16A34A; color: #fff; padding: 12px 24px; border-radius: 8px; z-index: 9999; font-weight: 600; display: none; }
+        .notification.show { display: block; }
         @media(max-width: 768px) {
-            .sidebar { width: 100%; height: auto; position: relative; padding: 10px; }
+            .sidebar { width: 100%; height: auto; position: relative; }
             .main { margin-right: 0; }
             .stats-grid { grid-template-columns: repeat(2, 1fr); }
             .kpi-grid { grid-template-columns: 1fr; }
@@ -55,21 +51,18 @@
             <div class="logo-text">📦 آن‌باکس</div>
         </div>
         <div class="nav-menu">
-            <div class="nav-item active" onclick="switchPage('dashboard')">📊 داشبورد</div>
-            <div class="nav-item" onclick="switchPage('leads')">📋 لیدها</div>
-            <div class="nav-item" onclick="switchPage('reports')">📈 گزارش‌ها</div>
-            <div class="nav-item" onclick="switchPage('analytics')">📉 تحلیلات</div>
-            <div class="nav-item" onclick="switchPage('settings')">⚙️ تنظیمات</div>
+            <div class="nav-item active" onclick="switchPage(event, 'dashboard')">📊 داشبورد</div>
+            <div class="nav-item" onclick="switchPage(event, 'leads')">📋 لیدها</div>
+            <div class="nav-item" onclick="switchPage(event, 'reports')">📈 گزارش‌ها</div>
+            <div class="nav-item" onclick="switchPage(event, 'analytics')">📉 تحلیلات</div>
+            <div class="nav-item" onclick="switchPage(event, 'settings')">⚙️ تنظیمات</div>
         </div>
     </div>
 
     <div class="main">
         <div class="header">
             <div class="header-title">داشبورد V2 | آن‌باکس</div>
-            <div class="header-right">
-                <span>🔔 (۳)</span>
-                <span>👤 <span id="userName">مجتبی</span></span>
-            </div>
+            <div>🔔 (۳) | 👤 مجتبی</div>
         </div>
 
         <div class="content">
@@ -77,19 +70,19 @@
                 <h2 style="margin-bottom: 20px; color: #1B3A5C;">خلاصه کارایی</h2>
                 <div class="stats-grid">
                     <div class="stat-box">
-                        <div class="stat-value" id="stat-leads">۲۵۳</div>
+                        <div class="stat-value">۲۵۳</div>
                         <div class="stat-label">لیدهای فعال</div>
                     </div>
                     <div class="stat-box">
-                        <div class="stat-value" id="stat-conversion">۲۷٪</div>
+                        <div class="stat-value">۲۷٪</div>
                         <div class="stat-label">نرخ تبدیل</div>
                     </div>
                     <div class="stat-box">
-                        <div class="stat-value" id="stat-score">۸۵</div>
+                        <div class="stat-value">۸۵</div>
                         <div class="stat-label">میانگین Score</div>
                     </div>
                     <div class="stat-box">
-                        <div class="stat-value" id="stat-revenue">۲۵M</div>
+                        <div class="stat-value">۲۵M</div>
                         <div class="stat-label">درآمد ماه</div>
                     </div>
                 </div>
@@ -99,17 +92,17 @@
                     <div class="kpi-grid">
                         <div class="kpi-box">
                             <div class="kpi-icon">📞</div>
-                            <div class="kpi-value" id="kpi-calls">۶/۸</div>
+                            <div class="kpi-value">۶/۸</div>
                             <div class="kpi-label">تماس با لید</div>
                         </div>
                         <div class="kpi-box">
                             <div class="kpi-icon">🔄</div>
-                            <div class="kpi-value" id="kpi-followup">۳/۵</div>
+                            <div class="kpi-value">۳/۵</div>
                             <div class="kpi-label">فالوآپ</div>
                         </div>
                         <div class="kpi-box">
                             <div class="kpi-icon">📋</div>
-                            <div class="kpi-value" id="kpi-info">۴/۵</div>
+                            <div class="kpi-value">۴/۵</div>
                             <div class="kpi-label">اطلاعات دریافتی</div>
                         </div>
                     </div>
@@ -118,7 +111,36 @@
                 <div class="card">
                     <div class="card-title">🏆 Leaderboard هفتگی</div>
                     <div id="leaderboard">
-                        <div style="text-align: center; padding: 20px; color: #94A3B8;">⏳ بارگذاری...</div>
+                        <div class="leaderboard-row">
+                            <div class="rank">#۱</div>
+                            <div class="name">مجتبی رنجبر</div>
+                            <div class="score">۹۸۰ نقطه</div>
+                            <div>📈</div>
+                        </div>
+                        <div class="leaderboard-row">
+                            <div class="rank">#۲</div>
+                            <div class="name">ندا شریفی</div>
+                            <div class="score">۸۵۰ نقطه</div>
+                            <div>➡️</div>
+                        </div>
+                        <div class="leaderboard-row">
+                            <div class="rank">#۳</div>
+                            <div class="name">سمن خوشکلام</div>
+                            <div class="score">۷۲۰ نقطه</div>
+                            <div>➡️</div>
+                        </div>
+                        <div class="leaderboard-row">
+                            <div class="rank">#۴</div>
+                            <div class="name">پرستو احمدی</div>
+                            <div class="score">۶۵۰ نقطه</div>
+                            <div>📉</div>
+                        </div>
+                        <div class="leaderboard-row">
+                            <div class="rank">#۵</div>
+                            <div class="name">امیرحسین ریواز</div>
+                            <div class="score">۵۸۰ نقطه</div>
+                            <div>📉</div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -137,7 +159,7 @@
                 <h2 style="margin-bottom: 20px; color: #1B3A5C;">گزارش‌ها</h2>
                 <div class="card">
                     <div class="card-title">گزارش‌های شما</div>
-                    <div style="margin-top: 20px; padding: 20px; background: #F8FAFC; border-radius: 8px; border: 1px solid #E2E8F0;">
+                    <div style="margin-top: 20px; padding: 20px; background: #F8FAFC; border-radius: 8px;">
                         <div style="font-weight: 600; margin-bottom: 10px;">گزارش‌های موجود:</div>
                         <div style="color: #64748B; font-size: 12px; line-height: 1.8;">
                             • گزارش روزانه KPI<br>
@@ -164,12 +186,12 @@
                 <div class="card">
                     <div class="card-title">مدیریت اطلاعات</div>
                     <div style="margin-bottom: 15px;">
-                        <label style="display: block; font-size: 13px; font-weight: 600; margin-bottom: 5px; color: #1B3A5C;">نام کاربری</label>
-                        <input type="text" style="width: 100%; padding: 10px; border: 1px solid #E2E8F0; border-radius: 8px; font-size: 13px;" placeholder="نام کاربری">
+                        <label style="display: block; font-size: 13px; font-weight: 600; margin-bottom: 5px;">نام کاربری</label>
+                        <input type="text" style="width: 100%; padding: 10px; border: 1px solid #E2E8F0; border-radius: 8px;" placeholder="نام کاربری">
                     </div>
                     <div style="margin-bottom: 15px;">
-                        <label style="display: block; font-size: 13px; font-weight: 600; margin-bottom: 5px; color: #1B3A5C;">رمز عبور</label>
-                        <input type="password" style="width: 100%; padding: 10px; border: 1px solid #E2E8F0; border-radius: 8px; font-size: 13px;" placeholder="رمز عبور جدید">
+                        <label style="display: block; font-size: 13px; font-weight: 600; margin-bottom: 5px;">رمز عبور</label>
+                        <input type="password" style="width: 100%; padding: 10px; border: 1px solid #E2E8F0; border-radius: 8px;" placeholder="رمز عبور جدید">
                     </div>
                     <button style="padding: 10px 20px; background: #2563EB; color: #fff; border: none; border-radius: 8px; cursor: pointer; font-weight: 700;">ذخیره تنظیمات</button>
                 </div>
@@ -180,86 +202,15 @@
     <div class="notification" id="notification"></div>
 
     <script>
-        const SB_URL = 'https://uaydruhkevdmvpyefdjm.supabase.co';
-        const SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVheWRydWhrZXZkbXZweWVmZGptIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODIxOTk4MjUsImV4cCI6MjA5Nzc3NTgyNX0.PYIOjf2OUOcgftxSHOEjwS7H5Gbx8xlSk7l8Pdc6PYc';
-
-        const MOCK_LEADERBOARD = [
-            { rank: 1, name: 'مجتبی رنجبر', score: 980, trend: '📈' },
-            { rank: 2, name: 'ندا شریفی', score: 850, trend: '➡️' },
-            { rank: 3, name: 'سمن خوشکلام', score: 720, trend: '➡️' },
-            { rank: 4, name: 'پرستو احمدی', score: 650, trend: '📉' },
-            { rank: 5, name: 'امیرحسین ریواز', score: 580, trend: '📉' }
-        ];
-
-        let db = null;
-        try {
-            const { createClient } = window.supabase;
-            db = createClient(SB_URL, SB_KEY);
-        } catch (err) {
-            console.log('Supabase error:', err);
-        }
-
-        function switchPage(page) {
+        function switchPage(e, page) {
+            e.preventDefault();
             document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
             document.getElementById(page).classList.add('active');
             document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active'));
-            event.target.classList.add('active');
+            e.target.classList.add('active');
         }
 
-        function showNotification(msg, type = 'success') {
-            const el = document.getElementById('notification');
-            el.textContent = msg;
-            el.className = 'notification ' + (type === 'error' ? 'error' : '') + ' active';
-            setTimeout(() => el.classList.remove('active'), 3000);
-        }
-
-        async function loadLeaderboard() {
-            try {
-                if (!db) throw new Error('Supabase not available');
-                
-                const { data, error } = await db
-                    .from('leaderboard')
-                    .select('*, users(*)')
-                    .order('score', { ascending: false })
-                    .limit(5);
-
-                if (error) throw error;
-
-                let html = '';
-                data.forEach((row, i) => {
-                    const trend = i === 0 ? '📈' : i < 3 ? '➡️' : '📉';
-                    html += `<div class="leaderboard-row">
-                        <div class="rank">#${i+1}</div>
-                        <div class="name">${row.users?.name || 'نامشناس'}</div>
-                        <div class="score">${row.score} نقطه</div>
-                        <div class="trend">${trend}</div>
-                    </div>`;
-                });
-                document.getElementById('leaderboard').innerHTML = html;
-                showNotification('✅ داده‌های live بارگذاری شدند');
-            } catch (err) {
-                console.log('Supabase error:', err);
-                loadMockLeaderboard();
-            }
-        }
-
-        function loadMockLeaderboard() {
-            let html = '';
-            MOCK_LEADERBOARD.forEach(row => {
-                html += `<div class="leaderboard-row">
-                    <div class="rank">#${row.rank}</div>
-                    <div class="name">${row.name}</div>
-                    <div class="score">${row.score} نقطه</div>
-                    <div class="trend">${row.trend}</div>
-                </div>`;
-            });
-            document.getElementById('leaderboard').innerHTML = html;
-            showNotification('⚠️ داده‌های آزمایشی (Supabase fallback)', 'error');
-        }
-
-        window.addEventListener('DOMContentLoaded', () => {
-            loadLeaderboard();
-        });
+        console.log('Dashboard loaded successfully');
     </script>
 </body>
 </html>
