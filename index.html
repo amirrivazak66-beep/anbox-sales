@@ -671,7 +671,7 @@
 
                     let imported = 0;
                     json.forEach(row => {
-                        if (row['نام شرکت'] && row['موبایل']) {
+                        if (row['نام شرکت'] && row['شماره تماس']) {
                             const lead = {
                                 id: Date.now() + Math.random(),
                                 old_new: row['قدیمی / جدید'] || 'جدید',
