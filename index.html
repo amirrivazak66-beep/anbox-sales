@@ -11,13 +11,9 @@ body{font-family:Tahoma,'Segoe UI',sans-serif;background:#F0F4F8;color:#1E293B;m
 .header{background:#fff;border-bottom:3px solid #2563EB;padding:12px 24px;display:flex;align-items:center;justify-content:space-between;box-shadow:0 2px 12px rgba(0,0,0,.07);position:sticky;top:0;z-index:100}
 .header-logo{height:44px;object-fit:contain}
 .header-right{text-align:left}.htitle{font-size:13px;font-weight:700;color:#1B3A5C}.hdate{font-size:11px;color:#64748B}
-.online-dot{width:8px;height:8px;border-radius:50%;background:#22C55E;display:inline-block;margin-left:4px;animation:pulse 2s infinite}
-@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+.online-dot{width:8px;height:8px;border-radius:50%;background:#22C55E;display:inline-block;margin-left:4px}
 .toast{position:fixed;top:20px;left:50%;transform:translateX(-50%);background:#16A34A;color:#fff;padding:10px 24px;border-radius:30px;z-index:9999;font-size:14px;font-weight:600;box-shadow:0 4px 20px rgba(0,0,0,.2);pointer-events:none;opacity:0;transition:opacity .3s}
 .toast.err{background:#DC2626}.toast.show{opacity:1}
-.loading{display:flex;align-items:center;justify-content:center;min-height:60vh;flex-direction:column;gap:16px}
-.spinner{width:40px;height:40px;border:4px solid #E2E8F0;border-top-color:#2563EB;border-radius:50%;animation:spin 1s linear infinite}
-@keyframes spin{to{transform:rotate(360deg)}}
 .sel-wrap{max-width:480px;margin:32px auto;padding:0 16px}
 .sel-hero{background:linear-gradient(135deg,#1B3A5C,#2563EB);color:#fff;border-radius:18px;padding:24px;text-align:center;margin-bottom:24px}
 .sel-hero h1{font-size:20px;margin-bottom:4px}.sel-hero p{font-size:13px;opacity:.75}
@@ -27,11 +23,8 @@ body{font-family:Tahoma,'Segoe UI',sans-serif;background:#F0F4F8;color:#1E293B;m
 .ebadge.done{background:#DCFCE7;color:#16A34A}
 .act-btn{width:100%;padding:14px;border:none;border-radius:12px;font-size:14px;font-weight:700;cursor:pointer;margin-bottom:10px;font-family:Tahoma,sans-serif}
 .act-btn.pri{background:#1B3A5C;color:#fff}.act-btn.sec{background:#fff;color:#64748B;border:1.5px solid #E2E8F0}
-.share-strip{background:#EFF6FF;border:1.5px solid #BFDBFE;border-radius:12px;padding:12px 16px;font-size:13px;color:#1E40AF;display:flex;align-items:center;gap:10px;margin-bottom:8px}
-.share-strip button{margin-right:auto;padding:7px 14px;background:#25D366;color:#fff;border:none;border-radius:8px;font-size:12px;cursor:pointer;font-weight:700;font-family:Tahoma,sans-serif}
 .exp-header{background:linear-gradient(135deg,#1B3A5C,#2563EB);color:#fff;padding:14px 20px}
 .back-btn{background:rgba(255,255,255,.15);border:none;color:#fff;border-radius:8px;padding:5px 12px;cursor:pointer;font-size:12px;margin-bottom:10px;font-family:Tahoma,sans-serif}
-.back-btn.dark{background:#EFF6FF;color:#2563EB}
 .exp-hrow{display:flex;justify-content:space-between;align-items:center}
 .ck-badge{text-align:center;background:rgba(255,255,255,.15);border-radius:12px;padding:8px 16px}
 .ck-badge .num{font-size:18px;font-weight:700}.ck-badge .lbl{font-size:10px;opacity:.8}
@@ -83,16 +76,6 @@ body{font-family:Tahoma,'Segoe UI',sans-serif;background:#F0F4F8;color:#1E293B;m
 .mc:nth-child(3n){border-right:none}.mc:nth-child(n+4){border-bottom:none}
 .ml{font-size:10px;color:#64748B;margin-bottom:3px}.mv{font-size:20px;font-weight:700}.mt{font-size:9px;color:#94A3B8}
 .notes-strip{padding:9px 18px;border-top:1px solid #E2E8F0;background:#FFFBEB;font-size:12px;color:#374151}
-.chart-wrap{background:#fff;border-radius:16px;border:1.5px solid #E2E8F0;padding:18px;margin-bottom:14px}
-.chart-title{font-size:14px;font-weight:700;color:#1B3A5C;margin-bottom:14px}
-.gauge-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:4px}
-.gauge-item{text-align:center}
-.bar-chart-row{display:flex;align-items:center;gap:10px;margin-bottom:8px}
-.bcr-label{font-size:11px;color:#64748B;min-width:70px;text-align:right}
-.bcr-bar{flex:1;background:#E2E8F0;border-radius:99px;height:20px;position:relative;overflow:hidden}
-.bcr-fill{height:100%;border-radius:99px;transition:width .5s}
-.bcr-val{position:absolute;left:8px;top:50%;transform:translateY(-50%);font-size:10px;color:#fff;font-weight:700}
-.bcr-pct{font-size:11px;font-weight:700;min-width:36px}
 .set-wrap{max-width:520px;margin:0 auto;padding:18px 14px}
 .add-row{display:flex;gap:8px;margin-bottom:14px}
 .add-inp{flex:1;padding:10px 13px;border:1.5px solid #E2E8F0;border-radius:10px;font-size:14px;font-family:Tahoma,sans-serif;outline:none}
@@ -100,7 +83,6 @@ body{font-family:Tahoma,'Segoe UI',sans-serif;background:#F0F4F8;color:#1E293B;m
 .add-sub{padding:10px 18px;background:#2563EB;color:#fff;border:none;border-radius:10px;font-size:13px;font-weight:700;cursor:pointer;font-family:Tahoma,sans-serif}
 .si2{background:#fff;border-radius:12px;padding:13px 16px;border:1.5px solid #E2E8F0;display:flex;align-items:center;gap:9px;margin-bottom:9px}
 .si2 span{flex:1;font-size:14px;font-weight:600}
-.si2 input{flex:1;padding:6px 10px;border:1.5px solid #2563EB;border-radius:8px;font-size:13px;font-family:Tahoma,sans-serif;outline:none}
 .be{background:#EFF6FF;border:none;color:#2563EB;border-radius:8px;padding:6px 11px;cursor:pointer;font-size:11px;font-family:Tahoma,sans-serif}
 .bd{background:#FEF2F2;border:none;color:#DC2626;border-radius:8px;padding:6px 11px;cursor:pointer;font-size:11px;font-family:Tahoma,sans-serif}
 .kpi-set-row{display:grid;grid-template-columns:1fr 60px 70px 50px;gap:8px;align-items:center;padding:10px 12px;background:#F8FAFC;border-radius:10px;margin-bottom:8px;border:1.5px solid #E2E8F0}
@@ -108,38 +90,27 @@ body{font-family:Tahoma,'Segoe UI',sans-serif;background:#F0F4F8;color:#1E293B;m
 .kpi-set-row input:focus{border-color:#2563EB}
 .add-kpi-btn{padding:10px 16px;background:#16A34A;color:#fff;border:none;border-radius:10px;font-size:13px;font-weight:700;cursor:pointer;font-family:Tahoma,sans-serif;margin-top:4px}
 .del-kpi-btn{background:#FEF2F2;border:none;color:#DC2626;border-radius:8px;padding:5px 8px;cursor:pointer;font-size:11px;font-family:Tahoma,sans-serif}
-.col-hdr{font-size:10px;color:#94A3B8;text-align:center}
 .realtime-banner{background:#F0FDF4;border:1.5px solid #BBF7D0;border-radius:10px;padding:10px 14px;font-size:12px;color:#15803D;margin-bottom:14px;display:flex;align-items:center;gap:8px}
 .lead-table{width:100%;border-collapse:collapse;margin-top:14px;font-size:11px;background:#fff;border-radius:12px;overflow:hidden}
 .lead-table th{background:#F1F5F9;padding:10px;text-align:right;font-weight:700;color:#1B3A5C;border-bottom:1px solid #E2E8F0}
 .lead-table td{padding:10px;border-bottom:1px solid #E2E8F0}
 .lead-table tr:hover{background:#F8FAFC}
 .inline-select{padding:6px;border:1px solid #2563EB;border-radius:6px;font-size:10px;width:100%;font-family:Tahoma}
-@media(max-width:480px){.form-grid{grid-template-columns:1fr}.kpi-grid{grid-template-columns:repeat(2,1fr)}.gauge-grid{grid-template-columns:repeat(2,1fr)}.metrics-grid{grid-template-columns:repeat(2,1fr)}.kpi-set-row{grid-template-columns:1fr 50px 60px 40px}}
+@media(max-width:480px){.form-grid{grid-template-columns:1fr}.kpi-grid{grid-template-columns:repeat(2,1fr)}.metrics-grid{grid-template-columns:repeat(2,1fr)}.kpi-set-row{grid-template-columns:1fr 50px 60px 40px}}
 </style>
 </head>
 <body>
 <div class="header">
-  <img style="height:44px;object-fit:contain" id="hLogo" src="" alt="آن‌باکس">
+  <img style="height:44px;object-fit:contain" id="hLogo" src="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAkACQAAD/4QECRXhpZgAATU0AKgAAAAgABwEOAAIAAAALAAAAYgESAAMAAAABAAEAAAEaAAUAAAABAAAAbgEbAAUAAAABAAAAdgEoAAMAAAABAAIAAAEyAAIAAAAUAAAAfodpAAQAAAABAAAAkgAAAABTY3JlZW5zaG90AAAAAACQAAAAAQAAAJAAAAABMjAyNjowNjoxNCAwMDoxODoxMwAABZADAAIAAAAUAAAA1JKGAAcAAAASAAAA6KABAAMAAAAB//8AAKACAAQAAAABAAAE4KADAAQAAAABAAACXAAAAAAyMDI2OjA2OjE0IDAwOjE4OjEzAEFTQ0lJAAAAU2NyZWVuc2hvdA==" alt="آن‌باکس">
   <div class="header-right">
     <div class="htitle"><span class="online-dot"></span>داشبورد یکپارچه آن‌باکس</div>
     <div class="hdate" id="hDate"></div>
   </div>
 </div>
 <div class="toast" id="toast"></div>
-<div id="app"><div class="loading"><div class="spinner"></div><div style="color:#64748B;font-size:14px">در حال بارگذاری...</div></div></div>
+<div id="app"></div>
 
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
-// SUPABASE CONFIG - با API Key جدید ✅
-const SB_URL = 'https://uaydruhkevdmvpyefdjm.supabase.co';
-const SB_KEY = 'sb_publishable_VGCnUJB3Yxqm5UqbiUqdRw_KZoeEiEY';
-const { createClient } = supabase;
-const db = createClient(SB_URL, SB_KEY);
-
-const LOGO_B64 = '/9j/4AAQSkZJRgABAQAAkACQAAD/4QECRXhpZgAATU0AKgAAAAgABwEOAAIAAAALAAAAYgESAAMAAAABAAEAAAEaAAUAAAABAAAAbgEbAAUAAAABAAAAdgEoAAMAAAABAAIAAAEyAAIAAAAUAAAAfodpAAQAAAABAAAAkgAAAABTY3JlZW5zaG90AAAAAACQAAAAAQAAAJAAAAABMjAyNjowNjoxNCAwMDoxODoxMwAABZADAAIAAAAUAAAA1JKGAAcAAAASAAAA6KABAAMAAAAB//8AAKACAAQAAAABAAAE4KADAAQAAAABAAACXAAAAAAyMDI2OjA2OjE0IDAwOjE4OjEzAEFTQ0lJAAAAU2NyZWVuc2hvdA==';
-
-// TEAM & KPI DEFAULTS
 const DEFAULT_EXPERTS = [
   {id:1,name:'مجتبی رنجبر'},
   {id:2,name:'ندا شریفی'},
@@ -154,15 +125,7 @@ const DEFAULT_FIELDS = [
   {key:'trainings',label:'آموزش',icon:'🎓',target:3},
   {key:'barcodes',label:'بارکد',icon:'📦',target:10},
 ];
-const CHECK_ITEMS=[
-  'لیست لیدهای امروز دریافت شد','گزارش دیروز بررسی شد','اهداف روز با مدیر هماهنگ شد',
-  'تماس با تمام لیدهای امروز انجام شد','فالوآپ مشتریان دیروز انجام شد',
-  'اطلاعات مشتریان تأییدشده دریافت شد','پنل‌های جدید ساخته و تحویل داده شد',
-  'آموزش شارژ و ارسال به مشتریان انجام شد','بارکد سفارشات امروز صادر شد',
-  'گزارش پایان روز در CRM ثبت شد'
-];
-
-// LEADS DEFAULT DROPDOWNS
+const CHECK_ITEMS=['لیست لیدهای امروز دریافت شد','گزارش دیروز بررسی شد','اهداف روز با مدیر هماهنگ شد','تماس با تمام لیدهای امروز انجام شد','فالوآپ مشتریان دیروز انجام شد','اطلاعات مشتریان تأییدشده دریافت شد','پنل‌های جدید ساخته و تحویل داده شد','آموزش شارژ و ارسال به مشتریان انجام شد','بارکد سفارشات امروز صادر شد','گزارش پایان روز در CRM ثبت شد'];
 const LEAD_DROPDOWNS = {
   lead_type: ['گرم', 'سرد'],
   lead_source: ['سرچ اینترنتی', 'تماس مشتری', 'بانک اطلاعاتی', 'دایره طلایی', 'پیامک تبلیغاتی', 'سوشیال مدیا'],
@@ -176,7 +139,6 @@ const LEAD_DROPDOWNS = {
   lead_status: ['در حال پیگیری', 'عدم توافق', 'انحلال شرکت', 'در حال عقد قرارداد', 'در حال مذاکره', 'در حال تست']
 };
 
-// GLOBAL VARS
 let CFG = {experts: DEFAULT_EXPERTS, fields: DEFAULT_FIELDS};
 let REPORTS = {};
 let LEADS = [];
@@ -195,30 +157,19 @@ function toast(msg,type='ok'){
   clearTimeout(toastT);toastT=setTimeout(()=>el.className='toast',2500);
 }
 
-// SUPABASE
-async function loadConfig(){
-  try{
-    const {data,error}=await db.from('config').select('*').eq('id',1).single();
-    if(data && !error){
-      CFG={
-        experts: data.experts||DEFAULT_EXPERTS,
-        fields:  data.fields||DEFAULT_FIELDS
-      };
-    } else {
-      await db.from('config').upsert({id:1, experts:DEFAULT_EXPERTS, fields:DEFAULT_FIELDS});
-    }
-  }catch(e){console.log('config load error',e);}
+function loadAll(){
+  const cfg = localStorage.getItem('anbox_cfg');
+  const reports = localStorage.getItem('anbox_reports');
+  const leads = localStorage.getItem('anbox_leads');
+  if(cfg) CFG = JSON.parse(cfg);
+  if(reports) REPORTS = JSON.parse(reports);
+  if(leads) LEADS = JSON.parse(leads);
 }
 
-async function saveConfig(){
-  await db.from('config').upsert({id:1, experts:CFG.experts, fields:CFG.fields});
-}
-
-async function loadReports(){
-  try{
-    const {data,error}=await db.from('reports').select('*').eq('date',tkey());
-    if(data) data.forEach(r=>{ REPORTS[r.eid+'_'+r.date]=r; });
-  }catch(e){console.log('reports load',e);}
+function saveAll(){
+  localStorage.setItem('anbox_cfg', JSON.stringify(CFG));
+  localStorage.setItem('anbox_reports', JSON.stringify(REPORTS));
+  localStorage.setItem('anbox_leads', JSON.stringify(LEADS));
 }
 
 function getReport(eid){
@@ -233,9 +184,7 @@ async function saveReport(eid){
   const r=getReport(eid);
   r.savedAt=new Date().toLocaleTimeString('fa-IR');
   REPORTS[eid+'_'+tkey()]=r;
-  const payload={eid,date:tkey(),crm:r.crm,notes:r.notes,checklist:r.checklist,savedAt:r.savedAt};
-  CFG.fields.forEach(f=>payload[f.key]=r[f.key]||'');
-  await db.from('reports').upsert(payload, {onConflict:'eid,date'});
+  saveAll();
   return r;
 }
 
@@ -243,40 +192,9 @@ async function updateField(eid, field, value){
   const r=getReport(eid);
   r[field]=value;
   REPORTS[eid+'_'+tkey()]=r;
-  clearTimeout(window['dbT_'+eid]);
-  window['dbT_'+eid]=setTimeout(async()=>{
-    const payload={eid,date:tkey()};
-    payload[field]=value;
-    CFG.fields.forEach(f=>payload[f.key]=getReport(eid)[f.key]||'');
-    payload.crm=getReport(eid).crm;
-    payload.notes=getReport(eid).notes;
-    payload.checklist=getReport(eid).checklist;
-    await db.from('reports').upsert(payload,{onConflict:'eid,date'});
-  },800);
+  saveAll();
 }
 
-async function loadLeads(){
-  try{
-    const {data,error}=await db.from('leads').select('*').order('created_at',{ascending:false});
-    if(data) LEADS=data;
-  }catch(e){console.log('leads load',e);}
-}
-
-async function saveLead(lead){
-  lead.created_by = AE.id;
-  lead.created_at = new Date().toISOString();
-  try{
-    const {error}=await db.from('leads').insert([lead]);
-    if(error) throw error;
-    toast('لید ذخیره شد ✓');
-    await loadLeads();
-  }catch(e){
-    console.log('lead save error',e);
-    toast('خطا در ذخیره','err');
-  }
-}
-
-// RENDER FUNCTIONS
 function hideAll(){
   ['page-sel','page-team','page-leads','page-mgr','page-set'].forEach(id=>{
     const el=document.getElementById(id);if(el)el.style.display='none';
@@ -297,7 +215,6 @@ function openTeam(eid){
 }
 
 function renderSel(){
-  document.getElementById('selDate').textContent=faDate();
   document.getElementById('hDate').textContent=faDate();
   const list=document.getElementById('expList');list.innerHTML='';
   CFG.experts.forEach(e=>{
@@ -327,13 +244,15 @@ function swTeamTab(t){
     const p=document.getElementById('t'+x);if(p)p.style.display=x===t?'':'none';
     const b=document.getElementById('btn'+x);if(b)b.className='tab-btn'+(x===t?' active':'');
   });
+  if(t==='R') buildTeamForm();
+  if(t==='S') buildTeamSchedule();
+  if(t==='C') buildTeamChecklist();
   if(t==='L') renderLeadsView();
 }
 
-// TEAM REPORT FORM
 function buildTeamForm(){
   const r=getReport(AE.id),p=document.getElementById('tR');
-  let html='<div class="realtime-banner">🟢 داده‌ها real-time با سرور همگام‌سازی می‌شود</div>';
+  let html='<div class="realtime-banner">💾 داده‌ها روی دستگاه ذخیره می‌شود</div>';
   html+='<div class="card"><div class="card-head"><h3>📝 ورود اطلاعات روزانه</h3></div><div class="card-body"><div class="form-grid">';
   CFG.fields.forEach(f=>{
     const v=r[f.key]||'',pc=pct(v,f.target),col=pColor(pc);
@@ -342,15 +261,13 @@ function buildTeamForm(){
       '<div class="prow"><span>'+(parseInt(v)||0)+'/'+f.target+'</span><span id="pp_'+f.key+'" style="font-weight:700;color:'+col+'">'+pc+'٪</span></div>'+
       '<div class="bwrap"><div class="bfill" id="bf_'+f.key+'" style="background:'+col+';width:'+pc+'%"></div></div></div>';
   });
-  html+='</div>';
-  html+='<div class="crm-row'+(r.crm?' done':'')+'" id="crmRow" onclick="togTeamCRM()">'+
-    '<div class="cbox'+(r.crm?' on':'')+'" id="crmBox">'+(r.crm?'✓':'')+'</div>'+
-    '<span>ثبت اطلاعات در CRM انجام شد</span></div>'+
+  html+='</div><div class="crm-row'+(r.crm?' done':'')+'" id="crmRow" onclick="togTeamCRM()">'+
+    '<div class="cbox'+(r.crm?' on':'')+'" id="crmBox">'+(r.crm?'✓':'')+'</div><span>ثبت اطلاعات در CRM انجام شد</span></div>'+
     '<label style="display:block;font-size:12px;color:#64748B;margin-bottom:6px">📝 یادداشت</label>'+
     '<textarea class="notes-area" id="notesA" rows="3" oninput="onTeamNotes()">'+(r.notes||'')+'</textarea>'+
     '<button class="save-btn" onclick="doTeamSave()">💾 ذخیره</button>'+
-    '<div id="savedM" class="saved-msg" style="'+(r.savedAt?'':'display:none')+'">'+(r.savedAt?'✓ ذخیره‌شد: '+r.savedAt:'')+'</div></div></div>';
-  html+='<div class="card"><div class="card-body"><div style="font-weight:700;color:#1B3A5C;margin-bottom:11px;font-size:13px">🎯 خلاصه</div><div class="kpi-grid" id="ksum"></div></div></div>';
+    '<div id="savedM" class="saved-msg" style="'+(r.savedAt?'':'display:none')+'">'+(r.savedAt?'✓ ذخیره‌شد: '+r.savedAt:'')+'</div></div></div>'+
+    '<div class="card"><div class="card-body"><div style="font-weight:700;color:#1B3A5C;margin-bottom:11px;font-size:13px">🎯 خلاصه</div><div class="kpi-grid" id="ksum"></div></div></div>';
   p.innerHTML=html;buildTeamKpiSum();
 }
 
@@ -410,20 +327,14 @@ function buildTeamSchedule(){
     {i:'📊',t:'گزارش پایان روز',h:'۱۷:۳۰',d:'در CRM'}
   ];
   document.getElementById('tS').innerHTML=SCH.map(s=>
-    '<div class="sch-item"><div class="si-icon">'+s.i+'</div><div>'+
-    '<div class="si-title">'+s.t+'</div><div class="si-time">⏰ '+s.h+'</div>'+
-    '<div class="si-desc">'+s.d+'</div></div></div>').join('');
+    '<div class="sch-item"><div class="si-icon">'+s.i+'</div><div><div class="si-title">'+s.t+'</div><div class="si-time">⏰ '+s.h+'</div><div class="si-desc">'+s.d+'</div></div></div>').join('');
 }
 
 function buildTeamChecklist(){
   const r=getReport(AE.id),done=r.checklist.filter(Boolean).length,pp=Math.round(done/10*100);
-  let html='<div class="ph"><div class="ph-row"><span style="font-weight:700">پیشرفت امروز</span>'+
-    '<span style="font-weight:700;color:#2563EB" id="ckProg">'+done+'/10</span></div>'+
-    '<div class="bwrap"><div class="bfill" id="ckBar" style="background:'+(done===10?'#22C55E':'linear-gradient(90deg,#1B3A5C,#2563EB)')+';width:'+pp+'%"></div></div></div>';
+  let html='<div class="ph"><div class="ph-row"><span style="font-weight:700">پیشرفت امروز</span><span style="font-weight:700;color:#2563EB" id="ckProg">'+done+'/10</span></div><div class="bwrap"><div class="bfill" id="ckBar" style="background:'+(done===10?'#22C55E':'linear-gradient(90deg,#1B3A5C,#2563EB)')+';width:'+pp+'%"></div></div></div>';
   CHECK_ITEMS.forEach((item,i)=>{
-    html+='<div class="ci'+(r.checklist[i]?' done':'')+'" onclick="togTeamCk('+i+')">'+
-      '<div class="cbox'+(r.checklist[i]?' on':'')+'">'+( r.checklist[i]?'✓':'')+'</div>'+
-      '<span>'+item+'</span></div>';
+    html+='<div class="ci'+(r.checklist[i]?' done':'')+'" onclick="togTeamCk('+i+')"><div class="cbox'+(r.checklist[i]?' on':'')+'">'+( r.checklist[i]?'✓':'')+'</div><span>'+item+'</span></div>';
   });
   if(done===10) html+='<div class="success-box"><div style="font-size:34px;margin-bottom:5px">🎉</div><div style="font-weight:700;color:#16A34A">آفرین! روز موفقی داشتید</div></div>';
   document.getElementById('tC').innerHTML=html;
@@ -436,31 +347,21 @@ async function togTeamCk(i){
   await updateField(AE.id,'checklist',r.checklist);
 }
 
-// LEADS MANAGEMENT
 function renderLeads(){
   document.getElementById('hDate').textContent=faDate();
-  let html='<div class="card"><div class="card-head"><h3>📋 مدیریت لیدها</h3></div><div class="card-body">'+
-    '<button class="save-btn" style="background:#16A34A;margin-bottom:14px" onclick="showLeadForm()">➕ افزودن لید جدید</button>'+
-    '<button class="save-btn" style="background:#2563EB;margin-bottom:14px" onclick="downloadLeadTemplate()">📥 دانلود نمونه Excel</button>'+
-    '<button class="save-btn" style="background:#D97706;margin-bottom:14px" onclick="document.getElementById(\'xlFile\').click()">📊 Import Excel</button>'+
-    '<input type="file" id="xlFile" accept=".xlsx,.xls" style="display:none" onchange="importLeadsExcel(event)">'+
-    '<div id="leadsList"></div></div></div>';
+  let html='<div class="card"><div class="card-head"><h3>📋 مدیریت لیدها</h3></div><div class="card-body"><button class="save-btn" style="background:#16A34A;margin-bottom:14px" onclick="showLeadForm()">➕ افزودن لید جدید</button><button class="save-btn" style="background:#2563EB;margin-bottom:14px" onclick="downloadLeadTemplate()">📥 دانلود نمونه Excel</button><button class="save-btn" style="background:#D97706;margin-bottom:14px" onclick="document.getElementById(\'xlFile\').click()">📊 Import Excel</button><input type="file" id="xlFile" accept=".xlsx,.xls" style="display:none" onchange="importLeadsExcel(event)"><div id="leadsList"></div></div></div>';
   setApp(html);
   renderLeadsTable();
 }
 
 function renderLeadsView(){
-  let html='<div class="card"><div class="card-head"><h3>📋 لیدهای من</h3></div><div class="card-body">'+
-    '<button class="save-btn" style="background:#16A34A;margin-bottom:14px" onclick="showLeadForm()">➕ افزودن لید</button>'+
-    '<div id="myLeadsList"></div></div></div>';
+  let html='<div class="card"><div class="card-head"><h3>📋 لیدهای من</h3></div><div class="card-body"><button class="save-btn" style="background:#16A34A;margin-bottom:14px" onclick="showLeadForm()">➕ افزودن لید</button><div id="myLeadsList"></div></div></div>';
   document.getElementById('tL').innerHTML=html;
   const myLeads=LEADS.filter(l=>l.created_by===AE.id);
   if(myLeads.length===0){
     document.getElementById('myLeadsList').innerHTML='<p style="text-align:center;color:#94A3B8;padding:20px">هیچ لیدی ثبت نشده</p>';
   }else{
-    let tbl='<table class="lead-table"><thead><tr>';
-    ['نام شرکت','تماس گیر','مرحله','وضعیت'].forEach(h=>tbl+='<th>'+h+'</th>');
-    tbl+='</tr></thead><tbody>';
+    let tbl='<table class="lead-table"><thead><tr><th>نام شرکت</th><th>تماس گیر</th><th>مرحله</th><th>وضعیت</th></tr></thead><tbody>';
     myLeads.forEach(l=>{
       tbl+='<tr><td>'+l.company_name+'</td><td>'+l.contact_name+'</td><td>'+l.sales_stage+'</td><td>'+l.lead_status+'</td></tr>';
     });
@@ -475,21 +376,19 @@ function renderLeadsTable(){
     list.innerHTML='<p style="text-align:center;color:#94A3B8;padding:20px">هیچ لیدی ثبت نشده</p>';
     return;
   }
-  let tbl='<table class="lead-table"><thead><tr>';
-  ['نام شرکت','صنعت','تماس گیر','شماره','مرحله','مانع','اقدام بعدی','وضعیت'].forEach(h=>tbl+='<th>'+h+'</th>');
-  tbl+='</tr></thead><tbody>';
-  LEADS.forEach(l=>{
+  let tbl='<table class="lead-table"><thead><tr><th>نام شرکت</th><th>صنعت</th><th>تماس گیر</th><th>شماره</th><th>مرحله</th><th>مانع</th><th>اقدام بعدی</th><th>وضعیت</th></tr></thead><tbody>';
+  LEADS.forEach((l,idx)=>{
     tbl+='<tr><td>'+l.company_name+'</td><td>'+l.industry+'</td><td>'+l.contact_name+'</td><td>'+l.phone+'</td>'+
-      '<td><select class="inline-select" onchange="updateLeadField('+l.id+`,\'sales_stage\',this.value)">'+
-      Object.entries(LEAD_DROPDOWNS.sales_stage).map((s,i)=>'<option '+(l.sales_stage===s?'selected':'')+'>'+s+'</option>').join('')+
+      '<td><select class="inline-select" onchange="updateLeadField('+idx+`,\'sales_stage\',this.value)">'+
+      LEAD_DROPDOWNS.sales_stage.map(s=>'<option '+(l.sales_stage===s?'selected':'')+'>'+s+'</option>').join('')+
       '</select></td>'+
-      '<td><select class="inline-select" onchange="updateLeadField('+l.id+`,\'main_obstacle\',this.value)"><option></option>'+
+      '<td><select class="inline-select" onchange="updateLeadField('+idx+`,\'main_obstacle\',this.value)"><option></option>'+
       LEAD_DROPDOWNS.main_obstacle.map(o=>'<option '+(l.main_obstacle===o?'selected':'')+'>'+o+'</option>').join('')+
       '</select></td>'+
-      '<td><select class="inline-select" onchange="updateLeadField('+l.id+`,\'next_action\',this.value)"><option></option>'+
+      '<td><select class="inline-select" onchange="updateLeadField('+idx+`,\'next_action\',this.value)"><option></option>'+
       LEAD_DROPDOWNS.next_action.map(a=>'<option '+(l.next_action===a?'selected':'')+'>'+a+'</option>').join('')+
       '</select></td>'+
-      '<td><select class="inline-select" onchange="updateLeadField('+l.id+`,\'lead_status\',this.value)">'+
+      '<td><select class="inline-select" onchange="updateLeadField('+idx+`,\'lead_status\',this.value)">'+
       LEAD_DROPDOWNS.lead_status.map(st=>'<option '+(l.lead_status===st?'selected':'')+'>'+st+'</option>').join('')+
       '</select></td></tr>';
   });
@@ -498,8 +397,7 @@ function renderLeadsTable(){
 }
 
 function showLeadForm(){
-  let html='<div class="card"><div class="card-head"><h3>افزودن لید جدید</h3></div><div class="card-body">';
-  html+='<div class="form-grid">';
+  let html='<div class="card"><div class="card-head"><h3>افزودن لید جدید</h3></div><div class="card-body"><div class="form-grid">';
   ['lead_type','lead_source','company_name','industry','selection_reason','phone','contact_name','contact_position','sales_stage','anbox_fit','main_obstacle','next_action','sales_expert','lead_status'].forEach(key=>{
     const label = {lead_type:'نوع لید',lead_source:'مبدأ لید',company_name:'نام شرکت',industry:'صنعت',selection_reason:'دلیل انتخاب',phone:'شماره تماس',contact_name:'نام فرد تماس',contact_position:'سمت فرد',sales_stage:'مرحله فروش',anbox_fit:'تناسب با آن‌باکس',main_obstacle:'مانع اصلی',next_action:'اقدام بعدی',sales_expert:'کارشناس',lead_status:'وضعیت لید'}[key];
     const isSelect = LEAD_DROPDOWNS[key];
@@ -523,16 +421,18 @@ async function doAddLead(){
   if(!lead.company_name || !lead.phone){
     toast('نام شرکت و شماره تماس الزامی است','err');return;
   }
-  await saveLead(lead);
+  lead.created_by = AE.id;
+  lead.created_at = new Date().toISOString();
+  LEADS.push(lead);
+  saveAll();
+  toast('لید ذخیره شد ✓');
   renderLeads();
 }
 
-function updateLeadField(id, field, value){
-  const lead = LEADS.find(l=>l.id===id);
-  if(lead){
-    lead[field]=value;
-    db.from('leads').update({[field]:value}).eq('id',id).then(()=>toast('به‌روزرسانی شد'));
-  }
+function updateLeadField(idx, field, value){
+  LEADS[idx][field]=value;
+  saveAll();
+  toast('به‌روزرسانی شد');
 }
 
 function downloadLeadTemplate(){
@@ -579,13 +479,15 @@ async function importLeadsExcel(event){
             main_obstacle: row['مانع اصلی']||'',
             next_action: row['اقدام بعدی']||'',
             sales_expert: row['کارشناس فروش']||'',
-            lead_status: row['وضعیت لید']||'در حال پیگیری'
+            lead_status: row['وضعیت لید']||'در حال پیگیری',
+            created_by: AE.id,
+            created_at: new Date().toISOString()
           };
-          saveLead(lead);imported++;
+          LEADS.push(lead);imported++;
         }
       });
+      saveAll();
       toast(`${imported} لید آپلود شد`);
-      loadLeads();
       renderLeads();
       document.getElementById('xlFile').value='';
     }catch(err){
@@ -595,36 +497,24 @@ async function importLeadsExcel(event){
   reader.readAsArrayBuffer(file);
 }
 
-// MANAGER VIEW
 function renderMgr(){
   document.getElementById('hDate').textContent=faDate();
   const tP=CFG.experts.reduce((s,e)=>s+(parseInt(getReport(e.id).panels)||0),0);
   const tC=CFG.experts.reduce((s,e)=>s+(parseInt(getReport(e.id).calls)||0),0);
   const tD=CFG.experts.filter(e=>getReport(e.id).checklist.filter(Boolean).length===10).length;
-  let html='<div class="card"><div class="card-head"><h3>📊 داشبورد مدیریتی</h3></div><div class="card-body">'+
-    '<div class="mgr-stats">'+
-    '<div class="stat-box"><div class="sv">'+CFG.experts.length+'</div><div class="sl">کارشناسان</div></div>'+
-    '<div class="stat-box"><div class="sv">'+tP+'</div><div class="sl">پنل امروز</div></div>'+
-    '<div class="stat-box"><div class="sv">'+tC+'</div><div class="sl">تماس امروز</div></div>'+
-    '<div class="stat-box"><div class="sv">'+tD+'/'+CFG.experts.length+'</div><div class="sl">چک‌لیست کامل</div></div>'+
-    '</div></div></div>';
+  let html='<div class="card"><div class="card-head"><h3>📊 داشبورد مدیریتی</h3></div><div class="card-body"><div class="mgr-stats"><div class="stat-box"><div class="sv">'+CFG.experts.length+'</div><div class="sl">کارشناسان</div></div><div class="stat-box"><div class="sv">'+tP+'</div><div class="sl">پنل امروز</div></div><div class="stat-box"><div class="sv">'+tC+'</div><div class="sl">تماس امروز</div></div><div class="stat-box"><div class="sv">'+tD+'/'+CFG.experts.length+'</div><div class="sl">چک‌لیست کامل</div></div></div></div></div>';
   CFG.experts.forEach(e=>{
     const r=getReport(e.id),done=r.checklist.filter(Boolean).length;
-    html+='<div class="exp-card"><div class="ech"><div style="display:flex;align-items:center;gap:9px"><div class="avatar">'+e.name[0]+'</div>'+
-      '<div><div class="en">'+e.name+'</div><div class="es">'+(r.savedAt?'ذخیره: '+r.savedAt:'بدون ذخیره')+'</div></div></div>'+
-      '<span class="ebadge'+(done===10?' done':'')+'">'+done+'/۱۰</span></div>'+
-      '<div class="metrics-grid">';
+    html+='<div class="exp-card"><div class="ech"><div style="display:flex;align-items:center;gap:9px"><div class="avatar">'+e.name[0]+'</div><div><div class="en">'+e.name+'</div><div class="es">'+(r.savedAt?'ذخیره: '+r.savedAt:'بدون ذخیره')+'</div></div></div><span class="ebadge'+(done===10?' done':'')+'">'+done+'/۱۰</span></div><div class="metrics-grid">';
     CFG.fields.forEach(f=>{
       const v=parseInt(r[f.key])||0,pc=pct(v,f.target),col=pColor(pc);
-      html+='<div class="mc"><div class="ml">'+f.icon+'</div><div class="mv" style="color:'+col+'">'+v+'</div>'+
-        '<div class="mt">هدف: '+f.target+'</div></div>';
+      html+='<div class="mc"><div class="ml">'+f.icon+'</div><div class="mv" style="color:'+col+'">'+v+'</div><div class="mt">هدف: '+f.target+'</div></div>';
     });
     html+='</div>'+(r.notes?'<div class="notes-strip">📝 '+r.notes+'</div>':'')+'</div>';
   });
   document.getElementById('page-mgr').innerHTML=html;
 }
 
-// SETTINGS
 function swSetTab(t){
   document.getElementById('setExperts').style.display=t==='E'?'':'none';
   document.getElementById('setKpi').style.display=t==='K'?'':'none';
@@ -635,71 +525,62 @@ function swSetTab(t){
 
 function renderSetExp(){
   const el=document.getElementById('setExperts');
-  let html='<div class="card"><div class="card-body"><label style="display:block;font-size:13px;color:#1B3A5C;margin-bottom:11px">افزودن کارشناس ('+CFG.experts.length+'/10)</label>'+
-    '<div class="add-row"><input class="add-inp" id="newNm" placeholder="نام و نام خانوادگی" onkeydown="if(event.key===\'Enter\')addExp()">'+
-    '<button class="add-sub" onclick="addExp()">+ افزودن</button></div></div></div>';
+  let html='<div class="card"><div class="card-body"><label style="display:block;font-size:13px;color:#1B3A5C;margin-bottom:11px">افزودن کارشناس ('+CFG.experts.length+'/10)</label><div class="add-row"><input class="add-inp" id="newNm" placeholder="نام و نام خانوادگی" onkeydown="if(event.key===\'Enter\')addExp()"><button class="add-sub" onclick="addExp()">+ افزودن</button></div></div></div>';
   CFG.experts.forEach(e=>{
-    html+='<div class="si2" id="si_'+e.id+'"><span>👤 '+e.name+'</span>'+
-      '<button class="be" onclick="stEdit('+e.id+')">ویرایش</button>'+
-      '<button class="bd" onclick="delExp('+e.id+')">حذف</button></div>';
+    html+='<div class="si2" id="si_'+e.id+'"><span>👤 '+e.name+'</span><button class="be" onclick="stEdit('+e.id+')">ویرایش</button><button class="bd" onclick="delExp('+e.id+')">حذف</button></div>';
   });
   el.innerHTML=html;
 }
 
 function stEdit(eid){
   const e=CFG.experts.find(x=>x.id===eid),div=document.getElementById('si_'+eid);
-  div.innerHTML='<input class="add-inp" id="ei_'+eid+'" value="'+e.name+'" style="flex:1" onkeydown="if(event.key===\'Enter\')doEdit('+eid+')">'+
-    '<button class="be" onclick="doEdit('+eid+')">ذخیره</button>';
+  div.innerHTML='<input class="add-inp" id="ei_'+eid+'" value="'+e.name+'" style="flex:1" onkeydown="if(event.key===\'Enter\')doEdit('+eid+')"><button class="be" onclick="doEdit('+eid+')">ذخیره</button>';
   document.getElementById('ei_'+eid).focus();
 }
 
-async function doEdit(eid){
+function doEdit(eid){
   const v=document.getElementById('ei_'+eid).value.trim();if(!v)return;
   CFG.experts=CFG.experts.map(e=>e.id===eid?{...e,name:v}:e);
-  await saveConfig();renderSetExp();toast('نام ویرایش شد');
+  saveAll();renderSetExp();toast('نام ویرایش شد');
 }
 
-async function addExp(){
+function addExp(){
   const nm=document.getElementById('newNm').value.trim();if(!nm)return;
   if(CFG.experts.length>=10){toast('حداکثر ۱۰ کارشناس','err');return;}
   CFG.experts.push({id:Date.now(),name:nm});
-  await saveConfig();document.getElementById('newNm').value='';renderSetExp();toast(nm+' اضافه شد');
+  saveAll();document.getElementById('newNm').value='';renderSetExp();toast(nm+' اضافه شد');
 }
 
-async function delExp(eid){
+function delExp(eid){
   CFG.experts=CFG.experts.filter(e=>e.id!==eid);
-  await saveConfig();renderSetExp();toast('حذف شد');
+  saveAll();renderSetExp();toast('حذف شد');
 }
 
 function renderSetKpi(){
   const el=document.getElementById('setKpi');
   let html='<div class="card"><div class="card-head"><h3>تنظیم KPI</h3></div><div class="card-body">';
   CFG.fields.forEach((f,i)=>{
-    html+='<div class="kpi-set-row">'+
-      '<input id="kl_'+i+'" value="'+f.label+'" oninput="updKpi('+i+`,\'label\',this.value)">'+
-      '<input id="ki_'+i+'" value="'+f.icon+'" style="text-align:center" oninput="updKpi('+i+`,\'icon\',this.value)">'+
-      '<input type="number" id="kt_'+i+'" value="'+f.target+'" min="1" oninput="updKpi('+i+`,\'target\',this.value)">'+
-      '<button class="del-kpi-btn" onclick="delKpi('+i+')">حذف</button></div>';
+    html+='<div class="kpi-set-row"><input id="kl_'+i+'" value="'+f.label+'" oninput="updKpi('+i+`,\'label\',this.value)"><input id="ki_'+i+'" value="'+f.icon+'" style="text-align:center" oninput="updKpi('+i+`,\'icon\',this.value)"><input type="number" id="kt_'+i+'" value="'+f.target+'" min="1" oninput="updKpi('+i+`,\'target\',this.value)"><button class="del-kpi-btn" onclick="delKpi('+i+')">حذف</button></div>';
   });
   html+='<button class="add-kpi-btn" onclick="addKpi()">+ KPI جدید</button></div></div>';
   el.innerHTML=html;
 }
 
-async function updKpi(i,prop,val){
+function updKpi(i,prop,val){
   if(prop==='target') CFG.fields[i].target=parseInt(val)||1;
   else CFG.fields[i][prop]=val;
   clearTimeout(window.kpiSaveT);
-  window.kpiSaveT=setTimeout(()=>saveConfig(),800);
+  window.kpiSaveT=setTimeout(()=>saveAll(),800);
 }
 
-async function delKpi(i){
+function delKpi(i){
   if(CFG.fields.length<=1){toast('حداقل یک KPI','err');return;}
-  CFG.fields.splice(i,1);await saveConfig();renderSetKpi();toast('حذف شد');
+  CFG.fields.splice(i,1);saveAll();renderSetKpi();toast('حذف شد');
 }
 
-async function addKpi(){
+function addKpi(){
   CFG.fields.push({key:'kpi_'+Date.now(),label:'KPI جدید',icon:'📌',target:5});
-  await saveConfig();renderSetKpi();toast('اضافه شد');
+  saveAll();renderSetKpi();toast('اضافه شد');
 }
 
 function shareWA(){
@@ -708,14 +589,9 @@ function shareWA(){
   window.open('https://wa.me/?text='+encodeURIComponent(txt),'_blank');
 }
 
-// INIT
-document.getElementById('hLogo').src='data:image/jpeg;base64,'+LOGO_B64;
-
 async function init(){
   document.getElementById('hDate').textContent=faDate();
-  await loadConfig();
-  await loadReports();
-  await loadLeads();
+  loadAll();
   
   document.getElementById('app').innerHTML=`
     <div id="page-sel">
@@ -726,7 +602,7 @@ async function init(){
         <button class="act-btn pri" onclick="gotoMgr()">📊 ورود مدیر</button>
         <button class="act-btn sec" onclick="gotoLeads()">📋 مدیریت لیدها</button>
         <button class="act-btn sec" onclick="gotoSet()">⚙️ تنظیمات</button>
-        <div class="share-strip"><span>📤 شریک شدن</span><button onclick="shareWA()">📲 واتساپ</button></div>
+        <div style="background:#EFF6FF;border:1.5px solid #BFDBFE;border-radius:12px;padding:12px 16px;font-size:13px;color:#1E40AF;display:flex;align-items:center;gap:10px;margin-bottom:8px"><span>📤 شریک شدن</span><button onclick="shareWA()" style="margin-right:auto;padding:7px 14px;background:#25D366;color:#fff;border:none;border-radius:8px;font-size:12px;cursor:pointer;font-weight:700;font-family:Tahoma,sans-serif">📲 واتساپ</button></div>
       </div>
     </div>
     <div id="page-team" style="display:none">
@@ -751,7 +627,7 @@ async function init(){
     <div id="page-leads" style="display:none"></div>
     <div id="page-mgr" style="display:none"></div>
     <div id="page-set" style="display:none">
-      <div style="padding:16px 14px"><button class="back-btn dark" onclick="gotoSel()">← بازگشت</button></div>
+      <div style="padding:16px 14px"><button class="back-btn" style="background:#EFF6FF;color:#2563EB" onclick="gotoSel()">← بازگشت</button></div>
       <div class="set-wrap">
         <div class="tabs" style="position:static;border-radius:12px;overflow:hidden;margin-bottom:18px">
           <button class="tab-btn active" id="stE" onclick="swSetTab('E')">👥 کارشناسان</button>
@@ -765,10 +641,7 @@ async function init(){
   gotoSel();
 }
 
-init().catch(e=>{
-  console.error(e);
-  document.getElementById('app').innerHTML='<div class="loading"><div style="color:#DC2626">خطا در اتصال</div></div>';
-});
+init();
 </script>
 </body>
 </html>
