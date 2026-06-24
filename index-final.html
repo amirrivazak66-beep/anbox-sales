@@ -1,700 +1,227 @@
 <!DOCTYPE html>
 <html dir="rtl" lang="fa">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>داشبورد فروش آن‌باکس</title>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.min.js"></script>
-<style>
-*{box-sizing:border-box;margin:0;padding:0}
-body{font-family:Tahoma,'Segoe UI',sans-serif;background:#F0F4F8;color:#1E293B;min-height:100vh}
-.header{background:#fff;border-bottom:3px solid #2563EB;padding:12px 24px;display:flex;align-items:center;justify-content:space-between;box-shadow:0 2px 12px rgba(0,0,0,.07);position:sticky;top:0;z-index:100}
-.header-logo{height:44px;object-fit:contain}
-.header-right{text-align:left}.htitle{font-size:13px;font-weight:700;color:#1B3A5C}.hdate{font-size:11px;color:#64748B}
-.online-dot{width:8px;height:8px;border-radius:50%;background:#22C55E;display:inline-block;margin-left:4px}
-.toast{position:fixed;top:20px;left:50%;transform:translateX(-50%);background:#16A34A;color:#fff;padding:10px 24px;border-radius:30px;z-index:9999;font-size:14px;font-weight:600;box-shadow:0 4px 20px rgba(0,0,0,.2);pointer-events:none;opacity:0;transition:opacity .3s}
-.toast.err{background:#DC2626}.toast.show{opacity:1}
-.sel-wrap{max-width:480px;margin:32px auto;padding:0 16px}
-.sel-hero{background:linear-gradient(135deg,#1B3A5C,#2563EB);color:#fff;border-radius:18px;padding:24px;text-align:center;margin-bottom:24px}
-.sel-hero h1{font-size:20px;margin-bottom:4px}.sel-hero p{font-size:13px;opacity:.75}
-.exp-btn{width:100%;padding:16px 20px;background:#fff;border:2px solid #E2E8F0;border-radius:14px;cursor:pointer;display:flex;align-items:center;justify-content:space-between;font-size:15px;font-weight:600;color:#1B3A5C;margin-bottom:10px;font-family:Tahoma,sans-serif;transition:border-color .2s}
-.exp-btn:hover{border-color:#2563EB}
-.ebadge{font-size:11px;padding:3px 10px;border-radius:20px;background:#F1F5F9;color:#64748B}
-.ebadge.done{background:#DCFCE7;color:#16A34A}
-.act-btn{width:100%;padding:14px;border:none;border-radius:12px;font-size:14px;font-weight:700;cursor:pointer;margin-bottom:10px;font-family:Tahoma,sans-serif}
-.act-btn.pri{background:#1B3A5C;color:#fff}.act-btn.sec{background:#fff;color:#64748B;border:1.5px solid #E2E8F0}
-.exp-header{background:linear-gradient(135deg,#1B3A5C,#2563EB);color:#fff;padding:14px 20px}
-.back-btn{background:rgba(255,255,255,.15);border:none;color:#fff;border-radius:8px;padding:5px 12px;cursor:pointer;font-size:12px;margin-bottom:10px;font-family:Tahoma,sans-serif}
-.exp-hrow{display:flex;justify-content:space-between;align-items:center}
-.ck-badge{text-align:center;background:rgba(255,255,255,.15);border-radius:12px;padding:8px 16px}
-.ck-badge .num{font-size:18px;font-weight:700}.ck-badge .lbl{font-size:10px;opacity:.8}
-.tabs{background:#fff;border-bottom:2px solid #E2E8F0;display:flex;position:sticky;top:67px;z-index:10}
-.tab-btn{flex:1;padding:13px 6px;border:none;background:none;cursor:pointer;font-size:12px;color:#64748B;border-bottom:3px solid transparent;font-family:Tahoma,sans-serif;transition:all .2s}
-.tab-btn.active{font-weight:700;color:#2563EB;border-bottom-color:#2563EB}
-.content{max-width:700px;margin:0 auto;padding:18px 14px}
-.card{background:#fff;border-radius:16px;border:1.5px solid #E2E8F0;overflow:hidden;margin-bottom:14px}
-.card-head{padding:14px 20px;background:#EFF6FF;border-bottom:1px solid #E2E8F0}
-.card-head h3{font-size:15px;color:#1B3A5C;font-weight:700}.card-head p{font-size:12px;color:#64748B;margin-top:2px}
-.card-body{padding:18px}
-.form-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;margin-bottom:14px}
-.ff label{display:block;font-size:11px;color:#64748B;margin-bottom:5px}
-.ff input[type=number]{width:100%;padding:9px 11px;border:1.5px solid #E2E8F0;border-radius:10px;font-size:15px;font-family:Tahoma,sans-serif;outline:none}
-.ff input:focus{border-color:#2563EB}
-.prow{display:flex;justify-content:space-between;font-size:11px;margin:4px 0 3px}
-.bwrap{background:#E2E8F0;border-radius:99px;height:7px}
-.bfill{height:7px;border-radius:99px;transition:width .4s,background .4s}
-.crm-row{display:flex;align-items:center;gap:12px;padding:12px 16px;border-radius:10px;cursor:pointer;margin-bottom:14px;border:1.5px solid #E2E8F0;background:#F8FAFC;transition:all .2s}
-.crm-row.done{background:#F0FDF4;border-color:#BBF7D0}
-.cbox{width:22px;height:22px;border-radius:6px;border:2px solid #CBD5E1;background:#fff;display:flex;align-items:center;justify-content:center;color:#fff;font-size:13px;flex-shrink:0}
-.cbox.on{background:#16A34A;border-color:#16A34A}
-.notes-area{width:100%;padding:9px 12px;border:1.5px solid #E2E8F0;border-radius:10px;font-size:14px;font-family:Tahoma,sans-serif;resize:vertical;outline:none;margin-bottom:14px}
-.notes-area:focus{border-color:#2563EB}
-.save-btn{width:100%;padding:14px;background:#2563EB;color:#fff;border:none;border-radius:12px;font-size:15px;font-weight:700;cursor:pointer;font-family:Tahoma,sans-serif}
-.saved-msg{text-align:center;font-size:12px;color:#16A34A;margin-top:7px}
-.kpi-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:9px}
-.kpi-box{text-align:center;padding:11px 6px;background:#F8FAFC;border-radius:10px}
-.kpi-box .ki{font-size:18px}.kpi-box .kv{font-size:20px;font-weight:700}.kpi-box .kl{font-size:9px;color:#64748B}
-.sch-item{background:#fff;border-radius:14px;border:1.5px solid #E2E8F0;padding:13px 16px;display:flex;gap:13px;align-items:flex-start;margin-bottom:9px}
-.si-icon{font-size:24px;min-width:34px;text-align:center}
-.si-title{font-weight:700;font-size:13px;color:#1B3A5C}.si-time{font-size:11px;color:#2563EB;margin-top:2px}.si-desc{font-size:12px;color:#374151;margin-top:5px;line-height:1.6}
-.ph{background:#fff;border-radius:14px;border:1.5px solid #E2E8F0;padding:15px 18px;margin-bottom:12px}
-.ph-row{display:flex;justify-content:space-between;margin-bottom:9px}
-.ci{display:flex;align-items:center;gap:13px;background:#fff;border:1.5px solid #E2E8F0;border-radius:12px;padding:13px 16px;cursor:pointer;margin-bottom:7px;transition:all .2s}
-.ci.done{background:#F0FDF4;border-color:#BBF7D0}
-.ci span{font-size:13px;color:#374151}.ci.done span{color:#16A34A;font-weight:600;text-decoration:line-through}
-.success-box{margin-top:14px;background:#F0FDF4;border:2px solid #22C55E;border-radius:14px;padding:18px;text-align:center}
-.mgr-header{background:linear-gradient(135deg,#1B3A5C,#2563EB);color:#fff;padding:14px 20px}
-.mgr-stats{display:flex;gap:10px;flex-wrap:wrap}
-.stat-box{text-align:center;background:rgba(255,255,255,.12);border-radius:12px;padding:9px 14px}
-.stat-box .sv{font-size:20px;font-weight:700}.stat-box .sl{font-size:10px;opacity:.8}
-.exp-card{background:#fff;border-radius:16px;border:1.5px solid #E2E8F0;overflow:hidden;margin-bottom:14px}
-.ech{padding:13px 18px;background:#FAFBFC;border-bottom:1px solid #E2E8F0;display:flex;justify-content:space-between;align-items:center}
-.avatar{width:36px;height:36px;border-radius:50%;background:#1B3A5C;color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:14px;flex-shrink:0}
-.en{font-weight:700;font-size:14px}.es{font-size:11px;color:#64748B;margin-top:1px}
-.metrics-grid{display:grid;grid-template-columns:repeat(3,1fr)}
-.mc{padding:12px 14px;border-right:1px solid #E2E8F0;border-bottom:1px solid #E2E8F0}
-.mc:nth-child(3n){border-right:none}.mc:nth-child(n+4){border-bottom:none}
-.ml{font-size:10px;color:#64748B;margin-bottom:3px}.mv{font-size:20px;font-weight:700}.mt{font-size:9px;color:#94A3B8}
-.notes-strip{padding:9px 18px;border-top:1px solid #E2E8F0;background:#FFFBEB;font-size:12px;color:#374151}
-.set-wrap{max-width:520px;margin:0 auto;padding:18px 14px}
-.add-row{display:flex;gap:8px;margin-bottom:14px}
-.add-inp{flex:1;padding:10px 13px;border:1.5px solid #E2E8F0;border-radius:10px;font-size:14px;font-family:Tahoma,sans-serif;outline:none}
-.add-inp:focus{border-color:#2563EB}
-.add-sub{padding:10px 18px;background:#2563EB;color:#fff;border:none;border-radius:10px;font-size:13px;font-weight:700;cursor:pointer;font-family:Tahoma,sans-serif}
-.si2{background:#fff;border-radius:12px;padding:13px 16px;border:1.5px solid #E2E8F0;display:flex;align-items:center;gap:9px;margin-bottom:9px}
-.si2 span{flex:1;font-size:14px;font-weight:600}
-.be{background:#EFF6FF;border:none;color:#2563EB;border-radius:8px;padding:6px 11px;cursor:pointer;font-size:11px;font-family:Tahoma,sans-serif}
-.bd{background:#FEF2F2;border:none;color:#DC2626;border-radius:8px;padding:6px 11px;cursor:pointer;font-size:11px;font-family:Tahoma,sans-serif}
-.kpi-set-row{display:grid;grid-template-columns:1fr 60px 70px 50px;gap:8px;align-items:center;padding:10px 12px;background:#F8FAFC;border-radius:10px;margin-bottom:8px;border:1.5px solid #E2E8F0}
-.kpi-set-row input{padding:7px 9px;border:1.5px solid #E2E8F0;border-radius:8px;font-size:12px;font-family:Tahoma,sans-serif;outline:none;width:100%}
-.kpi-set-row input:focus{border-color:#2563EB}
-.add-kpi-btn{padding:10px 16px;background:#16A34A;color:#fff;border:none;border-radius:10px;font-size:13px;font-weight:700;cursor:pointer;font-family:Tahoma,sans-serif;margin-top:4px}
-.del-kpi-btn{background:#FEF2F2;border:none;color:#DC2626;border-radius:8px;padding:5px 8px;cursor:pointer;font-size:11px;font-family:Tahoma,sans-serif}
-.realtime-banner{background:#F0FDF4;border:1.5px solid #BBF7D0;border-radius:10px;padding:10px 14px;font-size:12px;color:#15803D;margin-bottom:14px;display:flex;align-items:center;gap:8px}
-.lead-table{width:100%;border-collapse:collapse;margin-top:14px;font-size:11px;background:#fff;border-radius:12px;overflow:hidden}
-.lead-table th{background:#F1F5F9;padding:10px;text-align:right;font-weight:700;color:#1B3A5C;border-bottom:1px solid #E2E8F0}
-.lead-table td{padding:10px;border-bottom:1px solid #E2E8F0}
-.lead-table tr:hover{background:#F8FAFC}
-.inline-select{padding:6px;border:1px solid #2563EB;border-radius:6px;font-size:10px;width:100%;font-family:Tahoma}
-@media(max-width:480px){.form-grid{grid-template-columns:1fr}.kpi-grid{grid-template-columns:repeat(2,1fr)}.metrics-grid{grid-template-columns:repeat(2,1fr)}.kpi-set-row{grid-template-columns:1fr 50px 60px 40px}}
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>داشبورد V2 | آن‌باکس</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: Tahoma, 'Segoe UI', sans-serif; background: #F0F4F8; color: #1E293B; min-height: 100vh; }
+        .container { display: flex; min-height: 100vh; }
+        .sidebar { width: 250px; background: #1B3A5C; color: #fff; padding: 20px; position: fixed; height: 100vh; overflow-y: auto; z-index: 1000; }
+        .logo { display: flex; align-items: center; gap: 10px; margin-bottom: 30px; }
+        .logo-text { font-size: 14px; font-weight: 700; }
+        .nav-menu { display: flex; flex-direction: column; gap: 5px; }
+        .nav-item { padding: 12px 15px; border-radius: 8px; cursor: pointer; font-size: 13px; transition: all .2s; }
+        .nav-item:hover { background: rgba(255,255,255,.1); }
+        .nav-item.active { background: #2563EB; }
+        .main { margin-right: 250px; flex: 1; }
+        .header { background: #fff; border-bottom: 1px solid #E2E8F0; padding: 15px 30px; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 100; }
+        .header-title { font-size: 18px; font-weight: 700; color: #1B3A5C; }
+        .header-right { display: flex; align-items: center; gap: 20px; }
+        .content { padding: 30px; max-width: 1400px; margin: 0 auto; }
+        .page { display: none; }
+        .page.active { display: block; }
+        .card { background: #fff; border-radius: 12px; border: 1px solid #E2E8F0; padding: 20px; margin-bottom: 20px; box-shadow: 0 1px 3px rgba(0,0,0,.05); }
+        .card-title { font-size: 16px; font-weight: 700; margin-bottom: 15px; color: #1B3A5C; }
+        .stats-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; margin-bottom: 20px; }
+        .stat-box { background: linear-gradient(135deg, #1B3A5C, #2563EB); color: #fff; padding: 20px; border-radius: 12px; text-align: center; }
+        .stat-value { font-size: 28px; font-weight: 700; }
+        .stat-label { font-size: 12px; opacity: .8; margin-top: 5px; }
+        .kpi-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; }
+        .kpi-box { background: #F8FAFC; border-radius: 10px; padding: 15px; text-align: center; border: 1px solid #E2E8F0; }
+        .kpi-icon { font-size: 24px; }
+        .kpi-value { font-size: 22px; font-weight: 700; margin: 10px 0; color: #2563EB; }
+        .kpi-label { font-size: 12px; color: #64748B; }
+        .leaderboard-row { display: flex; align-items: center; padding: 12px; border-bottom: 1px solid #E2E8F0; gap: 15px; }
+        .rank { width: 30px; font-weight: 700; color: #2563EB; }
+        .name { flex: 1; font-weight: 600; }
+        .score { color: #2563EB; font-weight: 700; }
+        .notification { position: fixed; top: 20px; left: 50%; transform: translateX(-50%); background: #16A34A; color: #fff; padding: 12px 24px; border-radius: 8px; z-index: 9999; font-weight: 600; box-shadow: 0 4px 12px rgba(0,0,0,.15); display: none; }
+        .notification.active { display: block; }
+        @media(max-width: 768px) {
+            .sidebar { width: 100%; height: auto; position: relative; padding: 10px; }
+            .main { margin-right: 0; }
+            .stats-grid { grid-template-columns: repeat(2, 1fr); }
+            .kpi-grid { grid-template-columns: 1fr; }
+        }
+    </style>
 </head>
 <body>
-<div class="header">
-  <img style="height:44px;object-fit:contain" id="hLogo" src="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAkACQAAD/4QECRXhpZgAATU0AKgAAAAgABwEOAAIAAAALAAAAYgESAAMAAAABAAEAAAEaAAUAAAABAAAAbgEbAAUAAAABAAAAdgEoAAMAAAABAAIAAAEyAAIAAAAUAAAAfodpAAQAAAABAAAAkgAAAABTY3JlZW5zaG90AAAAAACQAAAAAQAAAJAAAAABMjAyNjowNjoxNCAwMDoxODoxMwAABZADAAIAAAAUAAAA1JKGAAcAAAASAAAA6KABAAMAAAAB//8AAKACAAQAAAABAAAE4KADAAQAAAABAAACXAAAAAAyMDI2OjA2OjE0IDAwOjE4OjEzAEFTQ0lJAAAAU2NyZWVuc2hvdA==" alt="آن‌باکس">
-  <div class="header-right">
-    <div class="htitle"><span class="online-dot"></span>داشبورد یکپارچه آن‌باکس</div>
-    <div class="hdate" id="hDate"></div>
-  </div>
-</div>
-<div class="toast" id="toast"></div>
-<div id="app"></div>
+    <!-- SIDEBAR -->
+    <div class="sidebar">
+        <div class="logo">
+            <div class="logo-text">📦 آن‌باکس</div>
+        </div>
+        <div class="nav-menu">
+            <div class="nav-item active" onclick="switchPage('dashboard')">📊 داشبورد</div>
+            <div class="nav-item" onclick="switchPage('leads')">📋 لیدها</div>
+            <div class="nav-item" onclick="switchPage('reports')">📈 گزارش‌ها</div>
+            <div class="nav-item" onclick="switchPage('analytics')">📉 تحلیلات</div>
+            <div class="nav-item" onclick="switchPage('settings')">⚙️ تنظیمات</div>
+        </div>
+    </div>
 
-<script>
-// CONSTANTS
-const DEFAULT_EXPERTS = [
-  {id:1,name:'مجتبی رنجبر'},
-  {id:2,name:'ندا شریفی'},
-  {id:3,name:'سمن خوشکلام'},
-  {id:4,name:'پرستو احمدی'},
-];
-const DEFAULT_FIELDS = [
-  {key:'calls',label:'تماس با لید',icon:'📞',target:8},
-  {key:'followups',label:'فالوآپ',icon:'🔄',target:5},
-  {key:'info',label:'اطلاعات دریافتی',icon:'📋',target:5},
-  {key:'panels',label:'پنل ساخته‌شده',icon:'🖥️',target:3},
-  {key:'trainings',label:'آموزش',icon:'🎓',target:3},
-  {key:'barcodes',label:'بارکد',icon:'📦',target:10},
-];
-const CHECK_ITEMS=[
-  'لیست لیدهای امروز دریافت شد','گزارش دیروز بررسی شد','اهداف روز با مدیر هماهنگ شد',
-  'تماس با تمام لیدهای امروز انجام شد','فالوآپ مشتریان دیروز انجام شد',
-  'اطلاعات مشتریان تأییدشده دریافت شد','پنل‌های جدید ساخته و تحویل داده شد',
-  'آموزش شارژ و ارسال به مشتریان انجام شد','بارکد سفارشات امروز صادر شد',
-  'گزارش پایان روز در CRM ثبت شد'
-];
+    <!-- MAIN -->
+    <div class="main">
+        <!-- HEADER -->
+        <div class="header">
+            <div class="header-title">داشبورد V2 | آن‌باکس</div>
+            <div class="header-right">
+                <span>🔔 (۳)</span>
+                <span>👤 مجتبی</span>
+            </div>
+        </div>
 
-const LEAD_DROPDOWNS = {
-  lead_type: ['گرم', 'سرد'],
-  lead_source: ['سرچ اینترنتی', 'تماس مشتری', 'بانک اطلاعاتی', 'دایره طلایی', 'پیامک تبلیغاتی', 'سوشیال مدیا'],
-  industry: ['دارویی', 'بانک', 'فروشگاه اینترنتی', 'خودرویی', 'لوازم خانگی', 'سازمانی', 'لوازم آرایشی', 'لوازم آشپزخانه', 'لوازم جانبی', 'فروشگاه حضوری'],
-  selection_reason: ['جغرافیای تحت پوشش', 'ارسال پستی دارد', 'حجم سفارش مناسب', 'سابقه خوب با شرکت', 'توصیه شده از منابع معتبر'],
-  sales_stage: ['1. لیدسازی', '2. تماس اولیه', '3. ارسال نرخ نامه', '4. جلسه مذاکره', '5. ارسال پروپوزال', '6. عقد قرارداد'],
-  anbox_fit: ['ارسال مرسوله روزانه', 'تناسب با SLA', 'تناسب با نرخ', 'ارسال ترکیبی', 'ارسال مرسولات کم حجم'],
-  main_obstacle: ['عدم توافق نرخ', 'عدم توافق SLA', 'عدم توافق قراردادی', 'شکایت مشتری از خدمات', 'مانع ندارد'],
-  next_action: ['ارسال پروپوزال', 'برقراری جلسه مذاکره', 'جلسه متقاعد سازی', 'ارسال درفت قرارداد', 'عقد قرارداد', 'عدم توافق'],
-  sales_expert: ['امیرحسین ریواز', 'مجتبی رنجبر', 'ندا شریفی', 'سمن خوشکلام', 'پرستو احمدی'],
-  lead_status: ['در حال پیگیری', 'عدم توافق', 'انحلال شرکت', 'در حال عقد قرارداد', 'در حال مذاکره', 'در حال تست']
-};
+        <!-- CONTENT -->
+        <div class="content">
+            <!-- DASHBOARD PAGE -->
+            <div class="page active" id="dashboard">
+                <h2 style="margin-bottom: 20px; color: #1B3A5C;">خلاصه کارایی</h2>
+                <div class="stats-grid">
+                    <div class="stat-box">
+                        <div class="stat-value">۲۵۳</div>
+                        <div class="stat-label">لیدهای فعال</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-value">۲۷٪</div>
+                        <div class="stat-label">نرخ تبدیل</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-value">۸۵</div>
+                        <div class="stat-label">میانگین Score</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-value">۲۵M</div>
+                        <div class="stat-label">درآمد ماه</div>
+                    </div>
+                </div>
 
-// GLOBAL STATE
-let CFG = {experts: DEFAULT_EXPERTS, fields: DEFAULT_FIELDS};
-let REPORTS = {};
-let LEADS = [];
-let AE = null;
-let currentPage = 'sel';
+                <div class="card">
+                    <div class="card-title">🎯 اهداف امروز</div>
+                    <div class="kpi-grid">
+                        <div class="kpi-box">
+                            <div class="kpi-icon">📞</div>
+                            <div class="kpi-value">۶/۸</div>
+                            <div class="kpi-label">تماس با لید</div>
+                        </div>
+                        <div class="kpi-box">
+                            <div class="kpi-icon">🔄</div>
+                            <div class="kpi-value">۳/۵</div>
+                            <div class="kpi-label">فالوآپ</div>
+                        </div>
+                        <div class="kpi-box">
+                            <div class="kpi-icon">📋</div>
+                            <div class="kpi-value">۴/۵</div>
+                            <div class="kpi-label">اطلاعات دریافتی</div>
+                        </div>
+                    </div>
+                </div>
 
-// HELPERS
-function tkey(){return new Date().toISOString().slice(0,10);}
-function faDate(){return new Date().toLocaleDateString('fa-IR',{weekday:'long',year:'numeric',month:'long',day:'numeric'});}
-function pct(v,t){return Math.min(100,Math.round((parseInt(v)||0)/t*100));}
-function pColor(p){return p>=100?'#16A34A':p>=60?'#2563EB':p>=30?'#D97706':'#94A3B8';}
+                <div class="card">
+                    <div class="card-title">🏆 Leaderboard هفتگی</div>
+                    <div id="leaderboard">
+                        <div class="leaderboard-row">
+                            <div class="rank">#۱</div>
+                            <div class="name">مجتبی رنجبر</div>
+                            <div class="score">۹۸۰ نقطه</div>
+                            <div class="trend">📈</div>
+                        </div>
+                        <div class="leaderboard-row">
+                            <div class="rank">#۲</div>
+                            <div class="name">ندا شریفی</div>
+                            <div class="score">۸۵۰ نقطه</div>
+                            <div class="trend">➡️</div>
+                        </div>
+                        <div class="leaderboard-row">
+                            <div class="rank">#۳</div>
+                            <div class="name">سمن خوشکلام</div>
+                            <div class="score">۷۲۰ نقطه</div>
+                            <div class="trend">➡️</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
 
-let toastT;
-function toast(msg,type='ok'){
-  const el=document.getElementById('toast');
-  el.textContent=msg;el.className='toast '+(type==='err'?'err':'')+' show';
-  clearTimeout(toastT);toastT=setTimeout(()=>el.className='toast',2500);
-}
+            <!-- LEADS PAGE -->
+            <div class="page" id="leads">
+                <h2 style="margin-bottom: 20px; color: #1B3A5C;">مدیریت لیدها</h2>
+                <div class="card">
+                    <div class="card-title">لیدهای شما</div>
+                    <div style="text-align: center; padding: 40px; color: #94A3B8;">
+                        📋 فاز ۲ — لیدها به زودی اضافه می‌شوند
+                    </div>
+                </div>
+            </div>
 
-// STORAGE (localStorage)
-function loadAll(){
-  const cfg = localStorage.getItem('anbox_cfg');
-  const reports = localStorage.getItem('anbox_reports');
-  const leads = localStorage.getItem('anbox_leads');
-  
-  if(cfg) CFG = JSON.parse(cfg);
-  if(reports) REPORTS = JSON.parse(reports);
-  if(leads) LEADS = JSON.parse(leads);
-}
+            <!-- REPORTS PAGE -->
+            <div class="page" id="reports">
+                <h2 style="margin-bottom: 20px; color: #1B3A5C;">گزارش‌ها</h2>
+                <div class="card">
+                    <div class="card-title">گزارش‌های شما</div>
+                    <div style="margin-top: 20px; padding: 20px; background: #F8FAFC; border-radius: 8px; border: 1px solid #E2E8F0;">
+                        <div style="font-weight: 600; margin-bottom: 10px;">گزارش‌های موجود:</div>
+                        <div style="color: #64748B; font-size: 12px; line-height: 1.8;">
+                            • گزارش روزانه KPI<br>
+                            • گزارش ماهیانه عملکرد<br>
+                            • گزارش Leaderboard<br>
+                            • گزارش تحلیل لیدها (فاز ۲)
+                        </div>
+                    </div>
+                </div>
+            </div>
 
-function saveAll(){
-  localStorage.setItem('anbox_cfg', JSON.stringify(CFG));
-  localStorage.setItem('anbox_reports', JSON.stringify(REPORTS));
-  localStorage.setItem('anbox_leads', JSON.stringify(LEADS));
-}
+            <!-- ANALYTICS PAGE -->
+            <div class="page" id="analytics">
+                <h2 style="margin-bottom: 20px; color: #1B3A5C;">تحلیلات</h2>
+                <div class="card">
+                    <div class="card-title">تحلیلات پیشرفته</div>
+                    <div style="text-align: center; padding: 40px; color: #94A3B8;">
+                        📊 فاز ۴ — تحلیلات بهبود‌یافته به زودی
+                    </div>
+                </div>
+            </div>
 
-function getReport(eid){
-  const k=eid+'_'+tkey();
-  if(REPORTS[k]) return REPORTS[k];
-  const blank={eid,date:tkey(),crm:false,notes:'',checklist:new Array(10).fill(false),savedAt:null};
-  CFG.fields.forEach(f=>blank[f.key]='');
-  return blank;
-}
+            <!-- SETTINGS PAGE -->
+            <div class="page" id="settings">
+                <h2 style="margin-bottom: 20px; color: #1B3A5C;">تنظیمات</h2>
+                <div class="card">
+                    <div class="card-title">مدیریت اطلاعات</div>
+                    <div style="margin-bottom: 15px;">
+                        <label style="display: block; font-size: 13px; font-weight: 600; margin-bottom: 5px; color: #1B3A5C;">نام کاربری</label>
+                        <input type="text" style="width: 100%; padding: 10px; border: 1px solid #E2E8F0; border-radius: 8px; font-size: 13px;" placeholder="نام کاربری">
+                    </div>
+                    <div style="margin-bottom: 15px;">
+                        <label style="display: block; font-size: 13px; font-weight: 600; margin-bottom: 5px; color: #1B3A5C;">رمز عبور</label>
+                        <input type="password" style="width: 100%; padding: 10px; border: 1px solid #E2E8F0; border-radius: 8px; font-size: 13px;" placeholder="رمز عبور جدید">
+                    </div>
+                    <button style="padding: 10px 20px; background: #2563EB; color: #fff; border: none; border-radius: 8px; cursor: pointer; font-weight: 700;">ذخیره تنظیمات</button>
+                </div>
+            </div>
+        </div>
+    </div>
 
-async function saveReport(eid){
-  const r=getReport(eid);
-  r.savedAt=new Date().toLocaleTimeString('fa-IR');
-  REPORTS[eid+'_'+tkey()]=r;
-  saveAll();
-  return r;
-}
+    <!-- NOTIFICATION -->
+    <div class="notification" id="notification"></div>
 
-async function updateField(eid, field, value){
-  const r=getReport(eid);
-  r[field]=value;
-  REPORTS[eid+'_'+tkey()]=r;
-  saveAll();
-}
-
-// RENDER
-function hideAll(){
-  ['page-sel','page-team','page-leads','page-mgr','page-set'].forEach(id=>{
-    const el=document.getElementById(id);if(el)el.style.display='none';
-  });
-}
-
-function setApp(html){document.getElementById('app').innerHTML=html;}
-
-function gotoSel(){hideAll();currentPage='sel';document.getElementById('page-sel').style.display='';renderSel();}
-function gotoTeam(){hideAll();currentPage='team';document.getElementById('page-team').style.display='';openTeam();}
-function gotoLeads(){hideAll();currentPage='leads';document.getElementById('page-leads').style.display='';renderLeads();}
-function gotoMgr(){hideAll();currentPage='mgr';document.getElementById('page-mgr').style.display='';renderMgr();}
-function gotoSet(){hideAll();currentPage='set';document.getElementById('page-set').style.display='';swSetTab('E');}
-
-function openTeam(eid){
-  AE=CFG.experts.find(e=>e.id===eid);
-  renderTeam();
-}
-
-function renderSel(){
-  document.getElementById('hDate').textContent=faDate();
-  const list=document.getElementById('expList');list.innerHTML='';
-  CFG.experts.forEach(e=>{
-    const r=getReport(e.id),done=r.checklist.filter(Boolean).length;
-    const b=document.createElement('button');b.className='exp-btn';
-    b.innerHTML='<span>👤 '+e.name+'</span><span class="ebadge'+(done===10?' done':'')+'">'+done+'/۱۰</span>';
-    b.onclick=()=>{openTeam(e.id);gotoTeam();};list.appendChild(b);
-  });
-}
-
-function renderTeam(){
-  document.getElementById('expGreet').textContent='سلام، '+AE.name+' 👋';
-  document.getElementById('expDate').textContent=faDate();
-  document.getElementById('hDate').textContent=faDate();
-  updCkBadge();
-  swTeamTab('R');
-}
-
-function updCkBadge(){
-  const r=getReport(AE.id),done=r.checklist.filter(Boolean).length;
-  const el=document.getElementById('ckBadge');
-  if(el){el.textContent=done+'/10';el.style.color=done===10?'#4ADE80':'#FCD34D';}
-}
-
-function swTeamTab(t){
-  ['R','S','C','L'].forEach(x=>{
-    const p=document.getElementById('t'+x);if(p)p.style.display=x===t?'':'none';
-    const b=document.getElementById('btn'+x);if(b)b.className='tab-btn'+(x===t?' active':'');
-  });
-  if(t==='R') buildTeamForm();
-  if(t==='S') buildTeamSchedule();
-  if(t==='C') buildTeamChecklist();
-  if(t==='L') renderLeadsView();
-}
-
-function buildTeamForm(){
-  const r=getReport(AE.id),p=document.getElementById('tR');
-  let html='<div class="realtime-banner">💾 داده‌ها روی دستگاه ذخیره می‌شود</div>';
-  html+='<div class="card"><div class="card-head"><h3>📝 ورود اطلاعات روزانه</h3></div><div class="card-body"><div class="form-grid">';
-  CFG.fields.forEach(f=>{
-    const v=r[f.key]||'',pc=pct(v,f.target),col=pColor(pc);
-    html+='<div class="ff"><label>'+f.icon+' '+f.label+' (هدف: '+f.target+')</label>'+
-      '<input type="number" min="0" id="inp_'+f.key+'" value="'+v+'" placeholder="۰" oninput="onTeamFCh(\''+f.key+'\')">'+
-      '<div class="prow"><span>'+(parseInt(v)||0)+'/'+f.target+'</span><span id="pp_'+f.key+'" style="font-weight:700;color:'+col+'">'+pc+'٪</span></div>'+
-      '<div class="bwrap"><div class="bfill" id="bf_'+f.key+'" style="background:'+col+';width:'+pc+'%"></div></div></div>';
-  });
-  html+='</div>';
-  html+='<div class="crm-row'+(r.crm?' done':'')+'" id="crmRow" onclick="togTeamCRM()">'+
-    '<div class="cbox'+(r.crm?' on':'')+'" id="crmBox">'+(r.crm?'✓':'')+'</div>'+
-    '<span>ثبت اطلاعات در CRM انجام شد</span></div>'+
-    '<label style="display:block;font-size:12px;color:#64748B;margin-bottom:6px">📝 یادداشت</label>'+
-    '<textarea class="notes-area" id="notesA" rows="3" oninput="onTeamNotes()">'+(r.notes||'')+'</textarea>'+
-    '<button class="save-btn" onclick="doTeamSave()">💾 ذخیره</button>'+
-    '<div id="savedM" class="saved-msg" style="'+(r.savedAt?'':'display:none')+'">'+(r.savedAt?'✓ ذخیره‌شد: '+r.savedAt:'')+'</div></div></div>';
-  html+='<div class="card"><div class="card-body"><div style="font-weight:700;color:#1B3A5C;margin-bottom:11px;font-size:13px">🎯 خلاصه</div><div class="kpi-grid" id="ksum"></div></div></div>';
-  p.innerHTML=html;buildTeamKpiSum();
-}
-
-function onTeamFCh(key){
-  const val=document.getElementById('inp_'+key).value;
-  const f=CFG.fields.find(x=>x.key===key);
-  const pc=pct(val,f.target),col=pColor(pc);
-  document.getElementById('bf_'+key).style.cssText='background:'+col+';width:'+pc+'%;height:7px;border-radius:99px';
-  document.getElementById('pp_'+key).textContent=pc+'٪';
-  document.getElementById('pp_'+key).style.color=col;
-  updateField(AE.id,key,val);
-  buildTeamKpiSum();
-}
-
-function togTeamCRM(){
-  const r=getReport(AE.id);r.crm=!r.crm;REPORTS[AE.id+'_'+tkey()]=r;
-  const row=document.getElementById('crmRow'),box=document.getElementById('crmBox');
-  if(r.crm){row.className='crm-row done';box.className='cbox on';box.textContent='✓';}
-  else{row.className='crm-row';box.className='cbox';box.textContent='';}
-  updateField(AE.id,'crm',r.crm);
-}
-
-function onTeamNotes(){
-  const r=getReport(AE.id);r.notes=document.getElementById('notesA').value;
-  REPORTS[AE.id+'_'+tkey()]=r;
-  updateField(AE.id,'notes',r.notes);
-}
-
-async function doTeamSave(){
-  const r=getReport(AE.id);
-  r.notes=document.getElementById('notesA').value;
-  REPORTS[AE.id+'_'+tkey()]=r;
-  await saveReport(AE.id);
-  const m=document.getElementById('savedM');
-  m.style.display='';m.textContent='✓ ذخیره‌شد: '+getReport(AE.id).savedAt;
-  toast('گزارش ذخیره شد ✓');
-}
-
-function buildTeamKpiSum(){
-  const r=getReport(AE.id),el=document.getElementById('ksum');if(!el)return;
-  el.innerHTML=CFG.fields.map(f=>{
-    const pc=pct(r[f.key],f.target),col=pColor(pc);
-    return '<div class="kpi-box"><div class="ki">'+f.icon+'</div><div class="kv" style="color:'+col+'">'+(parseInt(r[f.key])||0)+'</div><div class="kl">'+f.label+'</div></div>';
-  }).join('');
-}
-
-function buildTeamSchedule(){
-  const SCH=[
-    {i:'☀️',t:'جلسه صبحگاهی',h:'۰۸:۰۰',d:'مرور اهداف'},
-    {i:'📞',t:'تماس با لیدهای جدید',h:'۰۸:۳۰',d:'هدف: ۸ تماس'},
-    {i:'🔄',t:'فالوآپ مشتریان دیروز',h:'۱۰:۳۰',d:'هدف: ۱۰۰٪'},
-    {i:'📋',t:'دریافت اطلاعات',h:'۱۱:۳۰',d:'هدف: ۵ مورد'},
-    {i:'🍽️',t:'ناهار',h:'۱۳:۰۰',d:'استراحت'},
-    {i:'🖥️',t:'ساخت پنل',h:'۱۴:۰۰',d:'هدف: ۳ پنل'},
-    {i:'🎓',t:'آموزش',h:'۱۵:۳۰',d:'هدف: ۳ مورد'},
-    {i:'📦',t:'بارکد',h:'۱۶:۳۰',d:'هدف: ۱۰ بارکد'},
-    {i:'📊',t:'گزارش پایان روز',h:'۱۷:۳۰',d:'در CRM'}
-  ];
-  document.getElementById('tS').innerHTML=SCH.map(s=>
-    '<div class="sch-item"><div class="si-icon">'+s.i+'</div><div>'+
-    '<div class="si-title">'+s.t+'</div><div class="si-time">⏰ '+s.h+'</div>'+
-    '<div class="si-desc">'+s.d+'</div></div></div>').join('');
-}
-
-function buildTeamChecklist(){
-  const r=getReport(AE.id),done=r.checklist.filter(Boolean).length,pp=Math.round(done/10*100);
-  let html='<div class="ph"><div class="ph-row"><span style="font-weight:700">پیشرفت امروز</span>'+
-    '<span style="font-weight:700;color:#2563EB" id="ckProg">'+done+'/10</span></div>'+
-    '<div class="bwrap"><div class="bfill" id="ckBar" style="background:'+(done===10?'#22C55E':'linear-gradient(90deg,#1B3A5C,#2563EB)')+';width:'+pp+'%"></div></div></div>';
-  CHECK_ITEMS.forEach((item,i)=>{
-    html+='<div class="ci'+(r.checklist[i]?' done':'')+'" onclick="togTeamCk('+i+')">'+
-      '<div class="cbox'+(r.checklist[i]?' on':'')+'">'+( r.checklist[i]?'✓':'')+'</div>'+
-      '<span>'+item+'</span></div>';
-  });
-  if(done===10) html+='<div class="success-box"><div style="font-size:34px;margin-bottom:5px">🎉</div><div style="font-weight:700;color:#16A34A">آفرین! روز موفقی داشتید</div></div>';
-  document.getElementById('tC').innerHTML=html;
-}
-
-async function togTeamCk(i){
-  const r=getReport(AE.id);r.checklist[i]=!r.checklist[i];
-  REPORTS[AE.id+'_'+tkey()]=r;
-  buildTeamChecklist();updCkBadge();
-  await updateField(AE.id,'checklist',r.checklist);
-}
-
-function renderLeads(){
-  document.getElementById('hDate').textContent=faDate();
-  let html='<div class="card"><div class="card-head"><h3>📋 مدیریت لیدها</h3></div><div class="card-body">'+
-    '<button class="save-btn" style="background:#16A34A;margin-bottom:14px" onclick="showLeadForm()">➕ افزودن لید جدید</button>'+
-    '<button class="save-btn" style="background:#2563EB;margin-bottom:14px" onclick="downloadLeadTemplate()">📥 دانلود نمونه Excel</button>'+
-    '<button class="save-btn" style="background:#D97706;margin-bottom:14px" onclick="document.getElementById(\'xlFile\').click()">📊 Import Excel</button>'+
-    '<input type="file" id="xlFile" accept=".xlsx,.xls" style="display:none" onchange="importLeadsExcel(event)">'+
-    '<div id="leadsList"></div></div></div>';
-  setApp(html);
-  renderLeadsTable();
-}
-
-function renderLeadsView(){
-  let html='<div class="card"><div class="card-head"><h3>📋 لیدهای من</h3></div><div class="card-body">'+
-    '<button class="save-btn" style="background:#16A34A;margin-bottom:14px" onclick="showLeadForm()">➕ افزودن لید</button>'+
-    '<div id="myLeadsList"></div></div></div>';
-  document.getElementById('tL').innerHTML=html;
-  const myLeads=LEADS.filter(l=>l.created_by===AE.id);
-  if(myLeads.length===0){
-    document.getElementById('myLeadsList').innerHTML='<p style="text-align:center;color:#94A3B8;padding:20px">هیچ لیدی ثبت نشده</p>';
-  }else{
-    let tbl='<table class="lead-table"><thead><tr>';
-    ['نام شرکت','تماس گیر','مرحله','وضعیت'].forEach(h=>tbl+='<th>'+h+'</th>');
-    tbl+='</tr></thead><tbody>';
-    myLeads.forEach(l=>{
-      tbl+='<tr><td>'+l.company_name+'</td><td>'+l.contact_name+'</td><td>'+l.sales_stage+'</td><td>'+l.lead_status+'</td></tr>';
-    });
-    tbl+='</tbody></table>';
-    document.getElementById('myLeadsList').innerHTML=tbl;
-  }
-}
-
-function renderLeadsTable(){
-  const list=document.getElementById('leadsList');
-  if(LEADS.length===0){
-    list.innerHTML='<p style="text-align:center;color:#94A3B8;padding:20px">هیچ لیدی ثبت نشده</p>';
-    return;
-  }
-  let tbl='<table class="lead-table"><thead><tr>';
-  ['نام شرکت','صنعت','تماس گیر','شماره','مرحله','مانع','اقدام بعدی','وضعیت'].forEach(h=>tbl+='<th>'+h+'</th>');
-  tbl+='</tr></thead><tbody>';
-  LEADS.forEach((l,idx)=>{
-    tbl+='<tr><td>'+l.company_name+'</td><td>'+l.industry+'</td><td>'+l.contact_name+'</td><td>'+l.phone+'</td>'+
-      '<td><select class="inline-select" onchange="updateLeadField('+idx+`,\'sales_stage\',this.value)">'+
-      LEAD_DROPDOWNS.sales_stage.map(s=>'<option '+(l.sales_stage===s?'selected':'')+'>'+s+'</option>').join('')+
-      '</select></td>'+
-      '<td><select class="inline-select" onchange="updateLeadField('+idx+`,\'main_obstacle\',this.value)"><option></option>'+
-      LEAD_DROPDOWNS.main_obstacle.map(o=>'<option '+(l.main_obstacle===o?'selected':'')+'>'+o+'</option>').join('')+
-      '</select></td>'+
-      '<td><select class="inline-select" onchange="updateLeadField('+idx+`,\'next_action\',this.value)"><option></option>'+
-      LEAD_DROPDOWNS.next_action.map(a=>'<option '+(l.next_action===a?'selected':'')+'>'+a+'</option>').join('')+
-      '</select></td>'+
-      '<td><select class="inline-select" onchange="updateLeadField('+idx+`,\'lead_status\',this.value)">'+
-      LEAD_DROPDOWNS.lead_status.map(st=>'<option '+(l.lead_status===st?'selected':'')+'>'+st+'</option>').join('')+
-      '</select></td></tr>';
-  });
-  tbl+='</tbody></table>';
-  list.innerHTML=tbl;
-}
-
-function showLeadForm(){
-  let html='<div class="card"><div class="card-head"><h3>افزودن لید جدید</h3></div><div class="card-body">';
-  html+='<div class="form-grid">';
-  ['lead_type','lead_source','company_name','industry','selection_reason','phone','contact_name','contact_position','sales_stage','anbox_fit','main_obstacle','next_action','sales_expert','lead_status'].forEach(key=>{
-    const label = {lead_type:'نوع لید',lead_source:'مبدأ لید',company_name:'نام شرکت',industry:'صنعت',selection_reason:'دلیل انتخاب',phone:'شماره تماس',contact_name:'نام فرد تماس',contact_position:'سمت فرد',sales_stage:'مرحله فروش',anbox_fit:'تناسب با آن‌باکس',main_obstacle:'مانع اصلی',next_action:'اقدام بعدی',sales_expert:'کارشناس',lead_status:'وضعیت لید'}[key];
-    const isSelect = LEAD_DROPDOWNS[key];
-    if(isSelect){
-      html+='<div class="ff"><label>'+label+'</label><select id="f_'+key+'" class="add-inp" style="padding:8px"><option></option>';
-      LEAD_DROPDOWNS[key].forEach(v=>html+='<option>'+v+'</option>');
-      html+='</select></div>';
-    }else{
-      html+='<div class="ff"><label>'+label+'</label><input type="text" id="f_'+key+'" class="add-inp"></div>';
-    }
-  });
-  html+='</div><button class="save-btn" onclick="doAddLead()" style="background:#16A34A">➕ افزودن</button></div></div>';
-  document.getElementById('leadsList').innerHTML=html;
-}
-
-async function doAddLead(){
-  const lead={};
-  ['lead_type','lead_source','company_name','industry','selection_reason','phone','contact_name','contact_position','sales_stage','anbox_fit','main_obstacle','next_action','sales_expert','lead_status'].forEach(key=>{
-    lead[key]=document.getElementById('f_'+key).value||'';
-  });
-  if(!lead.company_name || !lead.phone){
-    toast('نام شرکت و شماره تماس الزامی است','err');return;
-  }
-  lead.created_by = AE.id;
-  lead.created_at = new Date().toISOString();
-  LEADS.push(lead);
-  saveAll();
-  toast('لید ذخیره شد ✓');
-  renderLeads();
-}
-
-function updateLeadField(idx, field, value){
-  LEADS[idx][field]=value;
-  saveAll();
-  toast('به‌روزرسانی شد');
-}
-
-function downloadLeadTemplate(){
-  const headers = ['نوع لید','مبدأ لید','نام شرکت','صنعت','دلیل انتخاب شرکت','شماره تماس','نام فرد تماس','سمت فرد تماس','مرحله فروش','تناسب با آن باکس','مانع اصلی','اقدام بعدی','کارشناس فروش','وضعیت لید'];
-  const sampleData = [['گرم','سرچ اینترنتی','شرکت نمونه','بانک','جغرافیای تحت پوشش','09121234567','علی احمدی','مدیر انبار','2. تماس اولیه','ارسال مرسوله روزانه','مانع ندارد','برقراری جلسه مذاکره','امیرحسین ریواز','در حال مذاکره']];
-  let csv = headers.join('\t') + '\n';
-  sampleData.forEach(row=>csv+=row.join('\t')+'\n');
-  const blob = new Blob([csv], {type: 'text/csv;charset=utf-8;'});
-  const link = document.createElement('a');
-  const url = URL.createObjectURL(blob);
-  link.setAttribute('href', url);
-  link.setAttribute('download', 'نمونه_لیدها.csv');
-  link.style.visibility = 'hidden';
-  document.body.appendChild(link);
-  link.click();
-  document.body.removeChild(link);
-  toast('نمونه دانلود شد');
-}
-
-async function importLeadsExcel(event){
-  const file = event.target.files[0];
-  if(!file) return;
-  const reader = new FileReader();
-  reader.onload = (e)=>{
-    try{
-      const data = new Uint8Array(e.target.result);
-      const workbook = XLSX.read(data, {type:'array'});
-      const worksheet = workbook.Sheets[workbook.SheetNames[0]];
-      const json = XLSX.utils.sheet_to_json(worksheet);
-      let imported=0;
-      json.forEach(row=>{
-        if(row['نام شرکت'] && row['شماره تماس']){
-          const lead={
-            lead_type: row['نوع لید']||'سرد',
-            lead_source: row['مبدأ لید']||'',
-            company_name: row['نام شرکت'],
-            industry: row['صنعت']||'',
-            selection_reason: row['دلیل انتخاب شرکت']||'',
-            phone: row['شماره تماس'],
-            contact_name: row['نام فرد تماس']||'',
-            contact_position: row['سمت فرد تماس']||'',
-            sales_stage: row['مرحله فروش']||'1. لیدسازی',
-            anbox_fit: row['تناسب با آن باکس']||'',
-            main_obstacle: row['مانع اصلی']||'',
-            next_action: row['اقدام بعدی']||'',
-            sales_expert: row['کارشناس فروش']||'',
-            lead_status: row['وضعیت لید']||'در حال پیگیری',
-            created_by: AE.id,
-            created_at: new Date().toISOString()
-          };
-          LEADS.push(lead);imported++;
+    <script>
+        function switchPage(page) {
+            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+            document.getElementById(page).classList.add('active');
+            document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active'));
+            event.target.classList.add('active');
         }
-      });
-      saveAll();
-      toast(`${imported} لید آپلود شد`);
-      renderLeads();
-      document.getElementById('xlFile').value='';
-    }catch(err){
-      toast('خطا در پردازش فایل','err');
-    }
-  };
-  reader.readAsArrayBuffer(file);
-}
 
-function renderMgr(){
-  document.getElementById('hDate').textContent=faDate();
-  const tP=CFG.experts.reduce((s,e)=>s+(parseInt(getReport(e.id).panels)||0),0);
-  const tC=CFG.experts.reduce((s,e)=>s+(parseInt(getReport(e.id).calls)||0),0);
-  const tD=CFG.experts.filter(e=>getReport(e.id).checklist.filter(Boolean).length===10).length;
-  let html='<div class="card"><div class="card-head"><h3>📊 داشبورد مدیریتی</h3></div><div class="card-body">'+
-    '<div class="mgr-stats">'+
-    '<div class="stat-box"><div class="sv">'+CFG.experts.length+'</div><div class="sl">کارشناسان</div></div>'+
-    '<div class="stat-box"><div class="sv">'+tP+'</div><div class="sl">پنل امروز</div></div>'+
-    '<div class="stat-box"><div class="sv">'+tC+'</div><div class="sl">تماس امروز</div></div>'+
-    '<div class="stat-box"><div class="sv">'+tD+'/'+CFG.experts.length+'</div><div class="sl">چک‌لیست کامل</div></div>'+
-    '</div></div></div>';
-  CFG.experts.forEach(e=>{
-    const r=getReport(e.id),done=r.checklist.filter(Boolean).length;
-    html+='<div class="exp-card"><div class="ech"><div style="display:flex;align-items:center;gap:9px"><div class="avatar">'+e.name[0]+'</div>'+
-      '<div><div class="en">'+e.name+'</div><div class="es">'+(r.savedAt?'ذخیره: '+r.savedAt:'بدون ذخیره')+'</div></div></div>'+
-      '<span class="ebadge'+(done===10?' done':'')+'">'+done+'/۱۰</span></div>'+
-      '<div class="metrics-grid">';
-    CFG.fields.forEach(f=>{
-      const v=parseInt(r[f.key])||0,pc=pct(v,f.target),col=pColor(pc);
-      html+='<div class="mc"><div class="ml">'+f.icon+'</div><div class="mv" style="color:'+col+'">'+v+'</div>'+
-        '<div class="mt">هدف: '+f.target+'</div></div>';
-    });
-    html+='</div>'+(r.notes?'<div class="notes-strip">📝 '+r.notes+'</div>':'')+'</div>';
-  });
-  document.getElementById('page-mgr').innerHTML=html;
-}
+        function showNotification(msg) {
+            const el = document.getElementById('notification');
+            el.textContent = msg;
+            el.classList.add('active');
+            setTimeout(() => el.classList.remove('active'), 3000);
+        }
 
-function swSetTab(t){
-  document.getElementById('setExperts').style.display=t==='E'?'':'none';
-  document.getElementById('setKpi').style.display=t==='K'?'':'none';
-  document.getElementById('stE').className='tab-btn'+(t==='E'?' active':'');
-  document.getElementById('stK').className='tab-btn'+(t==='K'?' active':'');
-  if(t==='E')renderSetExp();else renderSetKpi();
-}
-
-function renderSetExp(){
-  const el=document.getElementById('setExperts');
-  let html='<div class="card"><div class="card-body"><label style="display:block;font-size:13px;color:#1B3A5C;margin-bottom:11px">افزودن کارشناس ('+CFG.experts.length+'/10)</label>'+
-    '<div class="add-row"><input class="add-inp" id="newNm" placeholder="نام و نام خانوادگی" onkeydown="if(event.key===\'Enter\')addExp()">'+
-    '<button class="add-sub" onclick="addExp()">+ افزودن</button></div></div></div>';
-  CFG.experts.forEach(e=>{
-    html+='<div class="si2" id="si_'+e.id+'"><span>👤 '+e.name+'</span>'+
-      '<button class="be" onclick="stEdit('+e.id+')">ویرایش</button>'+
-      '<button class="bd" onclick="delExp('+e.id+')">حذف</button></div>';
-  });
-  el.innerHTML=html;
-}
-
-function stEdit(eid){
-  const e=CFG.experts.find(x=>x.id===eid),div=document.getElementById('si_'+eid);
-  div.innerHTML='<input class="add-inp" id="ei_'+eid+'" value="'+e.name+'" style="flex:1" onkeydown="if(event.key===\'Enter\')doEdit('+eid+')">'+
-    '<button class="be" onclick="doEdit('+eid+')">ذخیره</button>';
-  document.getElementById('ei_'+eid).focus();
-}
-
-function doEdit(eid){
-  const v=document.getElementById('ei_'+eid).value.trim();if(!v)return;
-  CFG.experts=CFG.experts.map(e=>e.id===eid?{...e,name:v}:e);
-  saveAll();renderSetExp();toast('نام ویرایش شد');
-}
-
-function addExp(){
-  const nm=document.getElementById('newNm').value.trim();if(!nm)return;
-  if(CFG.experts.length>=10){toast('حداکثر ۱۰ کارشناس','err');return;}
-  CFG.experts.push({id:Date.now(),name:nm});
-  saveAll();document.getElementById('newNm').value='';renderSetExp();toast(nm+' اضافه شد');
-}
-
-function delExp(eid){
-  CFG.experts=CFG.experts.filter(e=>e.id!==eid);
-  saveAll();renderSetExp();toast('حذف شد');
-}
-
-function renderSetKpi(){
-  const el=document.getElementById('setKpi');
-  let html='<div class="card"><div class="card-head"><h3>تنظیم KPI</h3></div><div class="card-body">';
-  CFG.fields.forEach((f,i)=>{
-    html+='<div class="kpi-set-row">'+
-      '<input id="kl_'+i+'" value="'+f.label+'" oninput="updKpi('+i+`,\'label\',this.value)">'+
-      '<input id="ki_'+i+'" value="'+f.icon+'" style="text-align:center" oninput="updKpi('+i+`,\'icon\',this.value)">'+
-      '<input type="number" id="kt_'+i+'" value="'+f.target+'" min="1" oninput="updKpi('+i+`,\'target\',this.value)">'+
-      '<button class="del-kpi-btn" onclick="delKpi('+i+')">حذف</button></div>';
-  });
-  html+='<button class="add-kpi-btn" onclick="addKpi()">+ KPI جدید</button></div></div>';
-  el.innerHTML=html;
-}
-
-function updKpi(i,prop,val){
-  if(prop==='target') CFG.fields[i].target=parseInt(val)||1;
-  else CFG.fields[i][prop]=val;
-  clearTimeout(window.kpiSaveT);
-  window.kpiSaveT=setTimeout(()=>saveAll(),800);
-}
-
-function delKpi(i){
-  if(CFG.fields.length<=1){toast('حداقل یک KPI','err');return;}
-  CFG.fields.splice(i,1);saveAll();renderSetKpi();toast('حذف شد');
-}
-
-function addKpi(){
-  CFG.fields.push({key:'kpi_'+Date.now(),label:'KPI جدید',icon:'📌',target:5});
-  saveAll();renderSetKpi();toast('اضافه شد');
-}
-
-function shareWA(){
-  const url=window.location.href;
-  const txt='داشبورد آن‌باکس 🚚\n'+url;
-  window.open('https://wa.me/?text='+encodeURIComponent(txt),'_blank');
-}
-
-// INIT
-async function init(){
-  document.getElementById('hDate').textContent=faDate();
-  loadAll();
-  
-  document.getElementById('app').innerHTML=`
-    <div id="page-sel">
-      <div class="sel-wrap">
-        <div class="sel-hero"><h1>🚚 داشبورد یکپارچه آن‌باکس</h1><p id="selDate"></p></div>
-        <div style="font-size:13px;color:#64748B;margin-bottom:11px;text-align:center">شما کدام کارشناس هستید؟</div>
-        <div id="expList"></div>
-        <button class="act-btn pri" onclick="gotoMgr()">📊 ورود مدیر</button>
-        <button class="act-btn sec" onclick="gotoLeads()">📋 مدیریت لیدها</button>
-        <button class="act-btn sec" onclick="gotoSet()">⚙️ تنظیمات</button>
-        <div style="background:#EFF6FF;border:1.5px solid #BFDBFE;border-radius:12px;padding:12px 16px;font-size:13px;color:#1E40AF;display:flex;align-items:center;gap:10px;margin-bottom:8px"><span>📤 شریک شدن</span><button onclick="shareWA()" style="margin-right:auto;padding:7px 14px;background:#25D366;color:#fff;border:none;border-radius:8px;font-size:12px;cursor:pointer;font-weight:700;font-family:Tahoma,sans-serif">📲 واتساپ</button></div>
-      </div>
-    </div>
-    <div id="page-team" style="display:none">
-      <div class="exp-header">
-        <button class="back-btn" onclick="gotoSel()">← تغییر</button>
-        <div class="exp-hrow">
-          <div><h2 id="expGreet"></h2><div id="expDate"></div></div>
-          <div class="ck-badge"><div class="num" id="ckBadge">0/10</div><div class="lbl">چک‌لیست</div></div>
-        </div>
-      </div>
-      <div class="tabs">
-        <button class="tab-btn active" id="btnR" onclick="swTeamTab('R')">📝 گزارش</button>
-        <button class="tab-btn" id="btnS" onclick="swTeamTab('S')">📅 برنامه</button>
-        <button class="tab-btn" id="btnC" onclick="swTeamTab('C')">✅ چک‌لیست</button>
-        <button class="tab-btn" id="btnL" onclick="swTeamTab('L')">📋 لیدهای من</button>
-      </div>
-      <div id="tR" class="content"></div>
-      <div id="tS" class="content" style="display:none"></div>
-      <div id="tC" class="content" style="display:none"></div>
-      <div id="tL" class="content" style="display:none"></div>
-    </div>
-    <div id="page-leads" style="display:none"></div>
-    <div id="page-mgr" style="display:none"></div>
-    <div id="page-set" style="display:none">
-      <div style="padding:16px 14px"><button class="back-btn" style="background:#EFF6FF;color:#2563EB" onclick="gotoSel()">← بازگشت</button></div>
-      <div class="set-wrap">
-        <div class="tabs" style="position:static;border-radius:12px;overflow:hidden;margin-bottom:18px">
-          <button class="tab-btn active" id="stE" onclick="swSetTab('E')">👥 کارشناسان</button>
-          <button class="tab-btn" id="stK" onclick="swSetTab('K')">🎯 KPI</button>
-        </div>
-        <div id="setExperts"></div>
-        <div id="setKpi" style="display:none"></div>
-      </div>
-    </div>`;
-
-  gotoSel();
-}
-
-init();
-</script>
+        // Init
+        showNotification('✅ Dashboard V2 بارگذاری شد');
+    </script>
 </body>
 </html>
