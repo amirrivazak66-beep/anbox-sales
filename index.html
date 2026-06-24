@@ -77,8 +77,7 @@
         .stage-badge { display: inline-block; padding: 4px 10px; border-radius: 20px; font-size: 10px; font-weight: 700; background: #DBEAFE; color: #2563EB; }
         
         /* INLINE EDIT */
-        .inline-select, .inline-input { padding: 6px; border: 1px solid #2563EB; border-radius: 6px; font-size: 11px; width: 100%; font-family: Tahoma; }
-        .inline-input { padding: 6px; }
+        .inline-select { padding: 6px; border: 1px solid #2563EB; border-radius: 6px; font-size: 11px; width: 100%; font-family: Tahoma; }
         .editable-cell { cursor: pointer; position: relative; padding: 8px; }
         .editable-cell:hover { background: #FFF8DC; border-radius: 4px; }
         .edit-icon { font-size: 10px; opacity: 0; margin-left: 5px; }
@@ -342,19 +341,31 @@
                         </select>
                     </div>
 
-                    <!-- Row 5: مانع اصلی، وضعیت لید -->
+                    <!-- Row 5: مانع اصلی -->
                     <div class="form-group">
                         <label class="form-label">مانع اصلی</label>
                         <input type="text" name="main_obstacle" class="form-input">
                     </div>
                     <div class="form-group">
+                        <label class="form-label">اقدام بعدی</label>
+                        <select name="next_action" class="form-input">
+                            <option>انتخاب کنید</option>
+                            <option>ارسال پروپوزال</option>
+                            <option>برقراری جلسه مذاکره</option>
+                            <option>جلسه متقاعد سازی</option>
+                            <option>ارسال درفت قرارداد</option>
+                            <option>عقد قرارداد</option>
+                            <option>عدم توافق</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
                         <label class="form-label">وضعیت لید</label>
                         <select name="lead_status" class="form-input">
-                            <option>گرم</option>
-                            <option>سرد</option>
                             <option>در حال پیگیری</option>
-                            <option>در حال مذاکره</option>
+                            <option>عدم توافق</option>
+                            <option>انحلال شرکت</option>
                             <option>در حال عقد قرارداد</option>
+                            <option>در حال مذاکره</option>
                             <option>در حال تست</option>
                         </select>
                     </div>
@@ -365,13 +376,7 @@
                         <textarea name="initial_message" class="form-input" style="min-height: 70px; resize: vertical;"></textarea>
                     </div>
 
-                    <!-- Row 7: اقدام بعدی (Full) -->
-                    <div class="form-group form-grid full">
-                        <label class="form-label">اقدام بعدی</label>
-                        <textarea name="next_action" class="form-input" style="min-height: 70px; resize: vertical;"></textarea>
-                    </div>
-
-                    <!-- Row 8: یادداشت‌ها (Full) -->
+                    <!-- Row 7: یادداشت‌ها (Full) -->
                     <div class="form-group form-grid full">
                         <label class="form-label">یادداشت‌ها</label>
                         <textarea name="notes" class="form-input" style="min-height: 70px; resize: vertical;"></textarea>
@@ -405,6 +410,24 @@
             { id: 4, name: 'جلسه مذاکره' },
             { id: 5, name: 'ارسال پروپوزال' },
             { id: 6, name: 'عقد قرارداد' }
+        ];
+
+        const NEXT_ACTIONS = [
+            'ارسال پروپوزال',
+            'برقراری جلسه مذاکره',
+            'جلسه متقاعد سازی',
+            'ارسال درفت قرارداد',
+            'عقد قرارداد',
+            'عدم توافق'
+        ];
+
+        const LEAD_STATUSES = [
+            'در حال پیگیری',
+            'عدم توافق',
+            'انحلال شرکت',
+            'در حال عقد قرارداد',
+            'در حال مذاکره',
+            'در حال تست'
         ];
 
         let currentUser = null;
@@ -579,12 +602,16 @@
                             </div>
                         </td>
                         <td>
-                            <div class="editable-cell" onclick="editField(${lead.id}, 'next_action', this)">
-                                ${(lead.next_action || '---').substring(0, 20)}...
-                                <span class="edit-icon">✏️</span>
-                            </div>
+                            <select class="inline-select" onchange="updateField(${lead.id}, 'next_action', this.value)">
+                                <option value="">-- انتخاب کنید --</option>
+                                ${NEXT_ACTIONS.map(action => `<option value="${action}" ${lead.next_action === action ? 'selected' : ''}>${action}</option>`).join('')}
+                            </select>
                         </td>
-                        <td><span class="stage-badge">${lead.status.emoji} ${lead.lead_status}</span></td>
+                        <td>
+                            <select class="inline-select" onchange="updateField(${lead.id}, 'lead_status', this.value)">
+                                ${LEAD_STATUSES.map(status => `<option value="${status}" ${lead.lead_status === status ? 'selected' : ''}>${status}</option>`).join('')}
+                            </select>
+                        </td>
                         <td>
                             <button class="btn danger" style="padding: 4px 8px; font-size: 10px;" onclick="deleteLead(${lead.id})">حذف</button>
                         </td>
@@ -663,7 +690,7 @@
                                 anbox_fit: row['تناسب با آن باکس'] || '',
                                 main_obstacle: row['مانع اصلی'] || '',
                                 next_action: row['اقدام بعدی'] || '',
-                                lead_status: 'سرد',
+                                lead_status: 'در حال پیگیری',
                                 notes: row['یادداشت‌ها'] || '',
                                 created_by: currentUser,
                                 created_at: new Date().toLocaleString('fa-IR')
