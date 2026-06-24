@@ -80,10 +80,6 @@
                 <input type="password" id="password" class="form-input" placeholder="رمز عبور را وارد کنید">
             </div>
             <button class="login-button" onclick="handleLogin()">ورود</button>
-            <div style="text-align: center; margin-top: 20px; font-size: 12px; color: #64748B;">
-                <div>نام کاربری: mojabi</div>
-                <div>رمز عبور: pass123</div>
-            </div>
         </div>
     </div>
 
@@ -312,6 +308,7 @@
             document.getElementById('dashboardPage').style.display = 'none';
             document.getElementById('username').value = '';
             document.getElementById('password').value = '';
+            document.getElementById('loginError').style.display = 'none';
             showNotification('👋 شما خارج شدید');
         }
 
