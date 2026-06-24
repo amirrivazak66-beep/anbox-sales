@@ -565,27 +565,7 @@
                 'یادداشت‌ها'
             ];
 
-            const sampleData = [
-                [
-                    'گرم',
-                    'سرچ اینترنتی',
-                    'شرکت نمونه',
-                    'بانک',
-                    'جغرافیای تحت پوشش',
-                    '09121234567',
-                    'علی احمدی',
-                    'مدیر انبار',
-                    '2',
-                    'ارسال مرسوله روزانه',
-                    'مانع ندارد',
-                    'برقراری جلسه مذاکره',
-                    'امیرحسین ریواز',
-                    'در حال مذاکره',
-                    'یادداشت نمونه'
-                ]
-            ];
-
-            const ws = XLSX.utils.aoa_to_sheet([headers, ...sampleData]);
+            const ws = XLSX.utils.aoa_to_sheet([headers]);
             const wb = XLSX.utils.book_new();
             XLSX.utils.book_append_sheet(wb, ws, 'لیدها');
             XLSX.writeFile(wb, 'نمونه_لیدها.xlsx');
