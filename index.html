@@ -78,10 +78,6 @@
         
         /* INLINE EDIT */
         .inline-select { padding: 6px; border: 1px solid #2563EB; border-radius: 6px; font-size: 11px; width: 100%; font-family: Tahoma; }
-        .editable-cell { cursor: pointer; position: relative; padding: 8px; }
-        .editable-cell:hover { background: #FFF8DC; border-radius: 4px; }
-        .edit-icon { font-size: 10px; opacity: 0; margin-left: 5px; }
-        .editable-cell:hover .edit-icon { opacity: 1; }
         
         .notification { position: fixed; top: 20px; left: 50%; transform: translateX(-50%); background: #16A34A; color: #fff; padding: 12px 24px; border-radius: 8px; z-index: 9999; font-weight: 600; display: none; }
         .notification.show { display: block; }
@@ -341,10 +337,17 @@
                         </select>
                     </div>
 
-                    <!-- Row 5: مانع اصلی -->
+                    <!-- Row 5: مانع اصلی، اقدام بعدی -->
                     <div class="form-group">
                         <label class="form-label">مانع اصلی</label>
-                        <input type="text" name="main_obstacle" class="form-input">
+                        <select name="main_obstacle" class="form-input">
+                            <option>انتخاب کنید</option>
+                            <option>عدم توافق نرخ</option>
+                            <option>عدم توافق SLA</option>
+                            <option>عدم توافق قراردادی</option>
+                            <option>شکایت مشتری از خدمات</option>
+                            <option>مانع ندارد</option>
+                        </select>
                     </div>
                     <div class="form-group">
                         <label class="form-label">اقدام بعدی</label>
@@ -410,6 +413,14 @@
             { id: 4, name: 'جلسه مذاکره' },
             { id: 5, name: 'ارسال پروپوزال' },
             { id: 6, name: 'عقد قرارداد' }
+        ];
+
+        const OBSTACLES = [
+            'عدم توافق نرخ',
+            'عدم توافق SLA',
+            'عدم توافق قراردادی',
+            'شکایت مشتری از خدمات',
+            'مانع ندارد'
         ];
 
         const NEXT_ACTIONS = [
@@ -596,14 +607,14 @@
                             </select>
                         </td>
                         <td>
-                            <div class="editable-cell" onclick="editField(${lead.id}, 'main_obstacle', this)">
-                                ${lead.main_obstacle || '---'}
-                                <span class="edit-icon">✏️</span>
-                            </div>
+                            <select class="inline-select" onchange="updateField(${lead.id}, 'main_obstacle', this.value)">
+                                <option value="">-- انتخاب --</option>
+                                ${OBSTACLES.map(obs => `<option value="${obs}" ${lead.main_obstacle === obs ? 'selected' : ''}>${obs}</option>`).join('')}
+                            </select>
                         </td>
                         <td>
                             <select class="inline-select" onchange="updateField(${lead.id}, 'next_action', this.value)">
-                                <option value="">-- انتخاب کنید --</option>
+                                <option value="">-- انتخاب --</option>
                                 ${NEXT_ACTIONS.map(action => `<option value="${action}" ${lead.next_action === action ? 'selected' : ''}>${action}</option>`).join('')}
                             </select>
                         </td>
@@ -621,18 +632,6 @@
             
             html += '</tbody></table>';
             container.innerHTML = html;
-        }
-
-        function editField(leadId, fieldName, cellElement) {
-            const lead = leads.find(l => l.id === leadId);
-            if (!lead) return;
-
-            const currentValue = lead[fieldName] || '';
-            const inputValue = prompt(`اپدیت کنید: ${fieldName === 'main_obstacle' ? 'مانع اصلی' : 'اقدام بعدی'}`, currentValue);
-            
-            if (inputValue !== null) {
-                updateField(leadId, fieldName, inputValue);
-            }
         }
 
         function updateField(leadId, fieldName, value) {
