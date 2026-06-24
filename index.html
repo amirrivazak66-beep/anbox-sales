@@ -1,797 +1,774 @@
 <!DOCTYPE html>
 <html dir="rtl" lang="fa">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>داشبورد V4 | آن‌باکس</title>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.min.js"></script>
-    <style>
-        * { box-sizing: border-box; margin: 0; padding: 0; }
-        body { font-family: Tahoma, 'Segoe UI', sans-serif; background: #F0F4F8; color: #1E293B; min-height: 100vh; }
-        
-        /* LOGIN */
-        .login-container { display: flex; align-items: center; justify-content: center; min-height: 100vh; background: linear-gradient(135deg, #1B3A5C, #2563EB); }
-        .login-box { background: #fff; padding: 40px; border-radius: 12px; box-shadow: 0 10px 40px rgba(0,0,0,.2); width: 100%; max-width: 400px; }
-        .login-logo { text-align: center; font-size: 48px; margin-bottom: 20px; }
-        .login-title { text-align: center; font-size: 24px; font-weight: 700; color: #1B3A5C; margin-bottom: 30px; }
-        .form-group { margin-bottom: 20px; }
-        .form-label { display: block; font-size: 14px; font-weight: 600; margin-bottom: 8px; color: #1B3A5C; }
-        .form-input, select { width: 100%; padding: 12px; border: 1px solid #E2E8F0; border-radius: 8px; font-size: 14px; font-family: Tahoma; }
-        .form-input:focus, select:focus { outline: none; border-color: #2563EB; box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1); }
-        .login-button { width: 100%; padding: 12px; background: #2563EB; color: #fff; border: none; border-radius: 8px; font-size: 16px; font-weight: 700; cursor: pointer; }
-        .login-button:hover { background: #1B5BB3; }
-        .login-error { background: #FEE2E2; color: #DC2626; padding: 12px; border-radius: 8px; margin-bottom: 20px; font-size: 14px; display: none; }
-        
-        /* DASHBOARD */
-        .dashboard-container { display: flex; min-height: 100vh; }
-        .sidebar { width: 250px; background: #1B3A5C; color: #fff; padding: 20px; position: fixed; height: 100vh; overflow-y: auto; z-index: 1000; }
-        .logo { display: flex; align-items: center; gap: 10px; margin-bottom: 30px; }
-        .logo-text { font-size: 14px; font-weight: 700; }
-        .user-info { background: rgba(255,255,255,.1); padding: 12px; border-radius: 8px; margin-bottom: 20px; font-size: 12px; }
-        .user-name { font-weight: 700; margin-bottom: 5px; }
-        .logout-btn { width: 100%; padding: 8px; background: #DC2626; color: #fff; border: none; border-radius: 6px; font-size: 12px; cursor: pointer; margin-top: 10px; }
-        .nav-menu { display: flex; flex-direction: column; gap: 5px; }
-        .nav-item { padding: 12px 15px; border-radius: 8px; cursor: pointer; font-size: 13px; transition: all .2s; }
-        .nav-item:hover { background: rgba(255,255,255,.1); }
-        .nav-item.active { background: #2563EB; }
-        .main { margin-right: 250px; flex: 1; }
-        .header { background: #fff; border-bottom: 1px solid #E2E8F0; padding: 15px 30px; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 100; }
-        .header-title { font-size: 18px; font-weight: 700; color: #1B3A5C; }
-        .content { padding: 30px; max-width: 1600px; margin: 0 auto; }
-        .page { display: none; }
-        .page.active { display: block; }
-        .card { background: #fff; border-radius: 12px; border: 1px solid #E2E8F0; padding: 20px; margin-bottom: 20px; box-shadow: 0 1px 3px rgba(0,0,0,.05); }
-        .card-title { font-size: 16px; font-weight: 700; margin-bottom: 15px; color: #1B3A5C; }
-        
-        /* TABS */
-        .tabs { display: flex; gap: 0; border-bottom: 2px solid #E2E8F0; margin-bottom: 20px; }
-        .tab { padding: 12px 24px; cursor: pointer; font-weight: 600; color: #64748B; border-bottom: 3px solid transparent; margin-bottom: -2px; transition: all .2s; }
-        .tab:hover { color: #1B3A5C; }
-        .tab.active { color: #2563EB; border-bottom-color: #2563EB; }
-        .tab-content { display: none; }
-        .tab-content.active { display: block; }
-        
-        /* PIPELINE */
-        .pipeline-grid { display: grid; grid-template-columns: repeat(6, 1fr); gap: 15px; margin-bottom: 20px; }
-        .pipeline-box { background: linear-gradient(135deg, #F8FAFC, #E2E8F0); padding: 15px; border-radius: 10px; text-align: center; border: 1px solid #E2E8F0; }
-        .pipeline-stage { font-size: 12px; color: #64748B; margin-bottom: 5px; }
-        .pipeline-count { font-size: 24px; font-weight: 700; color: #2563EB; }
-        .pipeline-percent { font-size: 11px; color: #94A3B8; margin-top: 5px; }
-        .progress-bar { width: 100%; height: 6px; background: #E2E8F0; border-radius: 3px; margin-top: 8px; overflow: hidden; }
-        .progress-fill { height: 100%; background: linear-gradient(90deg, #2563EB, #1B5BB3); }
-        
-        /* TEAM SECTION */
-        .team-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 15px; margin-bottom: 20px; }
-        .team-card { background: linear-gradient(135deg, #F8FAFC, #E2E8F0); padding: 20px; border-radius: 10px; border: 1px solid #E2E8F0; }
-        .team-name { font-size: 16px; font-weight: 700; color: #1B3A5C; margin-bottom: 8px; }
-        .team-role { font-size: 12px; color: #64748B; margin-bottom: 12px; }
-        .team-checkbox { display: flex; align-items: center; gap: 8px; padding: 8px; background: #fff; border-radius: 6px; cursor: pointer; }
-        .team-checkbox input { cursor: pointer; }
-        
-        /* LEAD FORM */
-        .toolbar { display: flex; gap: 10px; margin-bottom: 20px; flex-wrap: wrap; align-items: center; }
-        .btn { padding: 10px 20px; background: #2563EB; color: #fff; border: none; border-radius: 8px; cursor: pointer; font-weight: 700; font-family: Tahoma; transition: all .2s; }
-        .btn:hover { background: #1B5BB3; }
-        .btn.secondary { background: #E2E8F0; color: #1B3A5C; }
-        .btn.danger { background: #DC2626; }
-        .btn.success { background: #16A34A; }
-        .search-box { padding: 10px 15px; border: 1px solid #E2E8F0; border-radius: 8px; width: 250px; font-family: Tahoma; }
-        
-        .modal { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,.7); z-index: 2000; align-items: flex-start; justify-content: center; overflow-y: auto; padding: 20px 0; }
-        .modal.active { display: flex; }
-        .modal-content { background: #fff; border-radius: 12px; padding: 30px; max-width: 1000px; width: 95%; margin: 20px auto; max-height: 90vh; overflow-y: auto; }
-        .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
-        .modal-title { font-size: 18px; font-weight: 700; color: #1B3A5C; }
-        .close-btn { font-size: 24px; cursor: pointer; background: none; border: none; color: #64748B; }
-        .form-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 15px; }
-        .form-grid.full { grid-template-columns: 1fr; }
-        
-        /* TABLE */
-        .lead-table { width: 100%; border-collapse: collapse; margin-top: 20px; font-size: 12px; }
-        .lead-table th { background: #F1F5F9; padding: 12px; text-align: right; font-weight: 700; color: #1B3A5C; border-bottom: 2px solid #E2E8F0; }
-        .lead-table td { padding: 10px; border-bottom: 1px solid #E2E8F0; }
-        .lead-table tr:hover { background: #F8FAFC; }
-        .stage-badge { display: inline-block; padding: 4px 10px; border-radius: 20px; font-size: 10px; font-weight: 700; background: #DBEAFE; color: #2563EB; }
-        
-        /* INLINE EDIT */
-        .inline-select { padding: 6px; border: 1px solid #2563EB; border-radius: 6px; font-size: 11px; width: 100%; font-family: Tahoma; }
-        
-        .notification { position: fixed; top: 20px; left: 50%; transform: translateX(-50%); background: #16A34A; color: #fff; padding: 12px 24px; border-radius: 8px; z-index: 9999; font-weight: 600; display: none; }
-        .notification.show { display: block; }
-        .notification.error { background: #DC2626; }
-        
-        @media(max-width: 768px) {
-            .sidebar { width: 100%; height: auto; position: relative; }
-            .main { margin-right: 0; }
-            .pipeline-grid { grid-template-columns: repeat(2, 1fr); }
-            .form-grid { grid-template-columns: 1fr; }
-            .lead-table { font-size: 10px; }
-            .modal-content { width: 98%; }
-            .team-grid { grid-template-columns: 1fr; }
-        }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>داشبورد فروش آن‌باکس</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.min.js"></script>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:Tahoma,'Segoe UI',sans-serif;background:#F0F4F8;color:#1E293B;min-height:100vh}
+.header{background:#fff;border-bottom:3px solid #2563EB;padding:12px 24px;display:flex;align-items:center;justify-content:space-between;box-shadow:0 2px 12px rgba(0,0,0,.07);position:sticky;top:0;z-index:100}
+.header-logo{height:44px;object-fit:contain}
+.header-right{text-align:left}.htitle{font-size:13px;font-weight:700;color:#1B3A5C}.hdate{font-size:11px;color:#64748B}
+.online-dot{width:8px;height:8px;border-radius:50%;background:#22C55E;display:inline-block;margin-left:4px;animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+.toast{position:fixed;top:20px;left:50%;transform:translateX(-50%);background:#16A34A;color:#fff;padding:10px 24px;border-radius:30px;z-index:9999;font-size:14px;font-weight:600;box-shadow:0 4px 20px rgba(0,0,0,.2);pointer-events:none;opacity:0;transition:opacity .3s}
+.toast.err{background:#DC2626}.toast.show{opacity:1}
+.loading{display:flex;align-items:center;justify-content:center;min-height:60vh;flex-direction:column;gap:16px}
+.spinner{width:40px;height:40px;border:4px solid #E2E8F0;border-top-color:#2563EB;border-radius:50%;animation:spin 1s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.sel-wrap{max-width:480px;margin:32px auto;padding:0 16px}
+.sel-hero{background:linear-gradient(135deg,#1B3A5C,#2563EB);color:#fff;border-radius:18px;padding:24px;text-align:center;margin-bottom:24px}
+.sel-hero h1{font-size:20px;margin-bottom:4px}.sel-hero p{font-size:13px;opacity:.75}
+.exp-btn{width:100%;padding:16px 20px;background:#fff;border:2px solid #E2E8F0;border-radius:14px;cursor:pointer;display:flex;align-items:center;justify-content:space-between;font-size:15px;font-weight:600;color:#1B3A5C;margin-bottom:10px;font-family:Tahoma,sans-serif;transition:border-color .2s}
+.exp-btn:hover{border-color:#2563EB}
+.ebadge{font-size:11px;padding:3px 10px;border-radius:20px;background:#F1F5F9;color:#64748B}
+.ebadge.done{background:#DCFCE7;color:#16A34A}
+.act-btn{width:100%;padding:14px;border:none;border-radius:12px;font-size:14px;font-weight:700;cursor:pointer;margin-bottom:10px;font-family:Tahoma,sans-serif}
+.act-btn.pri{background:#1B3A5C;color:#fff}.act-btn.sec{background:#fff;color:#64748B;border:1.5px solid #E2E8F0}
+.share-strip{background:#EFF6FF;border:1.5px solid #BFDBFE;border-radius:12px;padding:12px 16px;font-size:13px;color:#1E40AF;display:flex;align-items:center;gap:10px;margin-bottom:8px}
+.share-strip button{margin-right:auto;padding:7px 14px;background:#25D366;color:#fff;border:none;border-radius:8px;font-size:12px;cursor:pointer;font-weight:700;font-family:Tahoma,sans-serif}
+.exp-header{background:linear-gradient(135deg,#1B3A5C,#2563EB);color:#fff;padding:14px 20px}
+.back-btn{background:rgba(255,255,255,.15);border:none;color:#fff;border-radius:8px;padding:5px 12px;cursor:pointer;font-size:12px;margin-bottom:10px;font-family:Tahoma,sans-serif}
+.back-btn.dark{background:#EFF6FF;color:#2563EB}
+.exp-hrow{display:flex;justify-content:space-between;align-items:center}
+.ck-badge{text-align:center;background:rgba(255,255,255,.15);border-radius:12px;padding:8px 16px}
+.ck-badge .num{font-size:18px;font-weight:700}.ck-badge .lbl{font-size:10px;opacity:.8}
+.tabs{background:#fff;border-bottom:2px solid #E2E8F0;display:flex;position:sticky;top:67px;z-index:10}
+.tab-btn{flex:1;padding:13px 6px;border:none;background:none;cursor:pointer;font-size:12px;color:#64748B;border-bottom:3px solid transparent;font-family:Tahoma,sans-serif;transition:all .2s}
+.tab-btn.active{font-weight:700;color:#2563EB;border-bottom-color:#2563EB}
+.content{max-width:700px;margin:0 auto;padding:18px 14px}
+.card{background:#fff;border-radius:16px;border:1.5px solid #E2E8F0;overflow:hidden;margin-bottom:14px}
+.card-head{padding:14px 20px;background:#EFF6FF;border-bottom:1px solid #E2E8F0}
+.card-head h3{font-size:15px;color:#1B3A5C;font-weight:700}.card-head p{font-size:12px;color:#64748B;margin-top:2px}
+.card-body{padding:18px}
+.form-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;margin-bottom:14px}
+.ff label{display:block;font-size:11px;color:#64748B;margin-bottom:5px}
+.ff input[type=number]{width:100%;padding:9px 11px;border:1.5px solid #E2E8F0;border-radius:10px;font-size:15px;font-family:Tahoma,sans-serif;outline:none}
+.ff input:focus{border-color:#2563EB}
+.prow{display:flex;justify-content:space-between;font-size:11px;margin:4px 0 3px}
+.bwrap{background:#E2E8F0;border-radius:99px;height:7px}
+.bfill{height:7px;border-radius:99px;transition:width .4s,background .4s}
+.crm-row{display:flex;align-items:center;gap:12px;padding:12px 16px;border-radius:10px;cursor:pointer;margin-bottom:14px;border:1.5px solid #E2E8F0;background:#F8FAFC;transition:all .2s}
+.crm-row.done{background:#F0FDF4;border-color:#BBF7D0}
+.cbox{width:22px;height:22px;border-radius:6px;border:2px solid #CBD5E1;background:#fff;display:flex;align-items:center;justify-content:center;color:#fff;font-size:13px;flex-shrink:0}
+.cbox.on{background:#16A34A;border-color:#16A34A}
+.notes-area{width:100%;padding:9px 12px;border:1.5px solid #E2E8F0;border-radius:10px;font-size:14px;font-family:Tahoma,sans-serif;resize:vertical;outline:none;margin-bottom:14px}
+.notes-area:focus{border-color:#2563EB}
+.save-btn{width:100%;padding:14px;background:#2563EB;color:#fff;border:none;border-radius:12px;font-size:15px;font-weight:700;cursor:pointer;font-family:Tahoma,sans-serif}
+.saved-msg{text-align:center;font-size:12px;color:#16A34A;margin-top:7px}
+.kpi-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:9px}
+.kpi-box{text-align:center;padding:11px 6px;background:#F8FAFC;border-radius:10px}
+.kpi-box .ki{font-size:18px}.kpi-box .kv{font-size:20px;font-weight:700}.kpi-box .kl{font-size:9px;color:#64748B}
+.sch-item{background:#fff;border-radius:14px;border:1.5px solid #E2E8F0;padding:13px 16px;display:flex;gap:13px;align-items:flex-start;margin-bottom:9px}
+.si-icon{font-size:24px;min-width:34px;text-align:center}
+.si-title{font-weight:700;font-size:13px;color:#1B3A5C}.si-time{font-size:11px;color:#2563EB;margin-top:2px}.si-desc{font-size:12px;color:#374151;margin-top:5px;line-height:1.6}
+.ph{background:#fff;border-radius:14px;border:1.5px solid #E2E8F0;padding:15px 18px;margin-bottom:12px}
+.ph-row{display:flex;justify-content:space-between;margin-bottom:9px}
+.ci{display:flex;align-items:center;gap:13px;background:#fff;border:1.5px solid #E2E8F0;border-radius:12px;padding:13px 16px;cursor:pointer;margin-bottom:7px;transition:all .2s}
+.ci.done{background:#F0FDF4;border-color:#BBF7D0}
+.ci span{font-size:13px;color:#374151}.ci.done span{color:#16A34A;font-weight:600;text-decoration:line-through}
+.success-box{margin-top:14px;background:#F0FDF4;border:2px solid #22C55E;border-radius:14px;padding:18px;text-align:center}
+.mgr-header{background:linear-gradient(135deg,#1B3A5C,#2563EB);color:#fff;padding:14px 20px}
+.mgr-stats{display:flex;gap:10px;flex-wrap:wrap}
+.stat-box{text-align:center;background:rgba(255,255,255,.12);border-radius:12px;padding:9px 14px}
+.stat-box .sv{font-size:20px;font-weight:700}.stat-box .sl{font-size:10px;opacity:.8}
+.exp-card{background:#fff;border-radius:16px;border:1.5px solid #E2E8F0;overflow:hidden;margin-bottom:14px}
+.ech{padding:13px 18px;background:#FAFBFC;border-bottom:1px solid #E2E8F0;display:flex;justify-content:space-between;align-items:center}
+.avatar{width:36px;height:36px;border-radius:50%;background:#1B3A5C;color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:14px;flex-shrink:0}
+.en{font-weight:700;font-size:14px}.es{font-size:11px;color:#64748B;margin-top:1px}
+.metrics-grid{display:grid;grid-template-columns:repeat(3,1fr)}
+.mc{padding:12px 14px;border-right:1px solid #E2E8F0;border-bottom:1px solid #E2E8F0}
+.mc:nth-child(3n){border-right:none}.mc:nth-child(n+4){border-bottom:none}
+.ml{font-size:10px;color:#64748B;margin-bottom:3px}.mv{font-size:20px;font-weight:700}.mt{font-size:9px;color:#94A3B8}
+.notes-strip{padding:9px 18px;border-top:1px solid #E2E8F0;background:#FFFBEB;font-size:12px;color:#374151}
+.chart-wrap{background:#fff;border-radius:16px;border:1.5px solid #E2E8F0;padding:18px;margin-bottom:14px}
+.chart-title{font-size:14px;font-weight:700;color:#1B3A5C;margin-bottom:14px}
+.gauge-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:4px}
+.gauge-item{text-align:center}
+.bar-chart-row{display:flex;align-items:center;gap:10px;margin-bottom:8px}
+.bcr-label{font-size:11px;color:#64748B;min-width:70px;text-align:right}
+.bcr-bar{flex:1;background:#E2E8F0;border-radius:99px;height:20px;position:relative;overflow:hidden}
+.bcr-fill{height:100%;border-radius:99px;transition:width .5s}
+.bcr-val{position:absolute;left:8px;top:50%;transform:translateY(-50%);font-size:10px;color:#fff;font-weight:700}
+.bcr-pct{font-size:11px;font-weight:700;min-width:36px}
+.set-wrap{max-width:520px;margin:0 auto;padding:18px 14px}
+.add-row{display:flex;gap:8px;margin-bottom:14px}
+.add-inp{flex:1;padding:10px 13px;border:1.5px solid #E2E8F0;border-radius:10px;font-size:14px;font-family:Tahoma,sans-serif;outline:none}
+.add-inp:focus{border-color:#2563EB}
+.add-sub{padding:10px 18px;background:#2563EB;color:#fff;border:none;border-radius:10px;font-size:13px;font-weight:700;cursor:pointer;font-family:Tahoma,sans-serif}
+.si2{background:#fff;border-radius:12px;padding:13px 16px;border:1.5px solid #E2E8F0;display:flex;align-items:center;gap:9px;margin-bottom:9px}
+.si2 span{flex:1;font-size:14px;font-weight:600}
+.si2 input{flex:1;padding:6px 10px;border:1.5px solid #2563EB;border-radius:8px;font-size:13px;font-family:Tahoma,sans-serif;outline:none}
+.be{background:#EFF6FF;border:none;color:#2563EB;border-radius:8px;padding:6px 11px;cursor:pointer;font-size:11px;font-family:Tahoma,sans-serif}
+.bd{background:#FEF2F2;border:none;color:#DC2626;border-radius:8px;padding:6px 11px;cursor:pointer;font-size:11px;font-family:Tahoma,sans-serif}
+.kpi-set-row{display:grid;grid-template-columns:1fr 60px 70px 50px;gap:8px;align-items:center;padding:10px 12px;background:#F8FAFC;border-radius:10px;margin-bottom:8px;border:1.5px solid #E2E8F0}
+.kpi-set-row input{padding:7px 9px;border:1.5px solid #E2E8F0;border-radius:8px;font-size:12px;font-family:Tahoma,sans-serif;outline:none;width:100%}
+.kpi-set-row input:focus{border-color:#2563EB}
+.add-kpi-btn{padding:10px 16px;background:#16A34A;color:#fff;border:none;border-radius:10px;font-size:13px;font-weight:700;cursor:pointer;font-family:Tahoma,sans-serif;margin-top:4px}
+.del-kpi-btn{background:#FEF2F2;border:none;color:#DC2626;border-radius:8px;padding:5px 8px;cursor:pointer;font-size:11px;font-family:Tahoma,sans-serif}
+.col-hdr{font-size:10px;color:#94A3B8;text-align:center}
+.realtime-banner{background:#F0FDF4;border:1.5px solid #BBF7D0;border-radius:10px;padding:10px 14px;font-size:12px;color:#15803D;margin-bottom:14px;display:flex;align-items:center;gap:8px}
+.lead-table{width:100%;border-collapse:collapse;margin-top:14px;font-size:11px;background:#fff;border-radius:12px;overflow:hidden}
+.lead-table th{background:#F1F5F9;padding:10px;text-align:right;font-weight:700;color:#1B3A5C;border-bottom:1px solid #E2E8F0}
+.lead-table td{padding:10px;border-bottom:1px solid #E2E8F0}
+.lead-table tr:hover{background:#F8FAFC}
+.inline-select{padding:6px;border:1px solid #2563EB;border-radius:6px;font-size:10px;width:100%;font-family:Tahoma}
+@media(max-width:480px){.form-grid{grid-template-columns:1fr}.kpi-grid{grid-template-columns:repeat(2,1fr)}.gauge-grid{grid-template-columns:repeat(2,1fr)}.metrics-grid{grid-template-columns:repeat(2,1fr)}.kpi-set-row{grid-template-columns:1fr 50px 60px 40px}}
+</style>
 </head>
 <body>
-    <!-- LOGIN PAGE -->
-    <div id="loginPage" class="login-container">
-        <div class="login-box">
-            <div class="login-logo">📦</div>
-            <div class="login-title">آن‌باکس</div>
-            <div class="login-error" id="loginError"></div>
-            <div class="form-group">
-                <label class="form-label">نام کاربری</label>
-                <input type="text" id="username" class="form-input" placeholder="نام کاربری">
-            </div>
-            <div class="form-group">
-                <label class="form-label">رمز عبور</label>
-                <input type="password" id="password" class="form-input" placeholder="رمز عبور">
-            </div>
-            <button class="login-button" onclick="handleLogin()">ورود</button>
-        </div>
+<div class="header">
+  <img style="height:44px;object-fit:contain" id="hLogo" src="" alt="آن‌باکس">
+  <div class="header-right">
+    <div class="htitle"><span class="online-dot"></span>داشبورد یکپارچه آن‌باکس</div>
+    <div class="hdate" id="hDate"></div>
+  </div>
+</div>
+<div class="toast" id="toast"></div>
+<div id="app"><div class="loading"><div class="spinner"></div><div style="color:#64748B;font-size:14px">در حال بارگذاری...</div></div></div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+// SUPABASE CONFIG
+const SB_URL = 'https://uaydruhkevdmvpyefdjm.supabase.co';
+const SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVheWRydWhrZXZkbXZweWVmZGptIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODIxOTk4MjUsImV4cCI6MjA5Nzc3NTgyNX0.PYIOjf2OUOcgftxSHOEjwS7H5Gbx8xlSk7l8Pdc6PYc';
+const { createClient } = supabase;
+const db = createClient(SB_URL, SB_KEY);
+
+const LOGO_B64 = '/9j/4AAQSkZJRgABAQAAkACQAAD/4QECRXhpZgAATU0AKgAAAAgABwEOAAIAAAALAAAAYgESAAMAAAABAAEAAAEaAAUAAAABAAAAbgEbAAUAAAABAAAAdgEoAAMAAAABAAIAAAEyAAIAAAAUAAAAfodpAAQAAAABAAAAkgAAAABTY3JlZW5zaG90AAAAAACQAAAAAQAAAJAAAAABMjAyNjowNjoxNCAwMDoxODoxMwAABZADAAIAAAAUAAAA1JKGAAcAAAASAAAA6KABAAMAAAAB//8AAKACAAQAAAABAAAE4KADAAQAAAABAAACXAAAAAAyMDI2OjA2OjE0IDAwOjE4OjEzAEFTQ0lJAAAAU2NyZWVuc2hvdA==';
+
+// TEAM & KPI DEFAULTS
+const DEFAULT_EXPERTS = [
+  {id:1,name:'مجتبی رنجبر'},
+  {id:2,name:'ندا شریفی'},
+  {id:3,name:'سمن خوشکلام'},
+  {id:4,name:'پرستو احمدی'},
+];
+const DEFAULT_FIELDS = [
+  {key:'calls',label:'تماس با لید',icon:'📞',target:8},
+  {key:'followups',label:'فالوآپ',icon:'🔄',target:5},
+  {key:'info',label:'اطلاعات دریافتی',icon:'📋',target:5},
+  {key:'panels',label:'پنل ساخته‌شده',icon:'🖥️',target:3},
+  {key:'trainings',label:'آموزش',icon:'🎓',target:3},
+  {key:'barcodes',label:'بارکد',icon:'📦',target:10},
+];
+const CHECK_ITEMS=[
+  'لیست لیدهای امروز دریافت شد','گزارش دیروز بررسی شد','اهداف روز با مدیر هماهنگ شد',
+  'تماس با تمام لیدهای امروز انجام شد','فالوآپ مشتریان دیروز انجام شد',
+  'اطلاعات مشتریان تأییدشده دریافت شد','پنل‌های جدید ساخته و تحویل داده شد',
+  'آموزش شارژ و ارسال به مشتریان انجام شد','بارکد سفارشات امروز صادر شد',
+  'گزارش پایان روز در CRM ثبت شد'
+];
+
+// LEADS DEFAULT DROPDOWNS
+const LEAD_DROPDOWNS = {
+  lead_type: ['گرم', 'سرد'],
+  lead_source: ['سرچ اینترنتی', 'تماس مشتری', 'بانک اطلاعاتی', 'دایره طلایی', 'پیامک تبلیغاتی', 'سوشیال مدیا'],
+  industry: ['دارویی', 'بانک', 'فروشگاه اینترنتی', 'خودرویی', 'لوازم خانگی', 'سازمانی', 'لوازم آرایشی', 'لوازم آشپزخانه', 'لوازم جانبی', 'فروشگاه حضوری'],
+  selection_reason: ['جغرافیای تحت پوشش', 'ارسال پستی دارد', 'حجم سفارش مناسب', 'سابقه خوب با شرکت', 'توصیه شده از منابع معتبر'],
+  sales_stage: ['1. لیدسازی', '2. تماس اولیه', '3. ارسال نرخ نامه', '4. جلسه مذاکره', '5. ارسال پروپوزال', '6. عقد قرارداد'],
+  anbox_fit: ['ارسال مرسوله روزانه', 'تناسب با SLA', 'تناسب با نرخ', 'ارسال ترکیبی', 'ارسال مرسولات کم حجم'],
+  main_obstacle: ['عدم توافق نرخ', 'عدم توافق SLA', 'عدم توافق قراردادی', 'شکایت مشتری از خدمات', 'مانع ندارد'],
+  next_action: ['ارسال پروپوزال', 'برقراری جلسه مذاکره', 'جلسه متقاعد سازی', 'ارسال درفت قرارداد', 'عقد قرارداد', 'عدم توافق'],
+  sales_expert: ['امیرحسین ریواز', 'مجتبی رنجبر', 'ندا شریفی', 'سمن خوشکلام', 'پرستو احمدی'],
+  lead_status: ['در حال پیگیری', 'عدم توافق', 'انحلال شرکت', 'در حال عقد قرارداد', 'در حال مذاکره', 'در حال تست']
+};
+
+// GLOBAL VARS
+let CFG = {experts: DEFAULT_EXPERTS, fields: DEFAULT_FIELDS};
+let REPORTS = {};
+let LEADS = [];
+let AE = null;
+let currentPage = 'sel';
+
+function tkey(){return new Date().toISOString().slice(0,10);}
+function faDate(){return new Date().toLocaleDateString('fa-IR',{weekday:'long',year:'numeric',month:'long',day:'numeric'});}
+function pct(v,t){return Math.min(100,Math.round((parseInt(v)||0)/t*100));}
+function pColor(p){return p>=100?'#16A34A':p>=60?'#2563EB':p>=30?'#D97706':'#94A3B8';}
+
+let toastT;
+function toast(msg,type='ok'){
+  const el=document.getElementById('toast');
+  el.textContent=msg;el.className='toast '+(type==='err'?'err':'')+' show';
+  clearTimeout(toastT);toastT=setTimeout(()=>el.className='toast',2500);
+}
+
+// SUPABASE
+async function loadConfig(){
+  try{
+    const {data,error}=await db.from('config').select('*').eq('id',1).single();
+    if(data && !error){
+      CFG={
+        experts: data.experts||DEFAULT_EXPERTS,
+        fields:  data.fields||DEFAULT_FIELDS
+      };
+    } else {
+      await db.from('config').upsert({id:1, experts:DEFAULT_EXPERTS, fields:DEFAULT_FIELDS});
+    }
+  }catch(e){console.log('config load error',e);}
+}
+
+async function saveConfig(){
+  await db.from('config').upsert({id:1, experts:CFG.experts, fields:CFG.fields});
+}
+
+async function loadReports(){
+  try{
+    const {data,error}=await db.from('reports').select('*').eq('date',tkey());
+    if(data) data.forEach(r=>{ REPORTS[r.eid+'_'+r.date]=r; });
+  }catch(e){console.log('reports load',e);}
+}
+
+function getReport(eid){
+  const k=eid+'_'+tkey();
+  if(REPORTS[k]) return REPORTS[k];
+  const blank={eid,date:tkey(),crm:false,notes:'',checklist:new Array(10).fill(false),savedAt:null};
+  CFG.fields.forEach(f=>blank[f.key]='');
+  return blank;
+}
+
+async function saveReport(eid){
+  const r=getReport(eid);
+  r.savedAt=new Date().toLocaleTimeString('fa-IR');
+  REPORTS[eid+'_'+tkey()]=r;
+  const payload={eid,date:tkey(),crm:r.crm,notes:r.notes,checklist:r.checklist,savedAt:r.savedAt};
+  CFG.fields.forEach(f=>payload[f.key]=r[f.key]||'');
+  await db.from('reports').upsert(payload, {onConflict:'eid,date'});
+  return r;
+}
+
+async function updateField(eid, field, value){
+  const r=getReport(eid);
+  r[field]=value;
+  REPORTS[eid+'_'+tkey()]=r;
+  clearTimeout(window['dbT_'+eid]);
+  window['dbT_'+eid]=setTimeout(async()=>{
+    const payload={eid,date:tkey()};
+    payload[field]=value;
+    CFG.fields.forEach(f=>payload[f.key]=getReport(eid)[f.key]||'');
+    payload.crm=getReport(eid).crm;
+    payload.notes=getReport(eid).notes;
+    payload.checklist=getReport(eid).checklist;
+    await db.from('reports').upsert(payload,{onConflict:'eid,date'});
+  },800);
+}
+
+async function loadLeads(){
+  try{
+    const {data,error}=await db.from('leads').select('*').order('created_at',{ascending:false});
+    if(data) LEADS=data;
+  }catch(e){console.log('leads load',e);}
+}
+
+async function saveLead(lead){
+  lead.created_by = AE.id;
+  lead.created_at = new Date().toISOString();
+  try{
+    const {error}=await db.from('leads').insert([lead]);
+    if(error) throw error;
+    toast('لید ذخیره شد ✓');
+    await loadLeads();
+  }catch(e){
+    console.log('lead save error',e);
+    toast('خطا در ذخیره','err');
+  }
+}
+
+// RENDER FUNCTIONS
+function hideAll(){
+  ['page-sel','page-team','page-leads','page-mgr','page-set'].forEach(id=>{
+    const el=document.getElementById(id);if(el)el.style.display='none';
+  });
+}
+
+function setApp(html){document.getElementById('app').innerHTML=html;}
+
+function gotoSel(){hideAll();currentPage='sel';document.getElementById('page-sel').style.display='';renderSel();}
+function gotoTeam(){hideAll();currentPage='team';document.getElementById('page-team').style.display='';openTeam();}
+function gotoLeads(){hideAll();currentPage='leads';document.getElementById('page-leads').style.display='';renderLeads();}
+function gotoMgr(){hideAll();currentPage='mgr';document.getElementById('page-mgr').style.display='';renderMgr();}
+function gotoSet(){hideAll();currentPage='set';document.getElementById('page-set').style.display='';swSetTab('E');}
+
+function openTeam(eid){
+  AE=CFG.experts.find(e=>e.id===eid);
+  renderTeam();
+}
+
+function renderSel(){
+  document.getElementById('selDate').textContent=faDate();
+  document.getElementById('hDate').textContent=faDate();
+  const list=document.getElementById('expList');list.innerHTML='';
+  CFG.experts.forEach(e=>{
+    const r=getReport(e.id),done=r.checklist.filter(Boolean).length;
+    const b=document.createElement('button');b.className='exp-btn';
+    b.innerHTML='<span>👤 '+e.name+'</span><span class="ebadge'+(done===10?' done':'')+'">'+done+'/۱۰</span>';
+    b.onclick=()=>{openTeam(e.id);gotoTeam();};list.appendChild(b);
+  });
+}
+
+function renderTeam(){
+  document.getElementById('expGreet').textContent='سلام، '+AE.name+' 👋';
+  document.getElementById('expDate').textContent=faDate();
+  document.getElementById('hDate').textContent=faDate();
+  updCkBadge();
+  swTeamTab('R');
+}
+
+function updCkBadge(){
+  const r=getReport(AE.id),done=r.checklist.filter(Boolean).length;
+  const el=document.getElementById('ckBadge');
+  if(el){el.textContent=done+'/10';el.style.color=done===10?'#4ADE80':'#FCD34D';}
+}
+
+function swTeamTab(t){
+  ['R','S','C','L'].forEach(x=>{
+    const p=document.getElementById('t'+x);if(p)p.style.display=x===t?'':'none';
+    const b=document.getElementById('btn'+x);if(b)b.className='tab-btn'+(x===t?' active':'');
+  });
+  if(t==='L') renderLeadsView();
+}
+
+// TEAM REPORT FORM
+function buildTeamForm(){
+  const r=getReport(AE.id),p=document.getElementById('tR');
+  let html='<div class="realtime-banner">🟢 داده‌ها real-time با سرور همگام‌سازی می‌شود</div>';
+  html+='<div class="card"><div class="card-head"><h3>📝 ورود اطلاعات روزانه</h3></div><div class="card-body"><div class="form-grid">';
+  CFG.fields.forEach(f=>{
+    const v=r[f.key]||'',pc=pct(v,f.target),col=pColor(pc);
+    html+='<div class="ff"><label>'+f.icon+' '+f.label+' (هدف: '+f.target+')</label>'+
+      '<input type="number" min="0" id="inp_'+f.key+'" value="'+v+'" placeholder="۰" oninput="onTeamFCh(\''+f.key+'\')">'+
+      '<div class="prow"><span>'+(parseInt(v)||0)+'/'+f.target+'</span><span id="pp_'+f.key+'" style="font-weight:700;color:'+col+'">'+pc+'٪</span></div>'+
+      '<div class="bwrap"><div class="bfill" id="bf_'+f.key+'" style="background:'+col+';width:'+pc+'%"></div></div></div>';
+  });
+  html+='</div>';
+  html+='<div class="crm-row'+(r.crm?' done':'')+'" id="crmRow" onclick="togTeamCRM()">'+
+    '<div class="cbox'+(r.crm?' on':'')+'" id="crmBox">'+(r.crm?'✓':'')+'</div>'+
+    '<span>ثبت اطلاعات در CRM انجام شد</span></div>'+
+    '<label style="display:block;font-size:12px;color:#64748B;margin-bottom:6px">📝 یادداشت</label>'+
+    '<textarea class="notes-area" id="notesA" rows="3" oninput="onTeamNotes()">'+(r.notes||'')+'</textarea>'+
+    '<button class="save-btn" onclick="doTeamSave()">💾 ذخیره</button>'+
+    '<div id="savedM" class="saved-msg" style="'+(r.savedAt?'':'display:none')+'">'+(r.savedAt?'✓ ذخیره‌شد: '+r.savedAt:'')+'</div></div></div>';
+  html+='<div class="card"><div class="card-body"><div style="font-weight:700;color:#1B3A5C;margin-bottom:11px;font-size:13px">🎯 خلاصه</div><div class="kpi-grid" id="ksum"></div></div></div>';
+  p.innerHTML=html;buildTeamKpiSum();
+}
+
+function onTeamFCh(key){
+  const val=document.getElementById('inp_'+key).value;
+  const f=CFG.fields.find(x=>x.key===key);
+  const pc=pct(val,f.target),col=pColor(pc);
+  document.getElementById('bf_'+key).style.cssText='background:'+col+';width:'+pc+'%;height:7px;border-radius:99px';
+  document.getElementById('pp_'+key).textContent=pc+'٪';
+  document.getElementById('pp_'+key).style.color=col;
+  updateField(AE.id,key,val);
+  buildTeamKpiSum();
+}
+
+function togTeamCRM(){
+  const r=getReport(AE.id);r.crm=!r.crm;REPORTS[AE.id+'_'+tkey()]=r;
+  const row=document.getElementById('crmRow'),box=document.getElementById('crmBox');
+  if(r.crm){row.className='crm-row done';box.className='cbox on';box.textContent='✓';}
+  else{row.className='crm-row';box.className='cbox';box.textContent='';}
+  updateField(AE.id,'crm',r.crm);
+}
+
+function onTeamNotes(){
+  const r=getReport(AE.id);r.notes=document.getElementById('notesA').value;
+  REPORTS[AE.id+'_'+tkey()]=r;
+  updateField(AE.id,'notes',r.notes);
+}
+
+async function doTeamSave(){
+  const r=getReport(AE.id);
+  r.notes=document.getElementById('notesA').value;
+  REPORTS[AE.id+'_'+tkey()]=r;
+  await saveReport(AE.id);
+  const m=document.getElementById('savedM');
+  m.style.display='';m.textContent='✓ ذخیره‌شد: '+getReport(AE.id).savedAt;
+  toast('گزارش ذخیره شد ✓');
+}
+
+function buildTeamKpiSum(){
+  const r=getReport(AE.id),el=document.getElementById('ksum');if(!el)return;
+  el.innerHTML=CFG.fields.map(f=>{
+    const pc=pct(r[f.key],f.target),col=pColor(pc);
+    return '<div class="kpi-box"><div class="ki">'+f.icon+'</div><div class="kv" style="color:'+col+'">'+(parseInt(r[f.key])||0)+'</div><div class="kl">'+f.label+'</div></div>';
+  }).join('');
+}
+
+function buildTeamSchedule(){
+  const SCH=[
+    {i:'☀️',t:'جلسه صبحگاهی',h:'۰۸:۰۰',d:'مرور اهداف'},
+    {i:'📞',t:'تماس با لیدهای جدید',h:'۰۸:۳۰',d:'هدف: ۸ تماس'},
+    {i:'🔄',t:'فالوآپ مشتریان دیروز',h:'۱۰:۳۰',d:'هدف: ۱۰۰٪'},
+    {i:'📋',t:'دریافت اطلاعات',h:'۱۱:۳۰',d:'هدف: ۵ مورد'},
+    {i:'🍽️',t:'ناهار',h:'۱۳:۰۰',d:'استراحت'},
+    {i:'🖥️',t:'ساخت پنل',h:'۱۴:۰۰',d:'هدف: ۳ پنل'},
+    {i:'🎓',t:'آموزش',h:'۱۵:۳۰',d:'هدف: ۳ مورد'},
+    {i:'📦',t:'بارکد',h:'۱۶:۳۰',d:'هدف: ۱۰ بارکد'},
+    {i:'📊',t:'گزارش پایان روز',h:'۱۷:۳۰',d:'در CRM'}
+  ];
+  document.getElementById('tS').innerHTML=SCH.map(s=>
+    '<div class="sch-item"><div class="si-icon">'+s.i+'</div><div>'+
+    '<div class="si-title">'+s.t+'</div><div class="si-time">⏰ '+s.h+'</div>'+
+    '<div class="si-desc">'+s.d+'</div></div></div>').join('');
+}
+
+function buildTeamChecklist(){
+  const r=getReport(AE.id),done=r.checklist.filter(Boolean).length,pp=Math.round(done/10*100);
+  let html='<div class="ph"><div class="ph-row"><span style="font-weight:700">پیشرفت امروز</span>'+
+    '<span style="font-weight:700;color:#2563EB" id="ckProg">'+done+'/10</span></div>'+
+    '<div class="bwrap"><div class="bfill" id="ckBar" style="background:'+(done===10?'#22C55E':'linear-gradient(90deg,#1B3A5C,#2563EB)')+';width:'+pp+'%"></div></div></div>';
+  CHECK_ITEMS.forEach((item,i)=>{
+    html+='<div class="ci'+(r.checklist[i]?' done':'')+'" onclick="togTeamCk('+i+')">'+
+      '<div class="cbox'+(r.checklist[i]?' on':'')+'">'+( r.checklist[i]?'✓':'')+'</div>'+
+      '<span>'+item+'</span></div>';
+  });
+  if(done===10) html+='<div class="success-box"><div style="font-size:34px;margin-bottom:5px">🎉</div><div style="font-weight:700;color:#16A34A">آفرین! روز موفقی داشتید</div></div>';
+  document.getElementById('tC').innerHTML=html;
+}
+
+async function togTeamCk(i){
+  const r=getReport(AE.id);r.checklist[i]=!r.checklist[i];
+  REPORTS[AE.id+'_'+tkey()]=r;
+  buildTeamChecklist();updCkBadge();
+  await updateField(AE.id,'checklist',r.checklist);
+}
+
+// LEADS MANAGEMENT
+function renderLeads(){
+  document.getElementById('hDate').textContent=faDate();
+  let html='<div class="card"><div class="card-head"><h3>📋 مدیریت لیدها</h3></div><div class="card-body">'+
+    '<button class="save-btn" style="background:#16A34A;margin-bottom:14px" onclick="showLeadForm()">➕ افزودن لید جدید</button>'+
+    '<button class="save-btn" style="background:#2563EB;margin-bottom:14px" onclick="downloadLeadTemplate()">📥 دانلود نمونه Excel</button>'+
+    '<button class="save-btn" style="background:#D97706;margin-bottom:14px" onclick="document.getElementById(\'xlFile\').click()">📊 Import Excel</button>'+
+    '<input type="file" id="xlFile" accept=".xlsx,.xls" style="display:none" onchange="importLeadsExcel(event)">'+
+    '<div id="leadsList"></div></div></div>';
+  setApp(html);
+  renderLeadsTable();
+}
+
+function renderLeadsView(){
+  let html='<div class="card"><div class="card-head"><h3>📋 لیدهای من</h3></div><div class="card-body">'+
+    '<button class="save-btn" style="background:#16A34A;margin-bottom:14px" onclick="showLeadForm()">➕ افزودن لید</button>'+
+    '<div id="myLeadsList"></div></div></div>';
+  document.getElementById('tL').innerHTML=html;
+  const myLeads=LEADS.filter(l=>l.created_by===AE.id);
+  if(myLeads.length===0){
+    document.getElementById('myLeadsList').innerHTML='<p style="text-align:center;color:#94A3B8;padding:20px">هیچ لیدی ثبت نشده</p>';
+  }else{
+    let tbl='<table class="lead-table"><thead><tr>';
+    ['نام شرکت','تماس گیر','مرحله','وضعیت'].forEach(h=>tbl+='<th>'+h+'</th>');
+    tbl+='</tr></thead><tbody>';
+    myLeads.forEach(l=>{
+      tbl+='<tr><td>'+l.company_name+'</td><td>'+l.contact_name+'</td><td>'+l.sales_stage+'</td><td>'+l.lead_status+'</td></tr>';
+    });
+    tbl+='</tbody></table>';
+    document.getElementById('myLeadsList').innerHTML=tbl;
+  }
+}
+
+function renderLeadsTable(){
+  const list=document.getElementById('leadsList');
+  if(LEADS.length===0){
+    list.innerHTML='<p style="text-align:center;color:#94A3B8;padding:20px">هیچ لیدی ثبت نشده</p>';
+    return;
+  }
+  let tbl='<table class="lead-table"><thead><tr>';
+  ['نام شرکت','صنعت','تماس گیر','شماره','مرحله','مانع','اقدام بعدی','وضعیت'].forEach(h=>tbl+='<th>'+h+'</th>');
+  tbl+='</tr></thead><tbody>';
+  LEADS.forEach(l=>{
+    tbl+='<tr><td>'+l.company_name+'</td><td>'+l.industry+'</td><td>'+l.contact_name+'</td><td>'+l.phone+'</td>'+
+      '<td><select class="inline-select" onchange="updateLeadField('+l.id+`,\'sales_stage\',this.value)">'+
+      Object.entries(LEAD_DROPDOWNS.sales_stage).map((s,i)=>'<option '+(l.sales_stage===s?'selected':'')+'>'+s+'</option>').join('')+
+      '</select></td>'+
+      '<td><select class="inline-select" onchange="updateLeadField('+l.id+`,\'main_obstacle\',this.value)"><option></option>'+
+      LEAD_DROPDOWNS.main_obstacle.map(o=>'<option '+(l.main_obstacle===o?'selected':'')+'>'+o+'</option>').join('')+
+      '</select></td>'+
+      '<td><select class="inline-select" onchange="updateLeadField('+l.id+`,\'next_action\',this.value)"><option></option>'+
+      LEAD_DROPDOWNS.next_action.map(a=>'<option '+(l.next_action===a?'selected':'')+'>'+a+'</option>').join('')+
+      '</select></td>'+
+      '<td><select class="inline-select" onchange="updateLeadField('+l.id+`,\'lead_status\',this.value)">'+
+      LEAD_DROPDOWNS.lead_status.map(st=>'<option '+(l.lead_status===st?'selected':'')+'>'+st+'</option>').join('')+
+      '</select></td></tr>';
+  });
+  tbl+='</tbody></table>';
+  list.innerHTML=tbl;
+}
+
+function showLeadForm(){
+  let html='<div class="card"><div class="card-head"><h3>افزودن لید جدید</h3></div><div class="card-body">';
+  html+='<div class="form-grid">';
+  ['lead_type','lead_source','company_name','industry','selection_reason','phone','contact_name','contact_position','sales_stage','anbox_fit','main_obstacle','next_action','sales_expert','lead_status'].forEach(key=>{
+    const label = {lead_type:'نوع لید',lead_source:'مبدأ لید',company_name:'نام شرکت',industry:'صنعت',selection_reason:'دلیل انتخاب',phone:'شماره تماس',contact_name:'نام فرد تماس',contact_position:'سمت فرد',sales_stage:'مرحله فروش',anbox_fit:'تناسب با آن‌باکس',main_obstacle:'مانع اصلی',next_action:'اقدام بعدی',sales_expert:'کارشناس',lead_status:'وضعیت لید'}[key];
+    const isSelect = LEAD_DROPDOWNS[key];
+    if(isSelect){
+      html+='<div class="ff"><label>'+label+'</label><select id="f_'+key+'" class="add-inp" style="padding:8px"><option></option>';
+      LEAD_DROPDOWNS[key].forEach(v=>html+='<option>'+v+'</option>');
+      html+='</select></div>';
+    }else{
+      html+='<div class="ff"><label>'+label+'</label><input type="text" id="f_'+key+'" class="add-inp"></div>';
+    }
+  });
+  html+='</div><button class="save-btn" onclick="doAddLead()" style="background:#16A34A">➕ افزودن</button></div></div>';
+  document.getElementById('leadsList').innerHTML=html;
+}
+
+async function doAddLead(){
+  const lead={};
+  ['lead_type','lead_source','company_name','industry','selection_reason','phone','contact_name','contact_position','sales_stage','anbox_fit','main_obstacle','next_action','sales_expert','lead_status'].forEach(key=>{
+    lead[key]=document.getElementById('f_'+key).value||'';
+  });
+  if(!lead.company_name || !lead.phone){
+    toast('نام شرکت و شماره تماس الزامی است','err');return;
+  }
+  await saveLead(lead);
+  renderLeads();
+}
+
+function updateLeadField(id, field, value){
+  const lead = LEADS.find(l=>l.id===id);
+  if(lead){
+    lead[field]=value;
+    db.from('leads').update({[field]:value}).eq('id',id).then(()=>toast('به‌روزرسانی شد'));
+  }
+}
+
+function downloadLeadTemplate(){
+  const headers = ['نوع لید','مبدأ لید','نام شرکت','صنعت','دلیل انتخاب شرکت','شماره تماس','نام فرد تماس','سمت فرد تماس','مرحله فروش','تناسب با آن باکس','مانع اصلی','اقدام بعدی','کارشناس فروش','وضعیت لید'];
+  const sampleData = [['گرم','سرچ اینترنتی','شرکت نمونه','بانک','جغرافیای تحت پوشش','09121234567','علی احمدی','مدیر انبار','2. تماس اولیه','ارسال مرسوله روزانه','مانع ندارد','برقراری جلسه مذاکره','امیرحسین ریواز','در حال مذاکره']];
+  let csv = headers.join('\t') + '\n';
+  sampleData.forEach(row=>csv+=row.join('\t')+'\n');
+  const blob = new Blob([csv], {type: 'text/csv;charset=utf-8;'});
+  const link = document.createElement('a');
+  const url = URL.createObjectURL(blob);
+  link.setAttribute('href', url);
+  link.setAttribute('download', 'نمونه_لیدها.csv');
+  link.style.visibility = 'hidden';
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+  toast('نمونه دانلود شد');
+}
+
+async function importLeadsExcel(event){
+  const file = event.target.files[0];
+  if(!file) return;
+  const reader = new FileReader();
+  reader.onload = (e)=>{
+    try{
+      const data = new Uint8Array(e.target.result);
+      const workbook = XLSX.read(data, {type:'array'});
+      const worksheet = workbook.Sheets[workbook.SheetNames[0]];
+      const json = XLSX.utils.sheet_to_json(worksheet);
+      let imported=0;
+      json.forEach(row=>{
+        if(row['نام شرکت'] && row['شماره تماس']){
+          const lead={
+            lead_type: row['نوع لید']||'سرد',
+            lead_source: row['مبدأ لید']||'',
+            company_name: row['نام شرکت'],
+            industry: row['صنعت']||'',
+            selection_reason: row['دلیل انتخاب شرکت']||'',
+            phone: row['شماره تماس'],
+            contact_name: row['نام فرد تماس']||'',
+            contact_position: row['سمت فرد تماس']||'',
+            sales_stage: row['مرحله فروش']||'1. لیدسازی',
+            anbox_fit: row['تناسب با آن باکس']||'',
+            main_obstacle: row['مانع اصلی']||'',
+            next_action: row['اقدام بعدی']||'',
+            sales_expert: row['کارشناس فروش']||'',
+            lead_status: row['وضعیت لید']||'در حال پیگیری'
+          };
+          saveLead(lead);imported++;
+        }
+      });
+      toast(`${imported} لید آپلود شد`);
+      loadLeads();
+      renderLeads();
+      document.getElementById('xlFile').value='';
+    }catch(err){
+      toast('خطا در پردازش فایل','err');
+    }
+  };
+  reader.readAsArrayBuffer(file);
+}
+
+// MANAGER VIEW
+function renderMgr(){
+  document.getElementById('hDate').textContent=faDate();
+  const tP=CFG.experts.reduce((s,e)=>s+(parseInt(getReport(e.id).panels)||0),0);
+  const tC=CFG.experts.reduce((s,e)=>s+(parseInt(getReport(e.id).calls)||0),0);
+  const tD=CFG.experts.filter(e=>getReport(e.id).checklist.filter(Boolean).length===10).length;
+  let html='<div class="card"><div class="card-head"><h3>📊 داشبورد مدیریتی</h3></div><div class="card-body">'+
+    '<div class="mgr-stats">'+
+    '<div class="stat-box"><div class="sv">'+CFG.experts.length+'</div><div class="sl">کارشناسان</div></div>'+
+    '<div class="stat-box"><div class="sv">'+tP+'</div><div class="sl">پنل امروز</div></div>'+
+    '<div class="stat-box"><div class="sv">'+tC+'</div><div class="sl">تماس امروز</div></div>'+
+    '<div class="stat-box"><div class="sv">'+tD+'/'+CFG.experts.length+'</div><div class="sl">چک‌لیست کامل</div></div>'+
+    '</div></div></div>';
+  CFG.experts.forEach(e=>{
+    const r=getReport(e.id),done=r.checklist.filter(Boolean).length;
+    html+='<div class="exp-card"><div class="ech"><div style="display:flex;align-items:center;gap:9px"><div class="avatar">'+e.name[0]+'</div>'+
+      '<div><div class="en">'+e.name+'</div><div class="es">'+(r.savedAt?'ذخیره: '+r.savedAt:'بدون ذخیره')+'</div></div></div>'+
+      '<span class="ebadge'+(done===10?' done':'')+'">'+done+'/۱۰</span></div>'+
+      '<div class="metrics-grid">';
+    CFG.fields.forEach(f=>{
+      const v=parseInt(r[f.key])||0,pc=pct(v,f.target),col=pColor(pc);
+      html+='<div class="mc"><div class="ml">'+f.icon+'</div><div class="mv" style="color:'+col+'">'+v+'</div>'+
+        '<div class="mt">هدف: '+f.target+'</div></div>';
+    });
+    html+='</div>'+(r.notes?'<div class="notes-strip">📝 '+r.notes+'</div>':'')+'</div>';
+  });
+  document.getElementById('page-mgr').innerHTML=html;
+}
+
+// SETTINGS
+function swSetTab(t){
+  document.getElementById('setExperts').style.display=t==='E'?'':'none';
+  document.getElementById('setKpi').style.display=t==='K'?'':'none';
+  document.getElementById('stE').className='tab-btn'+(t==='E'?' active':'');
+  document.getElementById('stK').className='tab-btn'+(t==='K'?' active':'');
+  if(t==='E')renderSetExp();else renderSetKpi();
+}
+
+function renderSetExp(){
+  const el=document.getElementById('setExperts');
+  let html='<div class="card"><div class="card-body"><label style="display:block;font-size:13px;color:#1B3A5C;margin-bottom:11px">افزودن کارشناس ('+CFG.experts.length+'/10)</label>'+
+    '<div class="add-row"><input class="add-inp" id="newNm" placeholder="نام و نام خانوادگی" onkeydown="if(event.key===\'Enter\')addExp()">'+
+    '<button class="add-sub" onclick="addExp()">+ افزودن</button></div></div></div>';
+  CFG.experts.forEach(e=>{
+    html+='<div class="si2" id="si_'+e.id+'"><span>👤 '+e.name+'</span>'+
+      '<button class="be" onclick="stEdit('+e.id+')">ویرایش</button>'+
+      '<button class="bd" onclick="delExp('+e.id+')">حذف</button></div>';
+  });
+  el.innerHTML=html;
+}
+
+function stEdit(eid){
+  const e=CFG.experts.find(x=>x.id===eid),div=document.getElementById('si_'+eid);
+  div.innerHTML='<input class="add-inp" id="ei_'+eid+'" value="'+e.name+'" style="flex:1" onkeydown="if(event.key===\'Enter\')doEdit('+eid+')">'+
+    '<button class="be" onclick="doEdit('+eid+')">ذخیره</button>';
+  document.getElementById('ei_'+eid).focus();
+}
+
+async function doEdit(eid){
+  const v=document.getElementById('ei_'+eid).value.trim();if(!v)return;
+  CFG.experts=CFG.experts.map(e=>e.id===eid?{...e,name:v}:e);
+  await saveConfig();renderSetExp();toast('نام ویرایش شد');
+}
+
+async function addExp(){
+  const nm=document.getElementById('newNm').value.trim();if(!nm)return;
+  if(CFG.experts.length>=10){toast('حداکثر ۱۰ کارشناس','err');return;}
+  CFG.experts.push({id:Date.now(),name:nm});
+  await saveConfig();document.getElementById('newNm').value='';renderSetExp();toast(nm+' اضافه شد');
+}
+
+async function delExp(eid){
+  CFG.experts=CFG.experts.filter(e=>e.id!==eid);
+  await saveConfig();renderSetExp();toast('حذف شد');
+}
+
+function renderSetKpi(){
+  const el=document.getElementById('setKpi');
+  let html='<div class="card"><div class="card-head"><h3>تنظیم KPI</h3></div><div class="card-body">';
+  CFG.fields.forEach((f,i)=>{
+    html+='<div class="kpi-set-row">'+
+      '<input id="kl_'+i+'" value="'+f.label+'" oninput="updKpi('+i+`,\'label\',this.value)">'+
+      '<input id="ki_'+i+'" value="'+f.icon+'" style="text-align:center" oninput="updKpi('+i+`,\'icon\',this.value)">'+
+      '<input type="number" id="kt_'+i+'" value="'+f.target+'" min="1" oninput="updKpi('+i+`,\'target\',this.value)">'+
+      '<button class="del-kpi-btn" onclick="delKpi('+i+')">حذف</button></div>';
+  });
+  html+='<button class="add-kpi-btn" onclick="addKpi()">+ KPI جدید</button></div></div>';
+  el.innerHTML=html;
+}
+
+async function updKpi(i,prop,val){
+  if(prop==='target') CFG.fields[i].target=parseInt(val)||1;
+  else CFG.fields[i][prop]=val;
+  clearTimeout(window.kpiSaveT);
+  window.kpiSaveT=setTimeout(()=>saveConfig(),800);
+}
+
+async function delKpi(i){
+  if(CFG.fields.length<=1){toast('حداقل یک KPI','err');return;}
+  CFG.fields.splice(i,1);await saveConfig();renderSetKpi();toast('حذف شد');
+}
+
+async function addKpi(){
+  CFG.fields.push({key:'kpi_'+Date.now(),label:'KPI جدید',icon:'📌',target:5});
+  await saveConfig();renderSetKpi();toast('اضافه شد');
+}
+
+function shareWA(){
+  const url=window.location.href;
+  const txt='داشبورد آن‌باکس 🚚\n'+url;
+  window.open('https://wa.me/?text='+encodeURIComponent(txt),'_blank');
+}
+
+// INIT
+document.getElementById('hLogo').src='data:image/jpeg;base64,'+LOGO_B64;
+
+async function init(){
+  document.getElementById('hDate').textContent=faDate();
+  await loadConfig();
+  await loadReports();
+  await loadLeads();
+  
+  document.getElementById('app').innerHTML=`
+    <div id="page-sel">
+      <div class="sel-wrap">
+        <div class="sel-hero"><h1>🚚 داشبورد یکپارچه آن‌باکس</h1><p id="selDate"></p></div>
+        <div style="font-size:13px;color:#64748B;margin-bottom:11px;text-align:center">شما کدام کارشناس هستید؟</div>
+        <div id="expList"></div>
+        <button class="act-btn pri" onclick="gotoMgr()">📊 ورود مدیر</button>
+        <button class="act-btn sec" onclick="gotoLeads()">📋 مدیریت لیدها</button>
+        <button class="act-btn sec" onclick="gotoSet()">⚙️ تنظیمات</button>
+        <div class="share-strip"><span>📤 شریک شدن</span><button onclick="shareWA()">📲 واتساپ</button></div>
+      </div>
     </div>
-
-    <!-- DASHBOARD -->
-    <div id="dashboardPage" class="dashboard-container" style="display: none;">
-        <div class="sidebar">
-            <div class="logo">
-                <div class="logo-text">📦 آن‌باکس</div>
-            </div>
-            <div class="user-info">
-                <div class="user-name" id="sidebarUsername">مجتبی</div>
-                <div style="font-size: 11px; opacity: 0.8;">فعال</div>
-                <button class="logout-btn" onclick="handleLogout()">خروج</button>
-            </div>
-            <div class="nav-menu">
-                <div class="nav-item active" onclick="switchPage(event, 'dashboard')">📊 داشبورد</div>
-                <div class="nav-item" onclick="switchPage(event, 'leads')">📋 لیدها</div>
-                <div class="nav-item" onclick="switchPage(event, 'pipeline')">🔄 Pipeline</div>
-                <div class="nav-item" onclick="switchPage(event, 'reports')">📈 گزارش‌ها</div>
-                <div class="nav-item" onclick="switchPage(event, 'settings')">⚙️ تنظیمات</div>
-            </div>
+    <div id="page-team" style="display:none">
+      <div class="exp-header">
+        <button class="back-btn" onclick="gotoSel()">← تغییر</button>
+        <div class="exp-hrow">
+          <div><h2 id="expGreet"></h2><div id="expDate"></div></div>
+          <div class="ck-badge"><div class="num" id="ckBadge">0/10</div><div class="lbl">چک‌لیست</div></div>
         </div>
-
-        <div class="main">
-            <div class="header">
-                <div class="header-title">داشبورد | آن‌باکس</div>
-                <div>👤 <span id="headerUsername">مجتبی</span></div>
-            </div>
-
-            <div class="content">
-                <!-- DASHBOARD PAGE -->
-                <div class="page active" id="dashboard">
-                    <h2 style="margin-bottom: 20px; color: #1B3A5C;">مدیریت Sales Pipeline</h2>
-                    
-                    <div class="card">
-                        <div class="card-title">📊 وضعیت Pipeline</div>
-                        <div class="pipeline-grid" id="pipelineGrid">
-                            <!-- Dynamic Content -->
-                        </div>
-                    </div>
-
-                    <div class="card">
-                        <div class="card-title">📈 آمار کلی</div>
-                        <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px;">
-                            <div style="text-align: center; padding: 20px; background: #F8FAFC; border-radius: 8px;">
-                                <div style="font-size: 24px; font-weight: 700; color: #2563EB;" id="stat-total">0</div>
-                                <div style="font-size: 12px; color: #64748B; margin-top: 5px;">کل لیدها</div>
-                            </div>
-                            <div style="text-align: center; padding: 20px; background: #F8FAFC; border-radius: 8px;">
-                                <div style="font-size: 24px; font-weight: 700; color: #DC2626;" id="stat-hot">0</div>
-                                <div style="font-size: 12px; color: #64748B; margin-top: 5px;">🔴 لیدهای گرم</div>
-                            </div>
-                            <div style="text-align: center; padding: 20px; background: #F8FAFC; border-radius: 8px;">
-                                <div style="font-size: 24px; font-weight: 700; color: #D97706;" id="stat-warm">0</div>
-                                <div style="font-size: 12px; color: #64748B; margin-top: 5px;">🟡 لیدهای گرم</div>
-                            </div>
-                            <div style="text-align: center; padding: 20px; background: #F8FAFC; border-radius: 8px;">
-                                <div style="font-size: 24px; font-weight: 700; color: #2563EB;" id="stat-qualified">0</div>
-                                <div style="font-size: 12px; color: #64748B; margin-top: 5px;">✅ Qualified</div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- LEADS PAGE -->
-                <div class="page" id="leads">
-                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-                        <h2 style="color: #1B3A5C;">مدیریت لیدها و تیم</h2>
-                    </div>
-
-                    <!-- TABS -->
-                    <div class="tabs">
-                        <div class="tab active" onclick="switchTab(event, 'leads-tab')">📋 مدیریت لیدها</div>
-                        <div class="tab" onclick="switchTab(event, 'team-tab')">👥 تیم کارشناسان</div>
-                    </div>
-
-                    <!-- LEADS TAB -->
-                    <div id="leads-tab" class="tab-content active">
-                        <div class="toolbar">
-                            <button class="btn" onclick="openLeadModal()">➕ افزودن لید</button>
-                            <button class="btn success" onclick="downloadExcelTemplate()">📥 دانلود نمونه Excel</button>
-                            <button class="btn secondary" onclick="document.getElementById('excelInput').click()">📊 Import Excel</button>
-                            <input type="file" id="excelInput" accept=".xlsx,.xls,.csv" style="display:none;" onchange="handleExcelUpload(event)">
-                            <input type="text" class="search-box" id="searchInput" placeholder="جستجو..." onkeyup="filterLeads()">
-                        </div>
-
-                        <div class="card">
-                            <div id="leadsContainer" style="text-align: center; padding: 40px; color: #94A3B8;">
-                                ⏳ بارگذاری لیدها...
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- TEAM TAB -->
-                    <div id="team-tab" class="tab-content">
-                        <div class="card">
-                            <div class="card-title">👥 کارشناسان فروش</div>
-                            <div class="team-grid" id="teamGrid">
-                                <!-- Dynamic Team Content -->
-                            </div>
-                        </div>
-
-                        <div class="card">
-                            <div class="card-title">📊 مدیریت کارشناسان و KPI</div>
-                            <div style="text-align: center; padding: 20px;">
-                                <a href="https://docs.google.com/spreadsheets/d/1Fx8uAZZ6-zbdlbRDMYXKaPuZ5HG8MMhxK2gNUBaUNE/edit" target="_blank" style="background: #2563EB; color: #fff; padding: 12px 24px; border-radius: 8px; text-decoration: none; font-weight: 700; display: inline-block;">📋 Worksheet - ورود مدیر</a>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- PIPELINE PAGE -->
-                <div class="page" id="pipeline">
-                    <h2 style="margin-bottom: 20px; color: #1B3A5C;">مراحل فروش (Pipeline)</h2>
-                    
-                    <div class="card">
-                        <div class="card-title">🔄 توزیع لیدها در مراحل</div>
-                        <div id="pipelineDetails" style="display: grid; gap: 20px;">
-                            <!-- Dynamic Content -->
-                        </div>
-                    </div>
-                </div>
-
-                <!-- REPORTS PAGE -->
-                <div class="page" id="reports">
-                    <h2 style="margin-bottom: 20px; color: #1B3A5C;">گزارش‌ها</h2>
-                    <div class="card">
-                        <div class="card-title">📈 گزارش‌های سیستم</div>
-                        <div style="color: #64748B; font-size: 13px; line-height: 1.8;">
-                            • گزارش Pipeline<br>
-                            • گزارش لیدهای Hot/Warm<br>
-                            • گزارش مرحله‌ای فروش<br>
-                            • گزارش تبدیل (Conversion)
-                        </div>
-                    </div>
-                </div>
-
-                <!-- SETTINGS PAGE -->
-                <div class="page" id="settings">
-                    <h2 style="margin-bottom: 20px; color: #1B3A5C;">تنظیمات</h2>
-                    <div class="card">
-                        <div class="card-title">اطلاعات کاربری</div>
-                        <div style="margin-bottom: 15px;">
-                            <label class="form-label">نام کاربری</label>
-                            <input type="text" id="settingsUsername" class="form-input" disabled>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
+      </div>
+      <div class="tabs">
+        <button class="tab-btn active" id="btnR" onclick="swTeamTab('R')">📝 گزارش</button>
+        <button class="tab-btn" id="btnS" onclick="swTeamTab('S')">📅 برنامه</button>
+        <button class="tab-btn" id="btnC" onclick="swTeamTab('C')">✅ چک‌لیست</button>
+        <button class="tab-btn" id="btnL" onclick="swTeamTab('L')">📋 لیدهای من</button>
+      </div>
+      <div id="tR" class="content"></div>
+      <div id="tS" class="content" style="display:none"></div>
+      <div id="tC" class="content" style="display:none"></div>
+      <div id="tL" class="content" style="display:none"></div>
     </div>
-
-    <!-- LEAD MODAL -->
-    <div id="leadModal" class="modal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <div class="modal-title">افزودن لید جدید</div>
-                <button class="close-btn" onclick="closeLeadModal()">✕</button>
-            </div>
-            <form id="leadForm" onsubmit="saveLead(event)">
-                <div class="form-grid">
-                    <div class="form-group">
-                        <label class="form-label">نوع لید *</label>
-                        <select name="lead_type" class="form-input" required>
-                            <option value="">انتخاب کنید</option>
-                            <option>گرم</option>
-                            <option>سرد</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label">مبدأ لید *</label>
-                        <select name="lead_source" class="form-input" required>
-                            <option value="">انتخاب کنید</option>
-                            <option>سرچ اینترنتی</option>
-                            <option>تماس مشتری</option>
-                            <option>بانک اطلاعاتی</option>
-                            <option>دایره طلایی</option>
-                            <option>پیامک تبلیغاتی</option>
-                            <option>سوشیال مدیا</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label">نام شرکت *</label>
-                        <input type="text" name="company_name" class="form-input" required>
-                    </div>
-
-                    <div class="form-group">
-                        <label class="form-label">صنعت *</label>
-                        <select name="industry" class="form-input" required>
-                            <option value="">انتخاب کنید</option>
-                            <option>دارویی</option>
-                            <option>بانک</option>
-                            <option>فروشگاه اینترنتی</option>
-                            <option>خودرویی</option>
-                            <option>لوازم خانگی</option>
-                            <option>سازمانی</option>
-                            <option>لوازم آرایشی</option>
-                            <option>لوازم آشپزخانه</option>
-                            <option>لوازم جانبی</option>
-                            <option>فروشگاه حضوری</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label">دلیل انتخاب شرکت</label>
-                        <select name="selection_reason" class="form-input">
-                            <option value="">انتخاب کنید</option>
-                            <option>جغرافیای تحت پوشش</option>
-                            <option>ارسال پستی دارد</option>
-                            <option>حجم سفارش مناسب</option>
-                            <option>سابقه خوب با شرکت</option>
-                            <option>توصیه شده از منابع معتبر</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label">شماره تماس *</label>
-                        <input type="tel" name="phone" class="form-input" required>
-                    </div>
-
-                    <div class="form-group">
-                        <label class="form-label">نام فرد تماس *</label>
-                        <input type="text" name="contact_name" class="form-input" required>
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label">سمت فرد تماس</label>
-                        <input type="text" name="contact_position" class="form-input">
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label">مرحله فروش *</label>
-                        <select name="sales_stage" class="form-input" required>
-                            <option value="1">1. لیدسازی</option>
-                            <option value="2">2. تماس اولیه</option>
-                            <option value="3">3. ارسال نرخ نامه</option>
-                            <option value="4">4. جلسه مذاکره</option>
-                            <option value="5">5. ارسال پروپوزال</option>
-                            <option value="6">6. عقد قرارداد</option>
-                        </select>
-                    </div>
-
-                    <div class="form-group">
-                        <label class="form-label">تناسب با آن باکس</label>
-                        <select name="anbox_fit" class="form-input">
-                            <option value="">انتخاب کنید</option>
-                            <option>ارسال مرسوله روزانه</option>
-                            <option>تناسب با SLA</option>
-                            <option>تناسب با نرخ</option>
-                            <option>ارسال ترکیبی</option>
-                            <option>ارسال مرسولات کم حجم</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label">مانع اصلی</label>
-                        <select name="main_obstacle" class="form-input">
-                            <option value="">انتخاب کنید</option>
-                            <option>عدم توافق نرخ</option>
-                            <option>عدم توافق SLA</option>
-                            <option>عدم توافق قراردادی</option>
-                            <option>شکایت مشتری از خدمات</option>
-                            <option>مانع ندارد</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label">اقدام بعدی</label>
-                        <select name="next_action" class="form-input">
-                            <option value="">انتخاب کنید</option>
-                            <option>ارسال پروپوزال</option>
-                            <option>برقراری جلسه مذاکره</option>
-                            <option>جلسه متقاعد سازی</option>
-                            <option>ارسال درفت قرارداد</option>
-                            <option>عقد قرارداد</option>
-                            <option>عدم توافق</option>
-                        </select>
-                    </div>
-
-                    <div class="form-group">
-                        <label class="form-label">کارشناس فروش</label>
-                        <select name="sales_expert" class="form-input">
-                            <option value="">انتخاب کنید</option>
-                            <option>امیرحسین ریواز</option>
-                            <option>مجتبی رنجبر</option>
-                            <option>ندا شریفی</option>
-                            <option>سمن خوشکلام</option>
-                            <option>پرستو احمدی</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label">وضعیت لید</label>
-                        <select name="lead_status" class="form-input">
-                            <option>در حال پیگیری</option>
-                            <option>عدم توافق</option>
-                            <option>انحلال شرکت</option>
-                            <option>در حال عقد قرارداد</option>
-                            <option>در حال مذاکره</option>
-                            <option>در حال تست</option>
-                        </select>
-                    </div>
-                    <div class="form-group form-grid full">
-                        <label class="form-label">یادداشت‌ها</label>
-                        <textarea name="notes" class="form-input" style="min-height: 70px; resize: vertical;"></textarea>
-                    </div>
-                </div>
-
-                <div style="display: flex; gap: 10px; margin-top: 20px;">
-                    <button type="submit" class="btn">ذخیره</button>
-                    <button type="button" class="btn secondary" onclick="closeLeadModal()">لغو</button>
-                </div>
-            </form>
+    <div id="page-leads" style="display:none"></div>
+    <div id="page-mgr" style="display:none"></div>
+    <div id="page-set" style="display:none">
+      <div style="padding:16px 14px"><button class="back-btn dark" onclick="gotoSel()">← بازگشت</button></div>
+      <div class="set-wrap">
+        <div class="tabs" style="position:static;border-radius:12px;overflow:hidden;margin-bottom:18px">
+          <button class="tab-btn active" id="stE" onclick="swSetTab('E')">👥 کارشناسان</button>
+          <button class="tab-btn" id="stK" onclick="swSetTab('K')">🎯 KPI</button>
         </div>
-    </div>
+        <div id="setExperts"></div>
+        <div id="setKpi" style="display:none"></div>
+      </div>
+    </div>`;
 
-    <div class="notification" id="notification"></div>
+  gotoSel();
+}
 
-    <script>
-        const USERS = {
-            'mojabi': { name: 'مجتبی رنجبر', password: 'pass123' },
-            'neda': { name: 'ندا شریفی', password: 'pass123' },
-            'saman': { name: 'سمن خوشکلام', password: 'pass123' },
-            'parasto': { name: 'پرستو احمدی', password: 'pass123' },
-            'amirhossein': { name: 'امیرحسین ریواز', password: 'sales2025' },
-            'admin': { name: 'ادمین سیستم', password: 'admin2025' }
-        };
-
-        const TEAM_MEMBERS = [
-            { name: 'مجتبی رنجبر', checklist: '5/10' },
-            { name: 'ندا شریفی', checklist: '5/10' },
-            { name: 'سمن خوشکلام', checklist: '5/10' },
-            { name: 'پرستو احمدی', checklist: '5/10' }
-        ];
-
-        const SALES_STAGES = [
-            { id: 1, name: 'لیدسازی' },
-            { id: 2, name: 'تماس اولیه و امکان سنجی' },
-            { id: 3, name: 'ارسال نرخ نامه' },
-            { id: 4, name: 'جلسه مذاکره' },
-            { id: 5, name: 'ارسال پروپوزال' },
-            { id: 6, name: 'عقد قرارداد' }
-        ];
-
-        const OBSTACLES = ['عدم توافق نرخ', 'عدم توافق SLA', 'عدم توافق قراردادی', 'شکایت مشتری از خدمات', 'مانع ندارد'];
-        const NEXT_ACTIONS = ['ارسال پروپوزال', 'برقراری جلسه مذاکره', 'جلسه متقاعد سازی', 'ارسال درفت قرارداد', 'عقد قرارداد', 'عدم توافق'];
-        const LEAD_STATUSES = ['در حال پیگیری', 'عدم توافق', 'انحلال شرکت', 'در حال عقد قرارداد', 'در حال مذاکره', 'در حال تست'];
-        const SALES_EXPERTS = ['امیرحسین ریواز', 'مجتبی رنجبر', 'ندا شریفی', 'سمن خوشکلام', 'پرستو احمدی'];
-
-        let currentUser = null;
-        let leads = [];
-        let filteredLeads = [];
-
-        window.addEventListener('DOMContentLoaded', () => {
-            const savedUser = localStorage.getItem('currentUser');
-            if (savedUser) {
-                currentUser = savedUser;
-                showDashboard();
-                loadLeads();
-                updateDashboard();
-                renderTeam();
-            }
-        });
-
-        function handleLogin() {
-            const username = document.getElementById('username').value.trim();
-            const password = document.getElementById('password').value;
-            const errorEl = document.getElementById('loginError');
-
-            if (!username || !password) {
-                errorEl.textContent = '❌ نام کاربری و رمز عبور را وارد کنید';
-                errorEl.style.display = 'block';
-                return;
-            }
-
-            const user = USERS[username];
-            if (!user || user.password !== password) {
-                errorEl.textContent = '❌ نام کاربری یا رمز عبور نادرست است';
-                errorEl.style.display = 'block';
-                return;
-            }
-
-            currentUser = username;
-            localStorage.setItem('currentUser', username);
-            showDashboard();
-            loadLeads();
-            updateDashboard();
-            renderTeam();
-        }
-
-        function showDashboard() {
-            const user = USERS[currentUser];
-            document.getElementById('loginPage').style.display = 'none';
-            document.getElementById('dashboardPage').style.display = 'flex';
-            document.getElementById('sidebarUsername').textContent = user.name;
-            document.getElementById('headerUsername').textContent = user.name;
-            document.getElementById('settingsUsername').value = currentUser;
-            showNotification('✅ خوش آمدید ' + user.name);
-        }
-
-        function handleLogout() {
-            localStorage.removeItem('currentUser');
-            currentUser = null;
-            document.getElementById('loginPage').style.display = 'flex';
-            document.getElementById('dashboardPage').style.display = 'none';
-            document.getElementById('username').value = '';
-            document.getElementById('password').value = '';
-            showNotification('👋 شما خارج شدید');
-        }
-
-        function switchPage(e, page) {
-            e.preventDefault();
-            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-            document.getElementById(page).classList.add('active');
-            document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active'));
-            e.target.classList.add('active');
-            
-            if (page === 'leads') loadLeads();
-            if (page === 'pipeline') renderPipelineDetails();
-        }
-
-        function switchTab(e, tabId) {
-            e.preventDefault();
-            document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
-            document.getElementById(tabId).classList.add('active');
-            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-            e.target.classList.add('active');
-        }
-
-        function calculateScore(lead) {
-            let score = 50;
-            if (lead.industry) score += 10;
-            if (parseInt(lead.sales_stage) >= 4) score += 30;
-            if (parseInt(lead.sales_stage) >= 5) score += 20;
-            return Math.min(100, score);
-        }
-
-        function getLeadStatus(score) {
-            if (score >= 85) return { type: 'hot', emoji: '🔴' };
-            if (score >= 60) return { type: 'warm', emoji: '🟡' };
-            return { type: 'cold', emoji: '🔵' };
-        }
-
-        function openLeadModal() {
-            document.getElementById('leadModal').classList.add('active');
-        }
-
-        function closeLeadModal() {
-            document.getElementById('leadModal').classList.remove('active');
-            document.getElementById('leadForm').reset();
-        }
-
-        function downloadExcelTemplate() {
-            const headers = [
-                'نوع لید',
-                'مبدأ لید',
-                'نام شرکت',
-                'صنعت',
-                'دلیل انتخاب شرکت',
-                'شماره تماس',
-                'نام فرد تماس',
-                'سمت فرد تماس',
-                'مرحله فروش',
-                'تناسب با آن باکس',
-                'مانع اصلی',
-                'اقدام بعدی',
-                'کارشناس فروش',
-                'وضعیت لید',
-                'یادداشت‌ها'
-            ];
-
-            let csv = headers.join('\t') + '\n';
-            const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
-            const link = document.createElement('a');
-            const url = URL.createObjectURL(blob);
-            link.setAttribute('href', url);
-            link.setAttribute('download', 'نمونه_لیدها.csv');
-            link.style.visibility = 'hidden';
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
-            showNotification('✅ فایل نمونه دانلود شد');
-        }
-
-        function saveLead(e) {
-            e.preventDefault();
-            const formData = new FormData(document.getElementById('leadForm'));
-            const lead = Object.fromEntries(formData);
-            lead.id = Date.now();
-            lead.created_by = currentUser;
-            lead.created_at = new Date().toLocaleString('fa-IR');
-            lead.score = calculateScore(lead);
-            lead.status = getLeadStatus(lead.score);
-            
-            leads.push(lead);
-            localStorage.setItem('leads_' + currentUser, JSON.stringify(leads));
-            
-            showNotification('✅ لید با موفقیت ذخیره شد');
-            closeLeadModal();
-            loadLeads();
-            updateDashboard();
-        }
-
-        function loadLeads() {
-            const saved = localStorage.getItem('leads_' + currentUser);
-            leads = saved ? JSON.parse(saved) : [];
-            filteredLeads = leads;
-            renderLeads();
-        }
-
-        function filterLeads() {
-            const query = document.getElementById('searchInput').value.toLowerCase();
-            filteredLeads = leads.filter(lead => 
-                lead.company_name.toLowerCase().includes(query) ||
-                lead.contact_name.toLowerCase().includes(query) ||
-                lead.phone.includes(query)
-            );
-            renderLeads();
-        }
-
-        function renderLeads() {
-            const container = document.getElementById('leadsContainer');
-            if (filteredLeads.length === 0) {
-                container.innerHTML = '<div style="text-align: center; padding: 40px; color: #94A3B8;">لیدی موجود نیست</div>';
-                return;
-            }
-
-            let html = `<table class="lead-table"><thead><tr><th>نام شرکت</th><th>صنعت</th><th>تماس گیر</th><th>مرحله</th><th>مانع اصلی</th><th>اقدام بعدی</th><th>وضعیت</th><th>اقدام</th></tr></thead><tbody>`;
-            
-            filteredLeads.forEach(lead => {
-                html += `<tr><td><strong>${lead.company_name}</strong></td><td>${lead.industry}</td><td>${lead.contact_name}</td><td><select class="inline-select" onchange="updateField(${lead.id}, 'sales_stage', this.value)">${SALES_STAGES.map(s => `<option value="${s.id}" ${s.id == lead.sales_stage ? 'selected' : ''}>${s.id}. ${s.name}</option>`).join('')}</select></td><td><select class="inline-select" onchange="updateField(${lead.id}, 'main_obstacle', this.value)"><option value="">-- انتخاب --</option>${OBSTACLES.map(obs => `<option value="${obs}" ${lead.main_obstacle === obs ? 'selected' : ''}>${obs}</option>`).join('')}</select></td><td><select class="inline-select" onchange="updateField(${lead.id}, 'next_action', this.value)"><option value="">-- انتخاب --</option>${NEXT_ACTIONS.map(action => `<option value="${action}" ${lead.next_action === action ? 'selected' : ''}>${action}</option>`).join('')}</select></td><td><select class="inline-select" onchange="updateField(${lead.id}, 'lead_status', this.value)">${LEAD_STATUSES.map(status => `<option value="${status}" ${lead.lead_status === status ? 'selected' : ''}>${status}</option>`).join('')}</select></td><td><button class="btn danger" style="padding: 4px 8px; font-size: 10px;" onclick="deleteLead(${lead.id})">حذف</button></td></tr>`;
-            });
-            
-            html += '</tbody></table>';
-            container.innerHTML = html;
-        }
-
-        function updateField(leadId, fieldName, value) {
-            const lead = leads.find(l => l.id === leadId);
-            if (lead) {
-                lead[fieldName] = value;
-                lead.score = calculateScore(lead);
-                lead.status = getLeadStatus(lead.score);
-                localStorage.setItem('leads_' + currentUser, JSON.stringify(leads));
-                showNotification('✅ به‌روزرسانی شد');
-                loadLeads();
-                updateDashboard();
-            }
-        }
-
-        function deleteLead(id) {
-            if (confirm('آیا مطمئن هستید؟')) {
-                leads = leads.filter(l => l.id !== id);
-                localStorage.setItem('leads_' + currentUser, JSON.stringify(leads));
-                showNotification('✅ لید حذف شد');
-                loadLeads();
-                updateDashboard();
-            }
-        }
-
-        function handleExcelUpload(event) {
-            const file = event.target.files[0];
-            if (!file) return;
-
-            const reader = new FileReader();
-            reader.onload = (e) => {
-                try {
-                    const data = new Uint8Array(e.target.result);
-                    const workbook = XLSX.read(data, { type: 'array' });
-                    const worksheet = workbook.Sheets[workbook.SheetNames[0]];
-                    const json = XLSX.utils.sheet_to_json(worksheet);
-
-                    let imported = 0;
-                    json.forEach(row => {
-                        if (row['نام شرکت'] && row['شماره تماس']) {
-                            const lead = {
-                                id: Date.now() + Math.random(),
-                                lead_type: row['نوع لید'] || 'سرد',
-                                lead_source: row['مبدأ لید'] || '',
-                                company_name: row['نام شرکت'],
-                                industry: row['صنعت'] || '',
-                                selection_reason: row['دلیل انتخاب شرکت'] || '',
-                                phone: row['شماره تماس'],
-                                contact_name: row['نام فرد تماس'] || '',
-                                contact_position: row['سمت فرد تماس'] || '',
-                                sales_stage: row['مرحله فروش'] || '1',
-                                anbox_fit: row['تناسب با آن باکس'] || '',
-                                main_obstacle: row['مانع اصلی'] || '',
-                                next_action: row['اقدام بعدی'] || '',
-                                sales_expert: row['کارشناس فروش'] || '',
-                                lead_status: row['وضعیت لید'] || 'در حال پیگیری',
-                                notes: row['یادداشت‌ها'] || '',
-                                created_by: currentUser,
-                                created_at: new Date().toLocaleString('fa-IR')
-                            };
-                            lead.score = calculateScore(lead);
-                            lead.status = getLeadStatus(lead.score);
-                            leads.push(lead);
-                            imported++;
-                        }
-                    });
-
-                    localStorage.setItem('leads_' + currentUser, JSON.stringify(leads));
-                    showNotification(`✅ ${imported} لید آپلود شد`);
-                    loadLeads();
-                    updateDashboard();
-                    document.getElementById('excelInput').value = '';
-                } catch (err) {
-                    showNotification('❌ خطا در پردازش فایل', 'error');
-                }
-            };
-            reader.readAsArrayBuffer(file);
-        }
-
-        function renderTeam() {
-            const teamGrid = document.getElementById('teamGrid');
-            let html = '';
-            TEAM_MEMBERS.forEach(member => {
-                html += `
-                    <div class="team-card">
-                        <div class="team-name">👤 ${member.name}</div>
-                        <div class="team-role">فروشنده</div>
-                        <div class="team-checkbox">
-                            <input type="checkbox" id="check_${member.name}">
-                            <label for="check_${member.name}" style="cursor: pointer;">Checklist: ${member.checklist}</label>
-                        </div>
-                    </div>
-                `;
-            });
-            teamGrid.innerHTML = html;
-        }
-
-        function updateDashboard() {
-            document.getElementById('stat-total').textContent = leads.length;
-            document.getElementById('stat-hot').textContent = leads.filter(l => l.status?.type === 'hot').length;
-            document.getElementById('stat-warm').textContent = leads.filter(l => l.status?.type === 'warm').length;
-            document.getElementById('stat-qualified').textContent = leads.filter(l => parseInt(l.sales_stage) >= 5).length;
-            renderPipeline();
-        }
-
-        function renderPipeline() {
-            const grid = document.getElementById('pipelineGrid');
-            let html = '';
-            const total = leads.length || 1;
-
-            SALES_STAGES.forEach(stage => {
-                const count = leads.filter(l => parseInt(l.sales_stage) === stage.id).length;
-                const percent = Math.round((count / total) * 100);
-                html += `<div class="pipeline-box"><div class="pipeline-stage">${stage.name}</div><div class="pipeline-count">${count}</div><div class="progress-bar"><div class="progress-fill" style="width: ${percent}%"></div></div><div class="pipeline-percent">${percent}%</div></div>`;
-            });
-
-            grid.innerHTML = html;
-        }
-
-        function renderPipelineDetails() {
-            const details = document.getElementById('pipelineDetails');
-            let html = '';
-
-            SALES_STAGES.forEach(stage => {
-                const stageLeads = leads.filter(l => parseInt(l.sales_stage) === stage.id);
-                html += `<div style="padding: 15px; background: #F8FAFC; border-radius: 8px; border-right: 4px solid #2563EB;"><h3 style="margin-bottom: 10px; color: #1B3A5C;">Stage ${stage.id}: ${stage.name}</h3><div style="font-size: 12px; color: #64748B;"><strong>تعداد:</strong> ${stageLeads.length} لید<br><strong>شرکت‌ها:</strong> ${stageLeads.map(l => l.company_name).join(', ') || 'هیچ‌کدام'}</div></div>`;
-            });
-
-            details.innerHTML = html;
-        }
-
-        function showNotification(msg, type = 'success') {
-            const el = document.getElementById('notification');
-            el.textContent = msg;
-            el.className = 'notification ' + (type === 'error' ? 'error' : '') + ' show';
-            setTimeout(() => el.classList.remove('show'), 3000);
-        }
-    </script>
+init().catch(e=>{
+  console.error(e);
+  document.getElementById('app').innerHTML='<div class="loading"><div style="color:#DC2626">خطا در اتصال</div></div>';
+});
+</script>
 </body>
 </html>
