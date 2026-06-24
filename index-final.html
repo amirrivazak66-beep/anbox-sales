@@ -1,227 +1,286 @@
 <!DOCTYPE html>
 <html dir="rtl" lang="fa">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>داشبورد V2 | آن‌باکس</title>
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <style>
-        * { box-sizing: border-box; margin: 0; padding: 0; }
-        body { font-family: Tahoma, 'Segoe UI', sans-serif; background: #F0F4F8; color: #1E293B; min-height: 100vh; }
-        .container { display: flex; min-height: 100vh; }
-        .sidebar { width: 250px; background: #1B3A5C; color: #fff; padding: 20px; position: fixed; height: 100vh; overflow-y: auto; z-index: 1000; }
-        .logo { display: flex; align-items: center; gap: 10px; margin-bottom: 30px; }
-        .logo-text { font-size: 14px; font-weight: 700; }
-        .nav-menu { display: flex; flex-direction: column; gap: 5px; }
-        .nav-item { padding: 12px 15px; border-radius: 8px; cursor: pointer; font-size: 13px; transition: all .2s; }
-        .nav-item:hover { background: rgba(255,255,255,.1); }
-        .nav-item.active { background: #2563EB; }
-        .main { margin-right: 250px; flex: 1; }
-        .header { background: #fff; border-bottom: 1px solid #E2E8F0; padding: 15px 30px; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 100; }
-        .header-title { font-size: 18px; font-weight: 700; color: #1B3A5C; }
-        .header-right { display: flex; align-items: center; gap: 20px; }
-        .content { padding: 30px; max-width: 1400px; margin: 0 auto; }
-        .page { display: none; }
-        .page.active { display: block; }
-        .card { background: #fff; border-radius: 12px; border: 1px solid #E2E8F0; padding: 20px; margin-bottom: 20px; box-shadow: 0 1px 3px rgba(0,0,0,.05); }
-        .card-title { font-size: 16px; font-weight: 700; margin-bottom: 15px; color: #1B3A5C; }
-        .stats-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; margin-bottom: 20px; }
-        .stat-box { background: linear-gradient(135deg, #1B3A5C, #2563EB); color: #fff; padding: 20px; border-radius: 12px; text-align: center; }
-        .stat-value { font-size: 28px; font-weight: 700; }
-        .stat-label { font-size: 12px; opacity: .8; margin-top: 5px; }
-        .kpi-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; }
-        .kpi-box { background: #F8FAFC; border-radius: 10px; padding: 15px; text-align: center; border: 1px solid #E2E8F0; }
-        .kpi-icon { font-size: 24px; }
-        .kpi-value { font-size: 22px; font-weight: 700; margin: 10px 0; color: #2563EB; }
-        .kpi-label { font-size: 12px; color: #64748B; }
-        .leaderboard-row { display: flex; align-items: center; padding: 12px; border-bottom: 1px solid #E2E8F0; gap: 15px; }
-        .rank { width: 30px; font-weight: 700; color: #2563EB; }
-        .name { flex: 1; font-weight: 600; }
-        .score { color: #2563EB; font-weight: 700; }
-        .notification { position: fixed; top: 20px; left: 50%; transform: translateX(-50%); background: #16A34A; color: #fff; padding: 12px 24px; border-radius: 8px; z-index: 9999; font-weight: 600; box-shadow: 0 4px 12px rgba(0,0,0,.15); display: none; }
-        .notification.active { display: block; }
-        @media(max-width: 768px) {
-            .sidebar { width: 100%; height: auto; position: relative; padding: 10px; }
-            .main { margin-right: 0; }
-            .stats-grid { grid-template-columns: repeat(2, 1fr); }
-            .kpi-grid { grid-template-columns: 1fr; }
-        }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>داشبورد فروش آن‌باکس</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.min.js"></script>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: Tahoma, sans-serif; background: #F0F4F8; color: #1E293B; min-height: 100vh; }
+.header { background: #fff; border-bottom: 3px solid #2563EB; padding: 12px 24px; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 100; }
+.header-logo { height: 44px; }
+.htitle { font-size: 13px; font-weight: 700; color: #1B3A5C; }
+.hdate { font-size: 11px; color: #64748B; }
+.toast { position: fixed; top: 20px; left: 50%; transform: translateX(-50%); background: #16A34A; color: #fff; padding: 10px 24px; border-radius: 30px; z-index: 9999; opacity: 0; transition: opacity 0.3s; }
+.toast.show { opacity: 1; }
+.toast.err { background: #DC2626; }
+.sel-wrap { max-width: 480px; margin: 32px auto; padding: 0 16px; }
+.sel-hero { background: linear-gradient(135deg, #1B3A5C, #2563EB); color: #fff; border-radius: 18px; padding: 24px; text-align: center; margin-bottom: 24px; }
+.sel-hero h1 { font-size: 20px; margin-bottom: 4px; }
+.exp-btn { width: 100%; padding: 16px 20px; background: #fff; border: 2px solid #E2E8F0; border-radius: 14px; cursor: pointer; display: flex; align-items: center; justify-content: space-between; font-size: 15px; font-weight: 600; color: #1B3A5C; margin-bottom: 10px; font-family: Tahoma; transition: border-color 0.2s; }
+.exp-btn:hover { border-color: #2563EB; }
+.ebadge { font-size: 11px; padding: 3px 10px; border-radius: 20px; background: #F1F5F9; color: #64748B; }
+.ebadge.done { background: #DCFCE7; color: #16A34A; }
+.act-btn { width: 100%; padding: 14px; border: none; border-radius: 12px; font-size: 14px; font-weight: 700; cursor: pointer; margin-bottom: 10px; font-family: Tahoma; }
+.act-btn.pri { background: #1B3A5C; color: #fff; }
+.act-btn.sec { background: #fff; color: #64748B; border: 1.5px solid #E2E8F0; }
+.exp-header { background: linear-gradient(135deg, #1B3A5C, #2563EB); color: #fff; padding: 14px 20px; }
+.back-btn { background: rgba(255,255,255,0.15); border: none; color: #fff; border-radius: 8px; padding: 5px 12px; cursor: pointer; font-size: 12px; margin-bottom: 10px; font-family: Tahoma; }
+.ck-badge { text-align: center; background: rgba(255,255,255,0.15); border-radius: 12px; padding: 8px 16px; }
+.tabs { background: #fff; border-bottom: 2px solid #E2E8F0; display: flex; position: sticky; top: 67px; z-index: 10; }
+.tab-btn { flex: 1; padding: 13px 6px; border: none; background: none; cursor: pointer; font-size: 12px; color: #64748B; border-bottom: 3px solid transparent; font-family: Tahoma; transition: all 0.2s; }
+.tab-btn.active { font-weight: 700; color: #2563EB; border-bottom-color: #2563EB; }
+.content { max-width: 700px; margin: 0 auto; padding: 18px 14px; }
+.card { background: #fff; border-radius: 16px; border: 1.5px solid #E2E8F0; overflow: hidden; margin-bottom: 14px; }
+.card-head { padding: 14px 20px; background: #EFF6FF; border-bottom: 1px solid #E2E8F0; }
+.card-head h3 { font-size: 15px; color: #1B3A5C; font-weight: 700; }
+.card-body { padding: 18px; }
+.form-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 14px; margin-bottom: 14px; }
+.ff label { display: block; font-size: 11px; color: #64748B; margin-bottom: 5px; }
+.ff input { width: 100%; padding: 9px 11px; border: 1.5px solid #E2E8F0; border-radius: 10px; font-size: 15px; font-family: Tahoma; outline: none; }
+.ff input:focus { border-color: #2563EB; }
+.prow { display: flex; justify-content: space-between; font-size: 11px; margin: 4px 0 3px; }
+.bwrap { background: #E2E8F0; border-radius: 99px; height: 7px; }
+.bfill { height: 7px; border-radius: 99px; transition: width 0.4s; }
+.crm-row { display: flex; align-items: center; gap: 12px; padding: 12px 16px; border-radius: 10px; cursor: pointer; margin-bottom: 14px; border: 1.5px solid #E2E8F0; background: #F8FAFC; }
+.crm-row.done { background: #F0FDF4; border-color: #BBF7D0; }
+.cbox { width: 22px; height: 22px; border-radius: 6px; border: 2px solid #CBD5E1; background: #fff; display: flex; align-items: center; justify-content: center; color: #fff; font-size: 13px; }
+.cbox.on { background: #16A34A; border-color: #16A34A; }
+.notes-area { width: 100%; padding: 9px 12px; border: 1.5px solid #E2E8F0; border-radius: 10px; font-size: 14px; font-family: Tahoma; resize: vertical; outline: none; margin-bottom: 14px; }
+.notes-area:focus { border-color: #2563EB; }
+.save-btn { width: 100%; padding: 14px; background: #2563EB; color: #fff; border: none; border-radius: 12px; font-size: 15px; font-weight: 700; cursor: pointer; font-family: Tahoma; }
+.saved-msg { text-align: center; font-size: 12px; color: #16A34A; margin-top: 7px; }
+.kpi-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 9px; }
+.kpi-box { text-align: center; padding: 11px 6px; background: #F8FAFC; border-radius: 10px; }
+.kpi-box .ki { font-size: 18px; }
+.kpi-box .kv { font-size: 20px; font-weight: 700; }
+.kpi-box .kl { font-size: 9px; color: #64748B; }
+.sch-item { background: #fff; border-radius: 14px; border: 1.5px solid #E2E8F0; padding: 13px 16px; display: flex; gap: 13px; align-items: flex-start; margin-bottom: 9px; }
+.si-icon { font-size: 24px; min-width: 34px; text-align: center; }
+.si-title { font-weight: 700; font-size: 13px; color: #1B3A5C; }
+.si-time { font-size: 11px; color: #2563EB; margin-top: 2px; }
+.si-desc { font-size: 12px; color: #374151; margin-top: 5px; }
+.ci { display: flex; align-items: center; gap: 13px; background: #fff; border: 1.5px solid #E2E8F0; border-radius: 12px; padding: 13px 16px; cursor: pointer; margin-bottom: 7px; }
+.ci.done { background: #F0FDF4; border-color: #BBF7D0; }
+.ci span { font-size: 13px; color: #374151; }
+.ci.done span { color: #16A34A; font-weight: 600; text-decoration: line-through; }
+.success-box { margin-top: 14px; background: #F0FDF4; border: 2px solid #22C55E; border-radius: 14px; padding: 18px; text-align: center; }
+.mgr-stats { display: flex; gap: 10px; flex-wrap: wrap; }
+.stat-box { text-align: center; background: rgba(255,255,255,0.12); border-radius: 12px; padding: 9px 14px; }
+.stat-box .sv { font-size: 20px; font-weight: 700; }
+.stat-box .sl { font-size: 10px; opacity: 0.8; }
+.exp-card { background: #fff; border-radius: 16px; border: 1.5px solid #E2E8F0; overflow: hidden; margin-bottom: 14px; }
+.ech { padding: 13px 18px; background: #FAFBFC; border-bottom: 1px solid #E2E8F0; display: flex; justify-content: space-between; align-items: center; }
+.avatar { width: 36px; height: 36px; border-radius: 50%; background: #1B3A5C; color: #fff; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 14px; }
+.en { font-weight: 700; font-size: 14px; }
+.es { font-size: 11px; color: #64748B; margin-top: 1px; }
+.metrics-grid { display: grid; grid-template-columns: repeat(3, 1fr); }
+.mc { padding: 12px 14px; border-right: 1px solid #E2E8F0; border-bottom: 1px solid #E2E8F0; }
+.mc:nth-child(3n) { border-right: none; }
+.ml { font-size: 10px; color: #64748B; margin-bottom: 3px; }
+.mv { font-size: 20px; font-weight: 700; }
+.mt { font-size: 9px; color: #94A3B8; }
+.notes-strip { padding: 9px 18px; border-top: 1px solid #E2E8F0; background: #FFFBEB; font-size: 12px; color: #374151; }
+.set-wrap { max-width: 520px; margin: 0 auto; padding: 18px 14px; }
+.add-row { display: flex; gap: 8px; margin-bottom: 14px; }
+.add-inp { flex: 1; padding: 10px 13px; border: 1.5px solid #E2E8F0; border-radius: 10px; font-size: 14px; font-family: Tahoma; outline: none; }
+.add-inp:focus { border-color: #2563EB; }
+.add-sub { padding: 10px 18px; background: #2563EB; color: #fff; border: none; border-radius: 10px; font-size: 13px; font-weight: 700; cursor: pointer; font-family: Tahoma; }
+.si2 { background: #fff; border-radius: 12px; padding: 13px 16px; border: 1.5px solid #E2E8F0; display: flex; align-items: center; gap: 9px; margin-bottom: 9px; }
+.si2 span { flex: 1; font-size: 14px; font-weight: 600; }
+.be { background: #EFF6FF; border: none; color: #2563EB; border-radius: 8px; padding: 6px 11px; cursor: pointer; font-size: 11px; font-family: Tahoma; }
+.bd { background: #FEF2F2; border: none; color: #DC2626; border-radius: 8px; padding: 6px 11px; cursor: pointer; font-size: 11px; font-family: Tahoma; }
+.lead-table { width: 100%; border-collapse: collapse; margin-top: 14px; font-size: 11px; background: #fff; border-radius: 12px; overflow: hidden; }
+.lead-table th { background: #F1F5F9; padding: 10px; text-align: right; font-weight: 700; color: #1B3A5C; border-bottom: 1px solid #E2E8F0; }
+.lead-table td { padding: 10px; border-bottom: 1px solid #E2E8F0; }
+.inline-select { padding: 6px; border: 1px solid #2563EB; border-radius: 6px; font-size: 10px; width: 100%; font-family: Tahoma; }
+@media(max-width:480px) { .form-grid { grid-template-columns: 1fr; } .kpi-grid { grid-template-columns: repeat(2, 1fr); } }
+</style>
 </head>
 <body>
-    <!-- SIDEBAR -->
-    <div class="sidebar">
-        <div class="logo">
-            <div class="logo-text">📦 آن‌باکس</div>
-        </div>
-        <div class="nav-menu">
-            <div class="nav-item active" onclick="switchPage('dashboard')">📊 داشبورد</div>
-            <div class="nav-item" onclick="switchPage('leads')">📋 لیدها</div>
-            <div class="nav-item" onclick="switchPage('reports')">📈 گزارش‌ها</div>
-            <div class="nav-item" onclick="switchPage('analytics')">📉 تحلیلات</div>
-            <div class="nav-item" onclick="switchPage('settings')">⚙️ تنظیمات</div>
-        </div>
-    </div>
+<div class="header">
+  <div style="display: flex; align-items: center; gap: 10px;">
+    <div style="width: 44px; height: 44px; background: #1B3A5C; border-radius: 8px; display: flex; align-items: center; justify-content: center; color: #fff; font-weight: 700; font-size: 20px;">🚚</div>
+  </div>
+  <div>
+    <div class="htitle">داشبورد یکپارچه آن‌باکس</div>
+    <div class="hdate" id="hDate"></div>
+  </div>
+</div>
+<div class="toast" id="toast"></div>
+<div id="app"></div>
 
-    <!-- MAIN -->
-    <div class="main">
-        <!-- HEADER -->
-        <div class="header">
-            <div class="header-title">داشبورد V2 | آن‌باکس</div>
-            <div class="header-right">
-                <span>🔔 (۳)</span>
-                <span>👤 مجتبی</span>
-            </div>
-        </div>
+<script>
+const DEFAULT_EXPERTS = [{id: 1, name: 'مجتبی رنجبر'}, {id: 2, name: 'ندا شریفی'}, {id: 3, name: 'سمن خوشکلام'}, {id: 4, name: 'پرستو احمدی'}];
+const DEFAULT_FIELDS = [{key: 'calls', label: 'تماس با لید', icon: '📞', target: 8}, {key: 'followups', label: 'فالوآپ', icon: '🔄', target: 5}, {key: 'info', label: 'اطلاعات دریافتی', icon: '📋', target: 5}, {key: 'panels', label: 'پنل ساخته‌شده', icon: '🖥️', target: 3}, {key: 'trainings', label: 'آموزش', icon: '🎓', target: 3}, {key: 'barcodes', label: 'بارکد', icon: '📦', target: 10}];
 
-        <!-- CONTENT -->
-        <div class="content">
-            <!-- DASHBOARD PAGE -->
-            <div class="page active" id="dashboard">
-                <h2 style="margin-bottom: 20px; color: #1B3A5C;">خلاصه کارایی</h2>
-                <div class="stats-grid">
-                    <div class="stat-box">
-                        <div class="stat-value">۲۵۳</div>
-                        <div class="stat-label">لیدهای فعال</div>
-                    </div>
-                    <div class="stat-box">
-                        <div class="stat-value">۲۷٪</div>
-                        <div class="stat-label">نرخ تبدیل</div>
-                    </div>
-                    <div class="stat-box">
-                        <div class="stat-value">۸۵</div>
-                        <div class="stat-label">میانگین Score</div>
-                    </div>
-                    <div class="stat-box">
-                        <div class="stat-value">۲۵M</div>
-                        <div class="stat-label">درآمد ماه</div>
-                    </div>
-                </div>
+let CFG = {experts: DEFAULT_EXPERTS, fields: DEFAULT_FIELDS};
+let REPORTS = {};
+let LEADS = [];
+let AE = null;
 
-                <div class="card">
-                    <div class="card-title">🎯 اهداف امروز</div>
-                    <div class="kpi-grid">
-                        <div class="kpi-box">
-                            <div class="kpi-icon">📞</div>
-                            <div class="kpi-value">۶/۸</div>
-                            <div class="kpi-label">تماس با لید</div>
-                        </div>
-                        <div class="kpi-box">
-                            <div class="kpi-icon">🔄</div>
-                            <div class="kpi-value">۳/۵</div>
-                            <div class="kpi-label">فالوآپ</div>
-                        </div>
-                        <div class="kpi-box">
-                            <div class="kpi-icon">📋</div>
-                            <div class="kpi-value">۴/۵</div>
-                            <div class="kpi-label">اطلاعات دریافتی</div>
-                        </div>
-                    </div>
-                </div>
+function tkey() { return new Date().toISOString().slice(0, 10); }
+function faDate() { return new Date().toLocaleDateString('fa-IR', {weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'}); }
+function pct(v, t) { return Math.min(100, Math.round((parseInt(v) || 0) / t * 100)); }
+function pColor(p) { return p >= 100 ? '#16A34A' : p >= 60 ? '#2563EB' : p >= 30 ? '#D97706' : '#94A3B8'; }
 
-                <div class="card">
-                    <div class="card-title">🏆 Leaderboard هفتگی</div>
-                    <div id="leaderboard">
-                        <div class="leaderboard-row">
-                            <div class="rank">#۱</div>
-                            <div class="name">مجتبی رنجبر</div>
-                            <div class="score">۹۸۰ نقطه</div>
-                            <div class="trend">📈</div>
-                        </div>
-                        <div class="leaderboard-row">
-                            <div class="rank">#۲</div>
-                            <div class="name">ندا شریفی</div>
-                            <div class="score">۸۵۰ نقطه</div>
-                            <div class="trend">➡️</div>
-                        </div>
-                        <div class="leaderboard-row">
-                            <div class="rank">#۳</div>
-                            <div class="name">سمن خوشکلام</div>
-                            <div class="score">۷۲۰ نقطه</div>
-                            <div class="trend">➡️</div>
-                        </div>
-                    </div>
-                </div>
-            </div>
+function toast(msg, type) {
+  const el = document.getElementById('toast');
+  el.textContent = msg;
+  el.className = 'toast ' + (type === 'err' ? 'err ' : '') + 'show';
+  setTimeout(() => el.className = 'toast', 2500);
+}
 
-            <!-- LEADS PAGE -->
-            <div class="page" id="leads">
-                <h2 style="margin-bottom: 20px; color: #1B3A5C;">مدیریت لیدها</h2>
-                <div class="card">
-                    <div class="card-title">لیدهای شما</div>
-                    <div style="text-align: center; padding: 40px; color: #94A3B8;">
-                        📋 فاز ۲ — لیدها به زودی اضافه می‌شوند
-                    </div>
-                </div>
-            </div>
+function loadAll() {
+  const cfg = localStorage.getItem('anbox_cfg');
+  const reports = localStorage.getItem('anbox_reports');
+  const leads = localStorage.getItem('anbox_leads');
+  if (cfg) CFG = JSON.parse(cfg);
+  if (reports) REPORTS = JSON.parse(reports);
+  if (leads) LEADS = JSON.parse(leads);
+}
 
-            <!-- REPORTS PAGE -->
-            <div class="page" id="reports">
-                <h2 style="margin-bottom: 20px; color: #1B3A5C;">گزارش‌ها</h2>
-                <div class="card">
-                    <div class="card-title">گزارش‌های شما</div>
-                    <div style="margin-top: 20px; padding: 20px; background: #F8FAFC; border-radius: 8px; border: 1px solid #E2E8F0;">
-                        <div style="font-weight: 600; margin-bottom: 10px;">گزارش‌های موجود:</div>
-                        <div style="color: #64748B; font-size: 12px; line-height: 1.8;">
-                            • گزارش روزانه KPI<br>
-                            • گزارش ماهیانه عملکرد<br>
-                            • گزارش Leaderboard<br>
-                            • گزارش تحلیل لیدها (فاز ۲)
-                        </div>
-                    </div>
-                </div>
-            </div>
+function saveAll() {
+  localStorage.setItem('anbox_cfg', JSON.stringify(CFG));
+  localStorage.setItem('anbox_reports', JSON.stringify(REPORTS));
+  localStorage.setItem('anbox_leads', JSON.stringify(LEADS));
+}
 
-            <!-- ANALYTICS PAGE -->
-            <div class="page" id="analytics">
-                <h2 style="margin-bottom: 20px; color: #1B3A5C;">تحلیلات</h2>
-                <div class="card">
-                    <div class="card-title">تحلیلات پیشرفته</div>
-                    <div style="text-align: center; padding: 40px; color: #94A3B8;">
-                        📊 فاز ۴ — تحلیلات بهبود‌یافته به زودی
-                    </div>
-                </div>
-            </div>
+function getReport(eid) {
+  const k = eid + '_' + tkey();
+  if (REPORTS[k]) return REPORTS[k];
+  const blank = {eid, date: tkey(), crm: false, notes: '', checklist: new Array(10).fill(false)};
+  CFG.fields.forEach(f => blank[f.key] = '');
+  return blank;
+}
 
-            <!-- SETTINGS PAGE -->
-            <div class="page" id="settings">
-                <h2 style="margin-bottom: 20px; color: #1B3A5C;">تنظیمات</h2>
-                <div class="card">
-                    <div class="card-title">مدیریت اطلاعات</div>
-                    <div style="margin-bottom: 15px;">
-                        <label style="display: block; font-size: 13px; font-weight: 600; margin-bottom: 5px; color: #1B3A5C;">نام کاربری</label>
-                        <input type="text" style="width: 100%; padding: 10px; border: 1px solid #E2E8F0; border-radius: 8px; font-size: 13px;" placeholder="نام کاربری">
-                    </div>
-                    <div style="margin-bottom: 15px;">
-                        <label style="display: block; font-size: 13px; font-weight: 600; margin-bottom: 5px; color: #1B3A5C;">رمز عبور</label>
-                        <input type="password" style="width: 100%; padding: 10px; border: 1px solid #E2E8F0; border-radius: 8px; font-size: 13px;" placeholder="رمز عبور جدید">
-                    </div>
-                    <button style="padding: 10px 20px; background: #2563EB; color: #fff; border: none; border-radius: 8px; cursor: pointer; font-weight: 700;">ذخیره تنظیمات</button>
-                </div>
-            </div>
-        </div>
-    </div>
+function hideAll() {
+  ['page-sel', 'page-team', 'page-leads', 'page-mgr'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.style.display = 'none';
+  });
+}
 
-    <!-- NOTIFICATION -->
-    <div class="notification" id="notification"></div>
+function setApp(html) { document.getElementById('app').innerHTML = html; }
+function gotoSel() { hideAll(); document.getElementById('page-sel').style.display = ''; renderSel(); }
+function gotoTeam() { hideAll(); document.getElementById('page-team').style.display = ''; renderTeam(); }
+function gotoLeads() { hideAll(); document.getElementById('page-leads').style.display = ''; renderLeads(); }
+function gotoMgr() { hideAll(); document.getElementById('page-mgr').style.display = ''; renderMgr(); }
 
-    <script>
-        function switchPage(page) {
-            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-            document.getElementById(page).classList.add('active');
-            document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active'));
-            event.target.classList.add('active');
-        }
+function openTeam(eid) {
+  AE = CFG.experts.find(e => e.id === eid);
+  gotoTeam();
+}
 
-        function showNotification(msg) {
-            const el = document.getElementById('notification');
-            el.textContent = msg;
-            el.classList.add('active');
-            setTimeout(() => el.classList.remove('active'), 3000);
-        }
+function renderSel() {
+  document.getElementById('hDate').textContent = faDate();
+  const list = document.getElementById('expList');
+  list.innerHTML = '';
+  CFG.experts.forEach(e => {
+    const r = getReport(e.id);
+    const done = r.checklist.filter(Boolean).length;
+    const btn = document.createElement('button');
+    btn.className = 'exp-btn';
+    btn.innerHTML = '<span>👤 ' + e.name + '</span><span class="ebadge' + (done === 10 ? ' done' : '') + '">' + done + '/10</span>';
+    btn.onclick = () => openTeam(e.id);
+    list.appendChild(btn);
+  });
+}
 
-        // Init
-        showNotification('✅ Dashboard V2 بارگذاری شد');
-    </script>
+function renderTeam() {
+  document.getElementById('hDate').textContent = faDate();
+  let html = '<div class="exp-header"><button class="back-btn" onclick="gotoSel()">← تغییر</button><div style="margin-top: 10px;"><h2>سلام، ' + AE.name + ' 👋</h2><div>' + faDate() + '</div></div></div>';
+  html += '<div class="tabs"><button class="tab-btn active" onclick="renderTeamReport()">📝 گزارش</button></div>';
+  html += '<div id="team-content" class="content"></div>';
+  document.getElementById('page-team').innerHTML = html;
+  renderTeamReport();
+}
+
+function renderTeamReport() {
+  const r = getReport(AE.id);
+  let html = '<div class="card"><div class="card-head"><h3>📝 گزارش روزانه</h3></div><div class="card-body"><div class="form-grid">';
+  CFG.fields.forEach(f => {
+    const v = r[f.key] || '';
+    const pc = pct(v, f.target);
+    const col = pColor(pc);
+    html += '<div class="ff"><label>' + f.icon + ' ' + f.label + '</label><input type="number" value="' + v + '" onchange="updateField(\'' + f.key + '\', this.value)"><div style="font-size: 10px; color: ' + col + '; margin-top: 4px;">' + v + '/' + f.target + ' (' + pc + '%)</div></div>';
+  });
+  html += '</div><button class="save-btn" onclick="saveTeamReport()">💾 ذخیره</button></div></div>';
+  document.getElementById('team-content').innerHTML = html;
+}
+
+function updateField(key, value) {
+  const r = getReport(AE.id);
+  r[key] = value;
+  REPORTS[AE.id + '_' + tkey()] = r;
+  saveAll();
+}
+
+function saveTeamReport() {
+  const r = getReport(AE.id);
+  r.savedAt = new Date().toLocaleTimeString('fa-IR');
+  REPORTS[AE.id + '_' + tkey()] = r;
+  saveAll();
+  toast('گزارش ذخیره شد ✓');
+}
+
+function renderLeads() {
+  document.getElementById('hDate').textContent = faDate();
+  let html = '<div class="card"><div class="card-head"><h3>📋 مدیریت لیدها</h3></div><div class="card-body"><button class="save-btn" style="background: #16A34A; margin-bottom: 14px;" onclick="addLeadForm()">➕ افزودن لید</button><div id="leads-list"></div></div></div>';
+  setApp(html);
+  renderLeadsList();
+}
+
+function addLeadForm() {
+  let html = '<div class="card"><div class="card-head"><h3>افزودن لید جدید</h3></div><div class="card-body"><input type="text" id="company" placeholder="نام شرکت" class="add-inp" style="margin-bottom: 10px;"><br><input type="text" id="phone" placeholder="شماره تماس" class="add-inp" style="margin-bottom: 10px;"><br><input type="text" id="contact" placeholder="نام تماس گیر" class="add-inp" style="margin-bottom: 10px;"><br><button class="save-btn" style="background: #16A34A;" onclick="saveLead()">افزودن</button></div></div>';
+  document.getElementById('leads-list').innerHTML = html;
+}
+
+function saveLead() {
+  const company = document.getElementById('company').value;
+  const phone = document.getElementById('phone').value;
+  const contact = document.getElementById('contact').value;
+  if (!company || !phone) {
+    toast('نام و شماره الزامی است', 'err');
+    return;
+  }
+  LEADS.push({company_name: company, phone: phone, contact_name: contact, created_by: AE ? AE.id : 1});
+  saveAll();
+  toast('لید ذخیره شد ✓');
+  renderLeadsList();
+}
+
+function renderLeadsList() {
+  let html = '<div style="margin-top: 20px;"><h3>لیدهای ثبت شده: ' + LEADS.length + '</h3>';
+  LEADS.forEach(l => {
+    html += '<div style="background: #F8FAFC; padding: 10px; border-radius: 8px; margin-bottom: 10px;"><strong>' + l.company_name + '</strong> - ' + l.phone + '</div>';
+  });
+  html += '</div>';
+  document.getElementById('leads-list').innerHTML += html;
+}
+
+function renderMgr() {
+  document.getElementById('hDate').textContent = faDate();
+  let html = '<div class="card"><div class="card-head"><h3>📊 داشبورد مدیریتی</h3></div><div class="card-body"><div class="mgr-stats"><div class="stat-box"><div class="sv">' + CFG.experts.length + '</div><div class="sl">کارشناسان</div></div><div class="stat-box"><div class="sv">' + LEADS.length + '</div><div class="sl">لیدها</div></div></div></div></div>';
+  CFG.experts.forEach(e => {
+    const r = getReport(e.id);
+    const done = r.checklist.filter(Boolean).length;
+    html += '<div class="exp-card"><div class="ech"><div class="avatar">' + e.name[0] + '</div><div><div class="en">' + e.name + '</div></div><span class="ebadge' + (done === 10 ? ' done' : '') + '">' + done + '/10</span></div></div>';
+  });
+  document.getElementById('page-mgr').innerHTML = html;
+}
+
+function init() {
+  document.getElementById('hDate').textContent = faDate();
+  loadAll();
+  
+  document.getElementById('app').innerHTML = '<div id="page-sel"><div class="sel-wrap"><div class="sel-hero"><h1>🚚 داشبورد آن‌باکس</h1><p id="selDate">' + faDate() + '</p></div><div style="font-size: 13px; color: #64748B; margin-bottom: 11px; text-align: center;">کارشناس را انتخاب کنید</div><div id="expList"></div><button class="act-btn pri" onclick="gotoMgr()">📊 مدیریت</button><button class="act-btn sec" onclick="gotoLeads()">📋 لیدها</button></div></div><div id="page-team" style="display: none;"></div><div id="page-leads" style="display: none;"></div><div id="page-mgr" style="display: none;"></div>';
+  
+  gotoSel();
+}
+
+init();
+</script>
 </body>
 </html>
