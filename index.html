@@ -111,6 +111,7 @@ body{font-family:Tahoma,'Segoe UI',sans-serif;background:#F0F4F8;color:#1E293B;m
 <div id="app"></div>
 
 <script>
+// CONSTANTS
 const DEFAULT_EXPERTS = [
   {id:1,name:'مجتبی رنجبر'},
   {id:2,name:'ندا شریفی'},
@@ -125,7 +126,14 @@ const DEFAULT_FIELDS = [
   {key:'trainings',label:'آموزش',icon:'🎓',target:3},
   {key:'barcodes',label:'بارکد',icon:'📦',target:10},
 ];
-const CHECK_ITEMS=['لیست لیدهای امروز دریافت شد','گزارش دیروز بررسی شد','اهداف روز با مدیر هماهنگ شد','تماس با تمام لیدهای امروز انجام شد','فالوآپ مشتریان دیروز انجام شد','اطلاعات مشتریان تأییدشده دریافت شد','پنل‌های جدید ساخته و تحویل داده شد','آموزش شارژ و ارسال به مشتریان انجام شد','بارکد سفارشات امروز صادر شد','گزارش پایان روز در CRM ثبت شد'];
+const CHECK_ITEMS=[
+  'لیست لیدهای امروز دریافت شد','گزارش دیروز بررسی شد','اهداف روز با مدیر هماهنگ شد',
+  'تماس با تمام لیدهای امروز انجام شد','فالوآپ مشتریان دیروز انجام شد',
+  'اطلاعات مشتریان تأییدشده دریافت شد','پنل‌های جدید ساخته و تحویل داده شد',
+  'آموزش شارژ و ارسال به مشتریان انجام شد','بارکد سفارشات امروز صادر شد',
+  'گزارش پایان روز در CRM ثبت شد'
+];
+
 const LEAD_DROPDOWNS = {
   lead_type: ['گرم', 'سرد'],
   lead_source: ['سرچ اینترنتی', 'تماس مشتری', 'بانک اطلاعاتی', 'دایره طلایی', 'پیامک تبلیغاتی', 'سوشیال مدیا'],
@@ -139,12 +147,14 @@ const LEAD_DROPDOWNS = {
   lead_status: ['در حال پیگیری', 'عدم توافق', 'انحلال شرکت', 'در حال عقد قرارداد', 'در حال مذاکره', 'در حال تست']
 };
 
+// GLOBAL STATE
 let CFG = {experts: DEFAULT_EXPERTS, fields: DEFAULT_FIELDS};
 let REPORTS = {};
 let LEADS = [];
 let AE = null;
 let currentPage = 'sel';
 
+// HELPERS
 function tkey(){return new Date().toISOString().slice(0,10);}
 function faDate(){return new Date().toLocaleDateString('fa-IR',{weekday:'long',year:'numeric',month:'long',day:'numeric'});}
 function pct(v,t){return Math.min(100,Math.round((parseInt(v)||0)/t*100));}
@@ -157,10 +167,12 @@ function toast(msg,type='ok'){
   clearTimeout(toastT);toastT=setTimeout(()=>el.className='toast',2500);
 }
 
+// STORAGE (localStorage)
 function loadAll(){
   const cfg = localStorage.getItem('anbox_cfg');
   const reports = localStorage.getItem('anbox_reports');
   const leads = localStorage.getItem('anbox_leads');
+  
   if(cfg) CFG = JSON.parse(cfg);
   if(reports) REPORTS = JSON.parse(reports);
   if(leads) LEADS = JSON.parse(leads);
@@ -195,6 +207,7 @@ async function updateField(eid, field, value){
   saveAll();
 }
 
+// RENDER
 function hideAll(){
   ['page-sel','page-team','page-leads','page-mgr','page-set'].forEach(id=>{
     const el=document.getElementById(id);if(el)el.style.display='none';
@@ -261,13 +274,15 @@ function buildTeamForm(){
       '<div class="prow"><span>'+(parseInt(v)||0)+'/'+f.target+'</span><span id="pp_'+f.key+'" style="font-weight:700;color:'+col+'">'+pc+'٪</span></div>'+
       '<div class="bwrap"><div class="bfill" id="bf_'+f.key+'" style="background:'+col+';width:'+pc+'%"></div></div></div>';
   });
-  html+='</div><div class="crm-row'+(r.crm?' done':'')+'" id="crmRow" onclick="togTeamCRM()">'+
-    '<div class="cbox'+(r.crm?' on':'')+'" id="crmBox">'+(r.crm?'✓':'')+'</div><span>ثبت اطلاعات در CRM انجام شد</span></div>'+
+  html+='</div>';
+  html+='<div class="crm-row'+(r.crm?' done':'')+'" id="crmRow" onclick="togTeamCRM()">'+
+    '<div class="cbox'+(r.crm?' on':'')+'" id="crmBox">'+(r.crm?'✓':'')+'</div>'+
+    '<span>ثبت اطلاعات در CRM انجام شد</span></div>'+
     '<label style="display:block;font-size:12px;color:#64748B;margin-bottom:6px">📝 یادداشت</label>'+
     '<textarea class="notes-area" id="notesA" rows="3" oninput="onTeamNotes()">'+(r.notes||'')+'</textarea>'+
     '<button class="save-btn" onclick="doTeamSave()">💾 ذخیره</button>'+
-    '<div id="savedM" class="saved-msg" style="'+(r.savedAt?'':'display:none')+'">'+(r.savedAt?'✓ ذخیره‌شد: '+r.savedAt:'')+'</div></div></div>'+
-    '<div class="card"><div class="card-body"><div style="font-weight:700;color:#1B3A5C;margin-bottom:11px;font-size:13px">🎯 خلاصه</div><div class="kpi-grid" id="ksum"></div></div></div>';
+    '<div id="savedM" class="saved-msg" style="'+(r.savedAt?'':'display:none')+'">'+(r.savedAt?'✓ ذخیره‌شد: '+r.savedAt:'')+'</div></div></div>';
+  html+='<div class="card"><div class="card-body"><div style="font-weight:700;color:#1B3A5C;margin-bottom:11px;font-size:13px">🎯 خلاصه</div><div class="kpi-grid" id="ksum"></div></div></div>';
   p.innerHTML=html;buildTeamKpiSum();
 }
 
@@ -327,14 +342,20 @@ function buildTeamSchedule(){
     {i:'📊',t:'گزارش پایان روز',h:'۱۷:۳۰',d:'در CRM'}
   ];
   document.getElementById('tS').innerHTML=SCH.map(s=>
-    '<div class="sch-item"><div class="si-icon">'+s.i+'</div><div><div class="si-title">'+s.t+'</div><div class="si-time">⏰ '+s.h+'</div><div class="si-desc">'+s.d+'</div></div></div>').join('');
+    '<div class="sch-item"><div class="si-icon">'+s.i+'</div><div>'+
+    '<div class="si-title">'+s.t+'</div><div class="si-time">⏰ '+s.h+'</div>'+
+    '<div class="si-desc">'+s.d+'</div></div></div>').join('');
 }
 
 function buildTeamChecklist(){
   const r=getReport(AE.id),done=r.checklist.filter(Boolean).length,pp=Math.round(done/10*100);
-  let html='<div class="ph"><div class="ph-row"><span style="font-weight:700">پیشرفت امروز</span><span style="font-weight:700;color:#2563EB" id="ckProg">'+done+'/10</span></div><div class="bwrap"><div class="bfill" id="ckBar" style="background:'+(done===10?'#22C55E':'linear-gradient(90deg,#1B3A5C,#2563EB)')+';width:'+pp+'%"></div></div></div>';
+  let html='<div class="ph"><div class="ph-row"><span style="font-weight:700">پیشرفت امروز</span>'+
+    '<span style="font-weight:700;color:#2563EB" id="ckProg">'+done+'/10</span></div>'+
+    '<div class="bwrap"><div class="bfill" id="ckBar" style="background:'+(done===10?'#22C55E':'linear-gradient(90deg,#1B3A5C,#2563EB)')+';width:'+pp+'%"></div></div></div>';
   CHECK_ITEMS.forEach((item,i)=>{
-    html+='<div class="ci'+(r.checklist[i]?' done':'')+'" onclick="togTeamCk('+i+')"><div class="cbox'+(r.checklist[i]?' on':'')+'">'+( r.checklist[i]?'✓':'')+'</div><span>'+item+'</span></div>';
+    html+='<div class="ci'+(r.checklist[i]?' done':'')+'" onclick="togTeamCk('+i+')">'+
+      '<div class="cbox'+(r.checklist[i]?' on':'')+'">'+( r.checklist[i]?'✓':'')+'</div>'+
+      '<span>'+item+'</span></div>';
   });
   if(done===10) html+='<div class="success-box"><div style="font-size:34px;margin-bottom:5px">🎉</div><div style="font-weight:700;color:#16A34A">آفرین! روز موفقی داشتید</div></div>';
   document.getElementById('tC').innerHTML=html;
@@ -349,19 +370,28 @@ async function togTeamCk(i){
 
 function renderLeads(){
   document.getElementById('hDate').textContent=faDate();
-  let html='<div class="card"><div class="card-head"><h3>📋 مدیریت لیدها</h3></div><div class="card-body"><button class="save-btn" style="background:#16A34A;margin-bottom:14px" onclick="showLeadForm()">➕ افزودن لید جدید</button><button class="save-btn" style="background:#2563EB;margin-bottom:14px" onclick="downloadLeadTemplate()">📥 دانلود نمونه Excel</button><button class="save-btn" style="background:#D97706;margin-bottom:14px" onclick="document.getElementById(\'xlFile\').click()">📊 Import Excel</button><input type="file" id="xlFile" accept=".xlsx,.xls" style="display:none" onchange="importLeadsExcel(event)"><div id="leadsList"></div></div></div>';
+  let html='<div class="card"><div class="card-head"><h3>📋 مدیریت لیدها</h3></div><div class="card-body">'+
+    '<button class="save-btn" style="background:#16A34A;margin-bottom:14px" onclick="showLeadForm()">➕ افزودن لید جدید</button>'+
+    '<button class="save-btn" style="background:#2563EB;margin-bottom:14px" onclick="downloadLeadTemplate()">📥 دانلود نمونه Excel</button>'+
+    '<button class="save-btn" style="background:#D97706;margin-bottom:14px" onclick="document.getElementById(\'xlFile\').click()">📊 Import Excel</button>'+
+    '<input type="file" id="xlFile" accept=".xlsx,.xls" style="display:none" onchange="importLeadsExcel(event)">'+
+    '<div id="leadsList"></div></div></div>';
   setApp(html);
   renderLeadsTable();
 }
 
 function renderLeadsView(){
-  let html='<div class="card"><div class="card-head"><h3>📋 لیدهای من</h3></div><div class="card-body"><button class="save-btn" style="background:#16A34A;margin-bottom:14px" onclick="showLeadForm()">➕ افزودن لید</button><div id="myLeadsList"></div></div></div>';
+  let html='<div class="card"><div class="card-head"><h3>📋 لیدهای من</h3></div><div class="card-body">'+
+    '<button class="save-btn" style="background:#16A34A;margin-bottom:14px" onclick="showLeadForm()">➕ افزودن لید</button>'+
+    '<div id="myLeadsList"></div></div></div>';
   document.getElementById('tL').innerHTML=html;
   const myLeads=LEADS.filter(l=>l.created_by===AE.id);
   if(myLeads.length===0){
     document.getElementById('myLeadsList').innerHTML='<p style="text-align:center;color:#94A3B8;padding:20px">هیچ لیدی ثبت نشده</p>';
   }else{
-    let tbl='<table class="lead-table"><thead><tr><th>نام شرکت</th><th>تماس گیر</th><th>مرحله</th><th>وضعیت</th></tr></thead><tbody>';
+    let tbl='<table class="lead-table"><thead><tr>';
+    ['نام شرکت','تماس گیر','مرحله','وضعیت'].forEach(h=>tbl+='<th>'+h+'</th>');
+    tbl+='</tr></thead><tbody>';
     myLeads.forEach(l=>{
       tbl+='<tr><td>'+l.company_name+'</td><td>'+l.contact_name+'</td><td>'+l.sales_stage+'</td><td>'+l.lead_status+'</td></tr>';
     });
@@ -376,7 +406,9 @@ function renderLeadsTable(){
     list.innerHTML='<p style="text-align:center;color:#94A3B8;padding:20px">هیچ لیدی ثبت نشده</p>';
     return;
   }
-  let tbl='<table class="lead-table"><thead><tr><th>نام شرکت</th><th>صنعت</th><th>تماس گیر</th><th>شماره</th><th>مرحله</th><th>مانع</th><th>اقدام بعدی</th><th>وضعیت</th></tr></thead><tbody>';
+  let tbl='<table class="lead-table"><thead><tr>';
+  ['نام شرکت','صنعت','تماس گیر','شماره','مرحله','مانع','اقدام بعدی','وضعیت'].forEach(h=>tbl+='<th>'+h+'</th>');
+  tbl+='</tr></thead><tbody>';
   LEADS.forEach((l,idx)=>{
     tbl+='<tr><td>'+l.company_name+'</td><td>'+l.industry+'</td><td>'+l.contact_name+'</td><td>'+l.phone+'</td>'+
       '<td><select class="inline-select" onchange="updateLeadField('+idx+`,\'sales_stage\',this.value)">'+
@@ -397,7 +429,8 @@ function renderLeadsTable(){
 }
 
 function showLeadForm(){
-  let html='<div class="card"><div class="card-head"><h3>افزودن لید جدید</h3></div><div class="card-body"><div class="form-grid">';
+  let html='<div class="card"><div class="card-head"><h3>افزودن لید جدید</h3></div><div class="card-body">';
+  html+='<div class="form-grid">';
   ['lead_type','lead_source','company_name','industry','selection_reason','phone','contact_name','contact_position','sales_stage','anbox_fit','main_obstacle','next_action','sales_expert','lead_status'].forEach(key=>{
     const label = {lead_type:'نوع لید',lead_source:'مبدأ لید',company_name:'نام شرکت',industry:'صنعت',selection_reason:'دلیل انتخاب',phone:'شماره تماس',contact_name:'نام فرد تماس',contact_position:'سمت فرد',sales_stage:'مرحله فروش',anbox_fit:'تناسب با آن‌باکس',main_obstacle:'مانع اصلی',next_action:'اقدام بعدی',sales_expert:'کارشناس',lead_status:'وضعیت لید'}[key];
     const isSelect = LEAD_DROPDOWNS[key];
@@ -502,13 +535,23 @@ function renderMgr(){
   const tP=CFG.experts.reduce((s,e)=>s+(parseInt(getReport(e.id).panels)||0),0);
   const tC=CFG.experts.reduce((s,e)=>s+(parseInt(getReport(e.id).calls)||0),0);
   const tD=CFG.experts.filter(e=>getReport(e.id).checklist.filter(Boolean).length===10).length;
-  let html='<div class="card"><div class="card-head"><h3>📊 داشبورد مدیریتی</h3></div><div class="card-body"><div class="mgr-stats"><div class="stat-box"><div class="sv">'+CFG.experts.length+'</div><div class="sl">کارشناسان</div></div><div class="stat-box"><div class="sv">'+tP+'</div><div class="sl">پنل امروز</div></div><div class="stat-box"><div class="sv">'+tC+'</div><div class="sl">تماس امروز</div></div><div class="stat-box"><div class="sv">'+tD+'/'+CFG.experts.length+'</div><div class="sl">چک‌لیست کامل</div></div></div></div></div>';
+  let html='<div class="card"><div class="card-head"><h3>📊 داشبورد مدیریتی</h3></div><div class="card-body">'+
+    '<div class="mgr-stats">'+
+    '<div class="stat-box"><div class="sv">'+CFG.experts.length+'</div><div class="sl">کارشناسان</div></div>'+
+    '<div class="stat-box"><div class="sv">'+tP+'</div><div class="sl">پنل امروز</div></div>'+
+    '<div class="stat-box"><div class="sv">'+tC+'</div><div class="sl">تماس امروز</div></div>'+
+    '<div class="stat-box"><div class="sv">'+tD+'/'+CFG.experts.length+'</div><div class="sl">چک‌لیست کامل</div></div>'+
+    '</div></div></div>';
   CFG.experts.forEach(e=>{
     const r=getReport(e.id),done=r.checklist.filter(Boolean).length;
-    html+='<div class="exp-card"><div class="ech"><div style="display:flex;align-items:center;gap:9px"><div class="avatar">'+e.name[0]+'</div><div><div class="en">'+e.name+'</div><div class="es">'+(r.savedAt?'ذخیره: '+r.savedAt:'بدون ذخیره')+'</div></div></div><span class="ebadge'+(done===10?' done':'')+'">'+done+'/۱۰</span></div><div class="metrics-grid">';
+    html+='<div class="exp-card"><div class="ech"><div style="display:flex;align-items:center;gap:9px"><div class="avatar">'+e.name[0]+'</div>'+
+      '<div><div class="en">'+e.name+'</div><div class="es">'+(r.savedAt?'ذخیره: '+r.savedAt:'بدون ذخیره')+'</div></div></div>'+
+      '<span class="ebadge'+(done===10?' done':'')+'">'+done+'/۱۰</span></div>'+
+      '<div class="metrics-grid">';
     CFG.fields.forEach(f=>{
       const v=parseInt(r[f.key])||0,pc=pct(v,f.target),col=pColor(pc);
-      html+='<div class="mc"><div class="ml">'+f.icon+'</div><div class="mv" style="color:'+col+'">'+v+'</div><div class="mt">هدف: '+f.target+'</div></div>';
+      html+='<div class="mc"><div class="ml">'+f.icon+'</div><div class="mv" style="color:'+col+'">'+v+'</div>'+
+        '<div class="mt">هدف: '+f.target+'</div></div>';
     });
     html+='</div>'+(r.notes?'<div class="notes-strip">📝 '+r.notes+'</div>':'')+'</div>';
   });
@@ -525,16 +568,21 @@ function swSetTab(t){
 
 function renderSetExp(){
   const el=document.getElementById('setExperts');
-  let html='<div class="card"><div class="card-body"><label style="display:block;font-size:13px;color:#1B3A5C;margin-bottom:11px">افزودن کارشناس ('+CFG.experts.length+'/10)</label><div class="add-row"><input class="add-inp" id="newNm" placeholder="نام و نام خانوادگی" onkeydown="if(event.key===\'Enter\')addExp()"><button class="add-sub" onclick="addExp()">+ افزودن</button></div></div></div>';
+  let html='<div class="card"><div class="card-body"><label style="display:block;font-size:13px;color:#1B3A5C;margin-bottom:11px">افزودن کارشناس ('+CFG.experts.length+'/10)</label>'+
+    '<div class="add-row"><input class="add-inp" id="newNm" placeholder="نام و نام خانوادگی" onkeydown="if(event.key===\'Enter\')addExp()">'+
+    '<button class="add-sub" onclick="addExp()">+ افزودن</button></div></div></div>';
   CFG.experts.forEach(e=>{
-    html+='<div class="si2" id="si_'+e.id+'"><span>👤 '+e.name+'</span><button class="be" onclick="stEdit('+e.id+')">ویرایش</button><button class="bd" onclick="delExp('+e.id+')">حذف</button></div>';
+    html+='<div class="si2" id="si_'+e.id+'"><span>👤 '+e.name+'</span>'+
+      '<button class="be" onclick="stEdit('+e.id+')">ویرایش</button>'+
+      '<button class="bd" onclick="delExp('+e.id+')">حذف</button></div>';
   });
   el.innerHTML=html;
 }
 
 function stEdit(eid){
   const e=CFG.experts.find(x=>x.id===eid),div=document.getElementById('si_'+eid);
-  div.innerHTML='<input class="add-inp" id="ei_'+eid+'" value="'+e.name+'" style="flex:1" onkeydown="if(event.key===\'Enter\')doEdit('+eid+')"><button class="be" onclick="doEdit('+eid+')">ذخیره</button>';
+  div.innerHTML='<input class="add-inp" id="ei_'+eid+'" value="'+e.name+'" style="flex:1" onkeydown="if(event.key===\'Enter\')doEdit('+eid+')">'+
+    '<button class="be" onclick="doEdit('+eid+')">ذخیره</button>';
   document.getElementById('ei_'+eid).focus();
 }
 
@@ -560,7 +608,11 @@ function renderSetKpi(){
   const el=document.getElementById('setKpi');
   let html='<div class="card"><div class="card-head"><h3>تنظیم KPI</h3></div><div class="card-body">';
   CFG.fields.forEach((f,i)=>{
-    html+='<div class="kpi-set-row"><input id="kl_'+i+'" value="'+f.label+'" oninput="updKpi('+i+`,\'label\',this.value)"><input id="ki_'+i+'" value="'+f.icon+'" style="text-align:center" oninput="updKpi('+i+`,\'icon\',this.value)"><input type="number" id="kt_'+i+'" value="'+f.target+'" min="1" oninput="updKpi('+i+`,\'target\',this.value)"><button class="del-kpi-btn" onclick="delKpi('+i+')">حذف</button></div>';
+    html+='<div class="kpi-set-row">'+
+      '<input id="kl_'+i+'" value="'+f.label+'" oninput="updKpi('+i+`,\'label\',this.value)">'+
+      '<input id="ki_'+i+'" value="'+f.icon+'" style="text-align:center" oninput="updKpi('+i+`,\'icon\',this.value)">'+
+      '<input type="number" id="kt_'+i+'" value="'+f.target+'" min="1" oninput="updKpi('+i+`,\'target\',this.value)">'+
+      '<button class="del-kpi-btn" onclick="delKpi('+i+')">حذف</button></div>';
   });
   html+='<button class="add-kpi-btn" onclick="addKpi()">+ KPI جدید</button></div></div>';
   el.innerHTML=html;
@@ -589,6 +641,7 @@ function shareWA(){
   window.open('https://wa.me/?text='+encodeURIComponent(txt),'_blank');
 }
 
+// INIT
 async function init(){
   document.getElementById('hDate').textContent=faDate();
   loadAll();
