@@ -1,840 +1,565 @@
-<!DOCTYPE html
+<!DOCTYPE html>
 <html dir="rtl" lang="fa">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>داشبورد V4 | آن‌باکس</title>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.min.js"></script>
-    <style>
-        * { box-sizing: border-box; margin: 0; padding: 0; }
-        body { font-family: Tahoma, 'Segoe UI', sans-serif; background: #F0F4F8; color: #1E293B; min-height: 100vh; }
-        
-        /* LOGIN */
-        .login-container { display: flex; align-items: center; justify-content: center; min-height: 100vh; background: linear-gradient(135deg, #1B3A5C, #2563EB); }
-        .login-box { background: #fff; padding: 40px; border-radius: 12px; box-shadow: 0 10px 40px rgba(0,0,0,.2); width: 100%; max-width: 400px; }
-        .login-logo { text-align: center; font-size: 48px; margin-bottom: 20px; }
-        .login-title { text-align: center; font-size: 24px; font-weight: 700; color: #1B3A5C; margin-bottom: 30px; }
-        .form-group { margin-bottom: 20px; }
-        .form-label { display: block; font-size: 14px; font-weight: 600; margin-bottom: 8px; color: #1B3A5C; }
-        .form-input, select { width: 100%; padding: 12px; border: 1px solid #E2E8F0; border-radius: 8px; font-size: 14px; font-family: Tahoma; }
-        .form-input:focus, select:focus { outline: none; border-color: #2563EB; box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1); }
-        .login-button { width: 100%; padding: 12px; background: #2563EB; color: #fff; border: none; border-radius: 8px; font-size: 16px; font-weight: 700; cursor: pointer; }
-        .login-button:hover { background: #1B5BB3; }
-        .login-error { background: #FEE2E2; color: #DC2626; padding: 12px; border-radius: 8px; margin-bottom: 20px; font-size: 14px; display: none; }
-        
-        /* DASHBOARD */
-        .dashboard-container { display: flex; min-height: 100vh; }
-        .sidebar { width: 250px; background: #1B3A5C; color: #fff; padding: 20px; position: fixed; height: 100vh; overflow-y: auto; z-index: 1000; }
-        .logo { display: flex; align-items: center; gap: 10px; margin-bottom: 30px; }
-        .logo-text { font-size: 14px; font-weight: 700; }
-        .user-info { background: rgba(255,255,255,.1); padding: 12px; border-radius: 8px; margin-bottom: 20px; font-size: 12px; }
-        .user-name { font-weight: 700; margin-bottom: 5px; }
-        .logout-btn { width: 100%; padding: 8px; background: #DC2626; color: #fff; border: none; border-radius: 6px; font-size: 12px; cursor: pointer; margin-top: 10px; }
-        .nav-menu { display: flex; flex-direction: column; gap: 5px; }
-        .nav-item { padding: 12px 15px; border-radius: 8px; cursor: pointer; font-size: 13px; transition: all .2s; }
-        .nav-item:hover { background: rgba(255,255,255,.1); }
-        .nav-item.active { background: #2563EB; }
-        .main { margin-right: 250px; flex: 1; }
-        .header { background: #fff; border-bottom: 1px solid #E2E8F0; padding: 15px 30px; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 100; }
-        .header-title { font-size: 18px; font-weight: 700; color: #1B3A5C; }
-        .content { padding: 30px; max-width: 1600px; margin: 0 auto; }
-        .page { display: none; }
-        .page.active { display: block; }
-        .card { background: #fff; border-radius: 12px; border: 1px solid #E2E8F0; padding: 20px; margin-bottom: 20px; box-shadow: 0 1px 3px rgba(0,0,0,.05); }
-        .card-title { font-size: 16px; font-weight: 700; margin-bottom: 15px; color: #1B3A5C; }
-        
-        /* TABS */
-        .tabs { display: flex; gap: 0; border-bottom: 2px solid #E2E8F0; margin-bottom: 20px; }
-        .tab { padding: 12px 24px; cursor: pointer; font-weight: 600; color: #64748B; border-bottom: 3px solid transparent; margin-bottom: -2px; transition: all .2s; }
-        .tab:hover { color: #1B3A5C; }
-        .tab.active { color: #2563EB; border-bottom-color: #2563EB; }
-        .tab-content { display: none; }
-        .tab-content.active { display: block; }
-        
-        /* PIPELINE */
-        .pipeline-grid { display: grid; grid-template-columns: repeat(6, 1fr); gap: 15px; margin-bottom: 20px; }
-        .pipeline-box { background: linear-gradient(135deg, #F8FAFC, #E2E8F0); padding: 15px; border-radius: 10px; text-align: center; border: 1px solid #E2E8F0; }
-        .pipeline-stage { font-size: 12px; color: #64748B; margin-bottom: 5px; }
-        .pipeline-count { font-size: 24px; font-weight: 700; color: #2563EB; }
-        .pipeline-percent { font-size: 11px; color: #94A3B8; margin-top: 5px; }
-        .progress-bar { width: 100%; height: 6px; background: #E2E8F0; border-radius: 3px; margin-top: 8px; overflow: hidden; }
-        .progress-fill { height: 100%; background: linear-gradient(90deg, #2563EB, #1B5BB3); }
-        
-        /* LEAD FORM */
-        .toolbar { display: flex; gap: 10px; margin-bottom: 20px; flex-wrap: wrap; align-items: center; }
-        .btn { padding: 10px 20px; background: #2563EB; color: #fff; border: none; border-radius: 8px; cursor: pointer; font-weight: 700; font-family: Tahoma; transition: all .2s; }
-        .btn:hover { background: #1B5BB3; }
-        .btn.secondary { background: #E2E8F0; color: #1B3A5C; }
-        .btn.danger { background: #DC2626; }
-        .btn.success { background: #16A34A; }
-        .search-box { padding: 10px 15px; border: 1px solid #E2E8F0; border-radius: 8px; width: 250px; font-family: Tahoma; }
-        
-        .modal { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,.7); z-index: 2000; align-items: flex-start; justify-content: center; overflow-y: auto; padding: 20px 0; }
-        .modal.active { display: flex; }
-        .modal-content { background: #fff; border-radius: 12px; padding: 30px; max-width: 1000px; width: 95%; margin: 20px auto; max-height: 90vh; overflow-y: auto; }
-        .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
-        .modal-title { font-size: 18px; font-weight: 700; color: #1B3A5C; }
-        .close-btn { font-size: 24px; cursor: pointer; background: none; border: none; color: #64748B; }
-        .form-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 15px; }
-        .form-grid.full { grid-template-columns: 1fr; }
-        
-        /* TABLE */
-        .lead-table { width: 100%; border-collapse: collapse; margin-top: 20px; font-size: 12px; }
-        .lead-table th { background: #F1F5F9; padding: 12px; text-align: right; font-weight: 700; color: #1B3A5C; border-bottom: 2px solid #E2E8F0; }
-        .lead-table td { padding: 10px; border-bottom: 1px solid #E2E8F0; }
-        .lead-table tr:hover { background: #F8FAFC; }
-        .stage-badge { display: inline-block; padding: 4px 10px; border-radius: 20px; font-size: 10px; font-weight: 700; background: #DBEAFE; color: #2563EB; }
-        
-        /* INLINE EDIT */
-        .inline-select { padding: 6px; border: 1px solid #2563EB; border-radius: 6px; font-size: 11px; width: 100%; font-family: Tahoma; }
-        
-        /* TEAM */
-        .team-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 15px; margin-bottom: 20px; }
-        .team-card { background: linear-gradient(135deg, #F8FAFC, #E2E8F0); padding: 20px; border-radius: 10px; border: 1px solid #E2E8F0; text-align: center; }
-        .team-name { font-size: 16px; font-weight: 700; color: #1B3A5C; margin-bottom: 8px; }
-        .team-role { font-size: 12px; color: #64748B; margin-bottom: 12px; }
-        
-        .notification { position: fixed; top: 20px; left: 50%; transform: translateX(-50%); background: #16A34A; color: #fff; padding: 12px 24px; border-radius: 8px; z-index: 9999; font-weight: 600; display: none; }
-        .notification.show { display: block; }
-        .notification.error { background: #DC2626; }
-        
-        @media(max-width: 768px) {
-            .sidebar { width: 100%; height: auto; position: relative; }
-            .main { margin-right: 0; }
-            .pipeline-grid { grid-template-columns: repeat(2, 1fr); }
-            .form-grid { grid-template-columns: 1fr; }
-            .lead-table { font-size: 10px; }
-            .modal-content { width: 98%; }
-            .team-grid { grid-template-columns: 1fr; }
-        }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>داشبورد فروش | آن‌باکس</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html,body{width:100%;height:100%;overflow-x:hidden}
+body{font-family:Tahoma,'Segoe UI',sans-serif;background:linear-gradient(135deg,#0a0e27,#1a1a3e);color:#e2e8f0;min-height:100vh}
+.container{display:flex;height:100vh;position:relative}
+.sidebar{width:240px;background:rgba(17,24,39,.95);backdrop-filter:blur(10px);border-right:2px solid #e53e3e;padding:20px;overflow-y:auto;position:fixed;left:0;top:0;height:100vh;z-index:1000;transition:transform .3s ease}
+.sidebar.hidden{transform:translateX(-240px)}
+.sidebar-logo{font-size:20px;font-weight:800;color:#e53e3e;margin-bottom:30px;display:flex;align-items:center;gap:8px;animation:slideDown .6s ease-out}
+@keyframes slideDown{from{opacity:0;transform:translateY(-20px)}to{opacity:1;transform:translateY(0)}}
+.nav-item{padding:12px 14px;border-radius:10px;cursor:pointer;font-size:13px;color:#a0aec0;transition:all .2s;margin-bottom:8px;display:flex;align-items:center;gap:10px;user-select:none}
+.nav-item:hover{background:rgba(255,107,107,.1);color:#f1f5f9}
+.nav-item.active{background:linear-gradient(135deg,#e53e3e,#dc2626);color:#fff;font-weight:600}
+.nav-item:active{transform:scale(.95)}
+.main-content{margin-right:0;width:100%;display:flex;flex-direction:column;height:100vh;transition:margin-right .3s ease}
+.overlay{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.5);z-index:999}
+.overlay.show{display:block}
+.top-bar{background:rgba(17,24,39,.95);backdrop-filter:blur(10px);border-bottom:2px solid #1f2937;padding:12px 16px;display:flex;justify-content:space-between;align-items:center;sticky;top:0;z-index:100;gap:12px}
+.hamburger{background:none;border:none;font-size:20px;color:#e2e8f0;cursor:pointer;display:none;padding:8px;margin-left:auto}
+.hamburger.show{display:block}
+.top-bar-right{display:flex;align-items:center;gap:10px;flex:1;min-width:0}
+.search-box{background:rgba(31,41,55,.8);border:1px solid rgba(255,255,255,.1);border-radius:8px;padding:8px 12px;color:#e2e8f0;font-size:12px;font-family:Tahoma,sans-serif;flex:1;min-width:0}
+.search-box:focus{outline:none;border-color:#e53e3e;box-shadow:0 0 20px rgba(229,62,62,.2)}
+.top-bar-left{display:flex;align-items:center;gap:10px}
+.icon-btn{background:rgba(31,41,55,.8);border:1px solid rgba(255,255,255,.1);border-radius:8px;width:36px;height:36px;cursor:pointer;display:flex;align-items:center;justify-content:center;color:#a0aec0;font-size:16px;transition:all .2s;flex-shrink:0}
+.icon-btn:hover{background:rgba(229,62,62,.2);color:#e53e3e}
+.icon-btn:active{background:#e53e3e;color:#fff}
+.profile-avatar{width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,#e53e3e,#f97316);display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:12px;cursor:pointer;flex-shrink:0;box-shadow:0 4px 12px rgba(229,62,62,.3)}
+.content-area{flex:1;overflow-y:auto;padding:16px;background:linear-gradient(135deg,#0a0e27,#1a1a3e);-webkit-overflow-scrolling:touch}
+.content-header{margin-bottom:20px;animation:fadeInDown .6s ease-out}
+@keyframes fadeInDown{from{opacity:0;transform:translateY(-15px)}to{opacity:1;transform:translateY(0)}}
+.content-header h1{font-size:20px;font-weight:700;color:#f1f5f9;margin-bottom:4px}
+.content-header p{font-size:12px;color:#a0aec0}
+.metrics-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px;margin-bottom:20px}
+.metric-card{background:rgba(255,255,255,.05);backdrop-filter:blur(10px);border:1px solid rgba(255,255,255,.1);border-radius:12px;padding:14px;position:relative;overflow:hidden;animation:slideUp .6s ease-out;cursor:pointer;transition:all .3s}
+.metric-card:hover{background:rgba(255,255,255,.08);border-color:rgba(229,62,62,.3);transform:translateY(-5px);box-shadow:0 8px 32px rgba(229,62,62,.2)}
+.metric-card::before{content:'';position:absolute;top:0;right:0;width:60px;height:60px;background:radial-gradient(circle,rgba(229,62,62,.1),transparent);border-radius:50%;pointer-events:none}
+@keyframes slideUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+.metric-label{font-size:11px;color:#a0aec0;margin-bottom:6px;font-weight:600}
+.metric-value{font-size:24px;font-weight:800;color:#f1f5f9;margin-bottom:2px;line-height:1}
+.metric-sub{font-size:10px;color:#6b7280;line-height:1}
+.metric-trend{display:inline-flex;align-items:center;gap:3px;margin-top:6px;font-size:10px;padding:3px 6px;border-radius:4px;background:rgba(34,197,94,.1);color:#22c55e}
+.metric-trend.down{background:rgba(239,68,68,.1);color:#ef4444}
+.summary-section{display:grid;grid-template-columns:1fr;gap:12px;margin-bottom:20px}
+.summary-card{background:rgba(255,255,255,.05);backdrop-filter:blur(10px);border:1px solid rgba(255,255,255,.1);border-radius:12px;padding:16px;animation:slideUp .6s ease-out;transition:all .3s}
+.summary-card:hover{background:rgba(255,255,255,.08);border-color:rgba(229,62,62,.2)}
+.summary-card h3{font-size:13px;font-weight:700;color:#f1f5f9;margin-bottom:12px}
+.category-row{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;padding-bottom:10px;border-bottom:1px solid rgba(255,255,255,.05);font-size:12px;transition:all .2s}
+.category-row:hover{background:rgba(255,255,255,.02);padding:5px;margin:-5px}
+.category-row:last-child{border-bottom:none}
+.category-name{color:#a0aec0}
+.category-score{font-size:16px;font-weight:700;color:#f1f5f9}
+.score-badge{font-size:10px;padding:3px 8px;border-radius:4px;background:#e53e3e;color:#fff;font-weight:600;margin-right:6px}
+.score-badge.good{background:#22c55e}
+.score-badge.warning{background:#f97316}
+.charts-grid{display:grid;grid-template-columns:1fr;gap:12px;margin-bottom:20px}
+.chart-container{background:rgba(255,255,255,.05);backdrop-filter:blur(10px);border:1px solid rgba(255,255,255,.1);border-radius:12px;padding:14px;animation:slideUp .6s ease-out}
+.chart-title{font-size:13px;font-weight:700;color:#f1f5f9;margin-bottom:12px}
+.chart-wrapper{position:relative;height:220px}
+.rating-section{background:rgba(255,255,255,.05);backdrop-filter:blur(10px);border:1px solid rgba(255,255,255,.1);border-radius:12px;padding:16px;margin-bottom:20px;animation:slideUp .6s ease-out}
+.rating-title{font-size:13px;font-weight:700;color:#f1f5f9;margin-bottom:12px}
+.rating-grid{display:grid;grid-template-columns:1fr;gap:12px}
+.rating-item{text-align:center;padding:12px;background:rgba(255,255,255,.02);border-radius:10px;border:1px solid rgba(255,255,255,.05);transition:all .2s}
+.rating-item:hover{background:rgba(255,255,255,.05);border-color:rgba(229,62,62,.2)}
+.rating-label{font-size:11px;color:#a0aec0;margin-bottom:8px;display:block}
+.stars{font-size:24px;letter-spacing:2px;cursor:pointer;transition:all .2s;user-select:none;margin-bottom:4px}
+.stars:active{transform:scale(.95)}
+.mood-selector{display:flex;gap:10px;justify-content:center;margin-bottom:8px}
+.mood-btn{width:44px;height:44px;border-radius:50%;border:2px solid rgba(255,255,255,.1);background:rgba(255,255,255,.02);cursor:pointer;font-size:20px;transition:all .2s;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.mood-btn:hover{background:rgba(255,255,255,.08)}
+.mood-btn:active,.mood-btn.active{border-color:#e53e3e;background:rgba(229,62,62,.2);transform:scale(1.05)}
+.energy-slider{width:100%;cursor:pointer;accent-color:#e53e3e;height:4px}
+.alerts-section{background:rgba(255,255,255,.05);backdrop-filter:blur(10px);border:1px solid rgba(255,255,255,.1);border-radius:12px;padding:16px;margin-bottom:20px;animation:slideUp .6s ease-out}
+.alerts-title{font-size:13px;font-weight:700;color:#f1f5f9;margin-bottom:10px}
+.alert-item{display:flex;align-items:flex-start;gap:10px;padding:10px 12px;border-radius:8px;margin-bottom:8px;font-size:12px;background:rgba(255,255,255,.02);border-left:3px solid #e53e3e;transition:all .2s}
+.alert-item:hover{background:rgba(255,255,255,.05)}
+.alert-item.success{border-left-color:#22c55e;background:rgba(34,197,94,.05)}
+.alert-item.warning{border-left-color:#f97316;background:rgba(249,115,22,.05)}
+.alert-icon{font-size:16px;min-width:20px;text-align:center;flex-shrink:0;margin-top:2px}
+.notes-section{background:rgba(255,255,255,.05);backdrop-filter:blur(10px);border:1px solid rgba(255,255,255,.1);border-radius:12px;padding:16px;margin-bottom:20px;animation:slideUp .6s ease-out}
+.notes-title{font-size:13px;font-weight:700;color:#f1f5f9;margin-bottom:10px}
+.notes-textarea{width:100%;padding:10px 12px;background:rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.1);border-radius:10px;color:#e2e8f0;font-size:12px;font-family:Tahoma,sans-serif;resize:vertical;min-height:80px;outline:none}
+.notes-textarea:focus{border-color:#e53e3e;box-shadow:0 0 20px rgba(229,62,62,.2)}
+.action-buttons{display:flex;gap:8px;margin-top:12px;flex-wrap:wrap}
+.btn{padding:10px 14px;border:none;border-radius:8px;cursor:pointer;font-size:12px;font-weight:700;font-family:Tahoma,sans-serif;transition:all .2s;flex:1;min-width:120px}
+.btn-primary{background:linear-gradient(135deg,#e53e3e,#dc2626);color:#fff;box-shadow:0 4px 15px rgba(229,62,62,.3)}
+.btn-primary:hover{transform:translateY(-2px);box-shadow:0 6px 20px rgba(229,62,62,.4)}
+.btn-primary:active{transform:translateY(0)}
+.btn-secondary{background:rgba(255,255,255,.1);color:#e2e8f0;border:1px solid rgba(255,255,255,.2)}
+.btn-secondary:hover{background:rgba(255,255,255,.15);border-color:rgba(255,255,255,.3)}
+.comparison-table{width:100%;margin-top:10px;font-size:11px;border-collapse:collapse}
+.comparison-table td{padding:8px 6px;color:#a0aec0;border-bottom:1px solid rgba(255,255,255,.05)}
+.comparison-table td:first-child{color:#e2e8f0;font-weight:600}
+.comparison-table .positive{color:#22c55e;font-weight:600}
+.comparison-table .negative{color:#ef4444;font-weight:600}
+.tab-content{display:none}
+.tab-content.active{display:block}
+.stats{display:flex;justify-content:space-around;padding:20px 0;border-top:1px solid rgba(255,255,255,.05);border-bottom:1px solid rgba(255,255,255,.05)}
+.stat{text-align:center;cursor:pointer;transition:all .2s}
+.stat-value{font-size:20px;font-weight:700;color:#e53e3e;display:block}
+.stat-label{font-size:11px;color:rgba(255,255,255,.6);margin-top:5px;text-transform:uppercase}
+.stat:hover .stat-value{color:#f97316;transform:scale(1.1)}
+@media(min-width:768px){
+  .hamburger{display:none}
+  .sidebar{transform:translateX(0);position:relative;width:200px}
+  .main-content{margin-right:200px;width:calc(100% - 200px)}
+  .overlay{display:none!important}
+  .top-bar{padding:14px 20px}
+  .search-box{width:300px}
+  .content-area{padding:20px}
+  .metrics-grid{grid-template-columns:repeat(2,1fr)}
+  .summary-section{grid-template-columns:repeat(2,1fr)}
+  .charts-grid{grid-template-columns:repeat(2,1fr)}
+  .rating-grid{grid-template-columns:repeat(3,1fr)}
+}
+@media(min-width:1024px){
+  .sidebar{width:240px}
+  .main-content{margin-right:240px;width:calc(100% - 240px)}
+  .top-bar{padding:16px 24px}
+  .content-area{padding:24px}
+  .metrics-grid{grid-template-columns:repeat(4,1fr)}
+}
+::-webkit-scrollbar{width:6px}
+::-webkit-scrollbar-track{background:rgba(17,24,39,.5)}
+::-webkit-scrollbar-thumb{background:rgba(229,62,62,.5);border-radius:3px}
+::-webkit-scrollbar-thumb:hover{background:#e53e3e}
+</style>
 </head>
 <body>
-    <!-- LOGIN PAGE -->
-    <div id="loginPage" class="login-container">
-        <div class="login-box">
-            <div class="login-logo">📦</div>
-            <div class="login-title">آن‌باکس</div>
-            <div class="login-error" id="loginError"></div>
-            <div class="form-group">
-                <label class="form-label">نام کاربری</label>
-                <input type="text" id="username" class="form-input" placeholder="نام کاربری">
-            </div>
-            <div class="form-group">
-                <label class="form-label">رمز عبور</label>
-                <input type="password" id="password" class="form-input" placeholder="رمز عبور">
-            </div>
-            <button class="login-button" onclick="handleLogin()">ورود</button>
-        </div>
+<div class="overlay" id="overlay" onclick="toggleSidebar()"></div>
+<div class="container">
+  <div class="sidebar" id="sidebar">
+    <div class="sidebar-logo">🚚 آن‌باکس</div>
+    <div class="nav-item active" onclick="switchTab('dashboard')">📊 داشبورد</div>
+    <div class="nav-item" onclick="switchTab('weekly')">📈 هفتگی</div>
+    <div class="nav-item" onclick="switchTab('monthly')">📊 ماهانه</div>
+    <div class="nav-item" onclick="switchTab('analytics')">📉 تحلیل‌ها</div>
+    <div class="nav-item" onclick="switchTab('settings')">⚙️ تنظیمات</div>
+    <div style="border-top:1px solid rgba(255,255,255,.1);margin-top:20px;padding-top:20px">
+      <div class="nav-item" onclick="logout()">🚪 خروج</div>
+    </div>
+  </div>
+
+  <div class="main-content" id="mainContent">
+    <div class="top-bar">
+      <button class="hamburger show" id="hamburger" onclick="toggleSidebar()">☰</button>
+      <div class="top-bar-right">
+        <input class="search-box" placeholder="جستجو...">
+      </div>
+      <div class="top-bar-left">
+        <div class="icon-btn">🔔</div>
+        <div class="icon-btn">⚙️</div>
+        <div class="profile-avatar" id="avatarUser">م</div>
+      </div>
     </div>
 
-    <!-- DASHBOARD -->
-    <div id="dashboardPage" class="dashboard-container" style="display: none;">
-        <div class="sidebar">
-            <div class="logo">
-                <div class="logo-text">📦 آن‌باکس</div>
-            </div>
-            <div class="user-info">
-                <div class="user-name" id="sidebarUsername">مجتبی</div>
-                <div style="font-size: 11px; opacity: 0.8;">فعال</div>
-                <button class="logout-btn" onclick="handleLogout()">خروج</button>
-            </div>
-            <div class="nav-menu">
-                <div class="nav-item active" onclick="switchPage(event, 'dashboard')">📊 داشبورد</div>
-                <div class="nav-item" onclick="switchPage(event, 'leads')">📋 لیدها</div>
-                <div class="nav-item" onclick="switchPage(event, 'team')">👥 تیم</div>
-                <div class="nav-item" onclick="switchPage(event, 'pipeline')">🔄 Pipeline</div>
-                <div class="nav-item" onclick="switchPage(event, 'reports')">📈 گزارش‌ها</div>
-                <div class="nav-item" onclick="switchPage(event, 'settings')">⚙️ تنظیمات</div>
-            </div>
+    <div class="content-area">
+      <!-- DASHBOARD TAB -->
+      <div id="dashboard-tab" class="tab-content active">
+        <div class="content-header">
+          <h1>داشبورد روزانه</h1>
+          <p id="todayDate"></p>
         </div>
 
-        <div class="main">
-            <div class="header">
-                <div class="header-title">داشبورد | آن‌باکس</div>
-                <div>👤 <span id="headerUsername">مجتبی</span></div>
-            </div>
-
-            <div class="content">
-                <!-- DASHBOARD PAGE -->
-                <div class="page active" id="dashboard">
-                    <h2 style="margin-bottom: 20px; color: #1B3A5C;">مدیریت Sales Pipeline</h2>
-                    
-                    <div class="card">
-                        <div class="card-title">📊 وضعیت Pipeline</div>
-                        <div class="pipeline-grid" id="pipelineGrid">
-                            <!-- Dynamic Content -->
-                        </div>
-                    </div>
-
-                    <div class="card">
-                        <div class="card-title">📈 آمار کلی</div>
-                        <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px;">
-                            <div style="text-align: center; padding: 20px; background: #F8FAFC; border-radius: 8px;">
-                                <div style="font-size: 24px; font-weight: 700; color: #2563EB;" id="stat-total">0</div>
-                                <div style="font-size: 12px; color: #64748B; margin-top: 5px;">کل لیدها</div>
-                            </div>
-                            <div style="text-align: center; padding: 20px; background: #F8FAFC; border-radius: 8px;">
-                                <div style="font-size: 24px; font-weight: 700; color: #DC2626;" id="stat-hot">0</div>
-                                <div style="font-size: 12px; color: #64748B; margin-top: 5px;">🔴 لیدهای گرم</div>
-                            </div>
-                            <div style="text-align: center; padding: 20px; background: #F8FAFC; border-radius: 8px;">
-                                <div style="font-size: 24px; font-weight: 700; color: #D97706;" id="stat-warm">0</div>
-                                <div style="font-size: 12px; color: #64748B; margin-top: 5px;">🟡 لیدهای معمولی</div>
-                            </div>
-                            <div style="text-align: center; padding: 20px; background: #F8FAFC; border-radius: 8px;">
-                                <div style="font-size: 24px; font-weight: 700; color: #2563EB;" id="stat-qualified">0</div>
-                                <div style="font-size: 12px; color: #64748B; margin-top: 5px;">✅ Qualified</div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- LEADS PAGE -->
-                <div class="page" id="leads">
-                    <h2 style="margin-bottom: 20px; color: #1B3A5C;">مدیریت لیدها</h2>
-                    
-                    <div class="toolbar">
-                        <button class="btn" onclick="openLeadModal()">➕ افزودن لید</button>
-                        <button class="btn success" onclick="downloadExcelTemplate()">📥 دانلود نمونه Excel</button>
-                        <button class="btn secondary" onclick="document.getElementById('excelInput').click()">📊 Import Excel</button>
-                        <input type="file" id="excelInput" accept=".xlsx,.xls" style="display:none;" onchange="handleExcelUpload(event)">
-                        <input type="text" class="search-box" id="searchInput" placeholder="جستجو..." onkeyup="filterLeads()">
-                    </div>
-
-                    <div class="card">
-                        <div id="leadsContainer" style="text-align: center; padding: 40px; color: #94A3B8;">
-                            ⏳ بارگذاری لیدها...
-                        </div>
-                    </div>
-                </div>
-
-                <!-- TEAM PAGE -->
-                <div class="page" id="team">
-                    <h2 style="margin-bottom: 20px; color: #1B3A5C;">تیم کارشناسان</h2>
-                    
-                    <div class="tabs">
-                        <div class="tab active" onclick="switchTab(event, 'team-members-tab')">👥 اعضای تیم</div>
-                        <div class="tab" onclick="switchTab(event, 'checklist-tab')">✅ چک‌لیست</div>
-                    </div>
-
-                    <!-- TEAM MEMBERS TAB -->
-                    <div id="team-members-tab" class="tab-content active">
-                        <div class="card">
-                            <div class="card-title">👥 کارشناسان فروش</div>
-                            <div class="team-grid" id="teamGrid">
-                                <!-- Dynamic Content -->
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- CHECKLIST TAB -->
-                    <div id="checklist-tab" class="tab-content">
-                        <div class="card">
-                            <div class="card-title">✅ چک‌لیست روزانه</div>
-                            <div style="margin-bottom: 20px;">
-                                <div style="font-size: 14px; font-weight: 700; margin-bottom: 10px;">
-                                    پیشرفت: <span id="checklist-progress">0</span>/10
-                                </div>
-                                <div class="progress-bar">
-                                    <div class="progress-fill" id="checklist-bar" style="width: 0%; background: linear-gradient(90deg, #16A34A, #22C55E);"></div>
-                                </div>
-                            </div>
-                            <div id="checklist-items"></div>
-                            <button class="btn" style="margin-top: 15px;" onclick="saveChecklist()">💾 ذخیره</button>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- PIPELINE PAGE -->
-                <div class="page" id="pipeline">
-                    <h2 style="margin-bottom: 20px; color: #1B3A5C;">مراحل فروش (Pipeline)</h2>
-                    
-                    <div class="card">
-                        <div class="card-title">🔄 توزیع لیدها در مراحل</div>
-                        <div id="pipelineDetails" style="display: grid; gap: 20px;">
-                            <!-- Dynamic Content -->
-                        </div>
-                    </div>
-                </div>
-
-                <!-- REPORTS PAGE -->
-                <div class="page" id="reports">
-                    <h2 style="margin-bottom: 20px; color: #1B3A5C;">گزارش‌ها</h2>
-                    <div class="card">
-                        <div class="card-title">📈 گزارش‌های سیستم</div>
-                        <div style="color: #64748B; font-size: 13px; line-height: 1.8;">
-                            • گزارش Pipeline<br>
-                            • گزارش لیدهای Hot/Warm<br>
-                            • گزارش مرحله‌ای فروش<br>
-                            • گزارش تبدیل (Conversion)
-                        </div>
-                    </div>
-                </div>
-
-                <!-- SETTINGS PAGE -->
-                <div class="page" id="settings">
-                    <h2 style="margin-bottom: 20px; color: #1B3A5C;">تنظیمات</h2>
-                    <div class="card">
-                        <div class="card-title">اطلاعات کاربری</div>
-                        <div style="margin-bottom: 15px;">
-                            <label class="form-label">نام کاربری</label>
-                            <input type="text" id="settingsUsername" class="form-input" disabled>
-                        </div>
-                    </div>
-                </div>
-            </div>
+        <!-- 4 MAIN METRICS -->
+        <div class="metrics-grid">
+          <div class="metric-card">
+            <div class="metric-label">📊 فروش</div>
+            <div class="metric-value">۱۲K</div>
+            <div class="metric-sub">ریال</div>
+            <div class="metric-trend">⬆️ +۲۳٪</div>
+          </div>
+          <div class="metric-card">
+            <div class="metric-label">🎯 KPI</div>
+            <div class="metric-value">۷۸</div>
+            <div class="metric-sub">/۱۰۰</div>
+            <div class="metric-trend">✅</div>
+          </div>
+          <div class="metric-card">
+            <div class="metric-label">✅ چک‌لیست</div>
+            <div class="metric-value">۱۰۰</div>
+            <div class="metric-sub">٪</div>
+            <div class="metric-trend">🎉</div>
+          </div>
+          <div class="metric-card">
+            <div class="metric-label">📈 OKR</div>
+            <div class="metric-value">۶۵</div>
+            <div class="metric-sub">٪</div>
+            <div class="metric-trend down">⚠️</div>
+          </div>
         </div>
+
+        <!-- CATEGORY 1 & 2 -->
+        <div class="summary-section">
+          <div class="summary-card">
+            <h3>📊 Category 1: Performance</h3>
+            <div class="category-row">
+              <div class="category-name">تماس‌ها</div>
+              <div><span class="score-badge good">88%</span><span class="category-score">7/8</span></div>
+            </div>
+            <div class="category-row">
+              <div class="category-name">فالوآپ</div>
+              <div><span class="score-badge good">100%</span><span class="category-score">5/5</span></div>
+            </div>
+            <div class="category-row">
+              <div class="category-name">اطلاعات</div>
+              <div><span class="score-badge">80%</span><span class="category-score">4/5</span></div>
+            </div>
+            <div class="category-row">
+              <div class="category-name">CRM Sync</div>
+              <div><span class="score-badge good">✅</span></div>
+            </div>
+            <div class="stats">
+              <div class="stat">
+                <span class="stat-value">87%</span>
+                <span class="stat-label">امتیاز</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="summary-card">
+            <h3>🎯 Category 2: Activity</h3>
+            <div class="category-row">
+              <div class="category-name">پنل‌ها</div>
+              <div><span class="score-badge good">100%</span><span class="category-score">3/3</span></div>
+            </div>
+            <div class="category-row">
+              <div class="category-name">آموزش‌ها</div>
+              <div><span class="score-badge warning">66%</span><span class="category-score">2/3</span></div>
+            </div>
+            <div class="category-row">
+              <div class="category-name">بارکدها</div>
+              <div><span class="score-badge">90%</span><span class="category-score">9/10</span></div>
+            </div>
+            <div class="category-row">
+              <div class="category-name">فعالیت کلی</div>
+              <div><span class="score-badge good">85%</span></div>
+            </div>
+            <div class="stats">
+              <div class="stat">
+                <span class="stat-value">85%</span>
+                <span class="stat-label">امتیاز</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- CHARTS -->
+        <div class="charts-grid">
+          <div class="chart-container">
+            <div class="chart-title">📈 روند KPI</div>
+            <div class="chart-wrapper">
+              <canvas id="kpiChart"></canvas>
+            </div>
+          </div>
+          <div class="chart-container">
+            <div class="chart-title">🎯 توزیع Performance</div>
+            <div class="chart-wrapper">
+              <canvas id="performanceChart"></canvas>
+            </div>
+          </div>
+        </div>
+
+        <!-- COMPARISON -->
+        <div class="summary-card">
+          <h3>📊 مقایسه عملکرد</h3>
+          <table class="comparison-table">
+            <tr style="font-weight:700;color:#e2e8f0;font-size:11px">
+              <td>متریک</td>
+              <td>امروز</td>
+              <td>دیروز</td>
+              <td>تغییر</td>
+            </tr>
+            <tr><td>فروش</td><td>۱۲۴۵۰</td><td>۱۰۲۰۰</td><td class="positive">+۲۲%</td></tr>
+            <tr><td>تماس</td><td>۷</td><td>۶</td><td class="positive">+۱۶%</td></tr>
+            <tr><td>فالوآپ</td><td>۵</td><td>۴</td><td class="positive">+۲۵%</td></tr>
+            <tr><td>KPI</td><td>۷۸</td><td>۷۲</td><td class="positive">+۸%</td></tr>
+          </table>
+        </div>
+
+        <!-- RATING & MOOD -->
+        <div class="rating-section">
+          <h3 class="rating-title">🌟 امروز چگونه بود؟</h3>
+          <div class="rating-grid">
+            <div class="rating-item">
+              <label class="rating-label">✨ امتیاز روز</label>
+              <div class="stars" onclick="setRating(5)">⭐⭐⭐⭐⭐</div>
+              <div style="font-size:10px;color:#a0aec0">عالی</div>
+            </div>
+            <div class="rating-item">
+              <label class="rating-label">😊 حال و روز</label>
+              <div class="mood-selector">
+                <div class="mood-btn" onclick="setMood(this,'happy')">😊</div>
+                <div class="mood-btn" onclick="setMood(this,'neutral')">😐</div>
+                <div class="mood-btn" onclick="setMood(this,'sad')">😢</div>
+              </div>
+            </div>
+            <div class="rating-item">
+              <label class="rating-label">⚡ سطح انرژی</label>
+              <input type="range" class="energy-slider" min="1" max="5" value="4" onchange="updateEnergyLabel(this.value)">
+              <div style="font-size:10px;color:#a0aec0" id="energyLabel">خوب</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ALERTS -->
+        <div class="alerts-section">
+          <h3 class="alerts-title">🚨 هشدارها و اطلاعات</h3>
+          <div class="alert-item success">
+            <div class="alert-icon">✅</div>
+            <div>چک‌لیست امروز ۱۰۰٪ تکمیل شد - عالی!</div>
+          </div>
+          <div class="alert-item warning">
+            <div class="alert-icon">⚠️</div>
+            <div>آموزش‌های روز هنوز تکمیل نشده - ۲ مورد باقی است</div>
+          </div>
+          <div class="alert-item success">
+            <div class="alert-icon">✅</div>
+            <div>تماس‌ها بیشتر از هدف روز - ۷/۸</div>
+          </div>
+          <div class="alert-item">
+            <div class="alert-icon">ℹ️</div>
+            <div>OKR شما ۵ درصد کمتر از هدف است - فردا حتماً بهبود بخشید</div>
+          </div>
+        </div>
+
+        <!-- NOTES -->
+        <div class="notes-section">
+          <h3 class="notes-title">📝 یادداشت‌ها و پیام‌های مهم</h3>
+          <textarea class="notes-textarea" id="dailyNotes" placeholder="چالش‌های امروز، اقدام‌های فردا و نکات مهم..."></textarea>
+          <div class="action-buttons">
+            <button class="btn btn-primary" onclick="saveDailyReport()">💾 ذخیره گزارش</button>
+            <button class="btn btn-secondary" onclick="exportPDF()">📄 خروجی PDF</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- WEEKLY TAB -->
+      <div id="weekly-tab" class="tab-content">
+        <div class="content-header">
+          <h1>گزارش هفتگی</h1>
+          <p>تجزیه و تحلیل ۷ روز گذشته</p>
+        </div>
+        <div class="summary-card">
+          <h3>📊 خلاصه هفتگی</h3>
+          <table class="comparison-table">
+            <tr style="font-weight:700;color:#e2e8f0">
+              <td>روز</td><td>فروش</td><td>تماس</td><td>KPI</td>
+            </tr>
+            <tr><td>شنبه</td><td>۱۲۴۵۰</td><td>۷</td><td>۷۸</td></tr>
+            <tr><td>یکشنبه</td><td>۱۱۹۰۰</td><td>۶</td><td>۷۲</td></tr>
+            <tr><td>دوشنبه</td><td>۱۳۲۵۰</td><td>۸</td><td>۸۲</td></tr>
+            <tr><td>سه‌شنبه</td><td>۱۲۸۰۰</td><td>۷</td><td>۷۶</td></tr>
+            <tr><td>چهارشنبه</td><td>۱۳۵۰۰</td><td>۹</td><td>۸۵</td></tr>
+            <tr><td>پنج‌شنبه</td><td>۱۲۶۰۰</td><td>۶</td><td>۷۴</td></tr>
+            <tr><td>جمعه</td><td>۱۴۲۰۰</td><td>۱۰</td><td>۸۹</td></tr>
+          </table>
+          <div class="stats" style="margin-top:20px">
+            <div class="stat">
+              <span class="stat-value">87.3K</span>
+              <span class="stat-label">کل فروش</span>
+            </div>
+            <div class="stat">
+              <span class="stat-value">53</span>
+              <span class="stat-label">کل تماس</span>
+            </div>
+            <div class="stat">
+              <span class="stat-value">79.7</span>
+              <span class="stat-label">میانگین KPI</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- MONTHLY TAB -->
+      <div id="monthly-tab" class="tab-content">
+        <div class="content-header">
+          <h1>گزارش ماهانه</h1>
+          <p>عملکرد کل ماه</p>
+        </div>
+        <div class="summary-card">
+          <h3>📊 خلاصه ماهانه</h3>
+          <div class="stats" style="margin-bottom:20px">
+            <div class="stat">
+              <span class="stat-value">2.4M</span>
+              <span class="stat-label">کل فروش</span>
+            </div>
+            <div class="stat">
+              <span class="stat-value">245</span>
+              <span class="stat-label">کل تماس</span>
+            </div>
+            <div class="stat">
+              <span class="stat-value">81.5</span>
+              <span class="stat-label">میانگین KPI</span>
+            </div>
+          </div>
+          <table class="comparison-table">
+            <tr style="font-weight:700;color:#e2e8f0">
+              <td>هفته</td><td>فروش</td><td>تماس</td><td>KPI</td>
+            </tr>
+            <tr><td>هفته ۱</td><td>۵۸۵K</td><td>۵۲</td><td>۷۸</td></tr>
+            <tr><td>هفته ۲</td><td>۶۲۰K</td><td>۶۱</td><td>۸۱</td></tr>
+            <tr><td>هفته ۳</td><td>۶۱۵K</td><td>۶۵</td><td>۸۰</td></tr>
+            <tr><td>هفته ۴</td><td>۶۸۰K</td><td>۷۲</td><td>۸۵</td></tr>
+          </table>
+        </div>
+      </div>
+
+      <!-- ANALYTICS TAB -->
+      <div id="analytics-tab" class="tab-content">
+        <div class="content-header">
+          <h1>تحلیل‌های پیشرفته</h1>
+          <p>آمار و نمودارهای تفصیلی</p>
+        </div>
+        <div class="summary-card">
+          <h3>📈 نمودارهای تحلیلی</h3>
+          <p style="color:#a0aec0;font-size:13px;margin-top:10px">نمودارهای بیشتر به‌زودی اضافه می‌شوند...</p>
+        </div>
+      </div>
+
+      <!-- SETTINGS TAB -->
+      <div id="settings-tab" class="tab-content">
+        <div class="content-header">
+          <h1>تنظیمات</h1>
+          <p>مدیریت ترجیحات شما</p>
+        </div>
+        <div class="summary-card">
+          <h3>⚙️ تنظیمات سیستم</h3>
+          <div style="padding:10px 0;color:#a0aec0;font-size:13px">
+            <p style="margin-bottom:10px">✓ اطلاعات کاربری</p>
+            <p style="margin-bottom:10px">✓ تنظیم‌های نوتیفیکیشن</p>
+            <p style="margin-bottom:10px">✓ مدیریت دسترسی</p>
+            <p>✓ تنظیمات نمایش</p>
+          </div>
+        </div>
+      </div>
+
     </div>
+  </div>
+</div>
 
-    <!-- LEAD MODAL -->
-    <div id="leadModal" class="modal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <div class="modal-title">افزودن لید جدید</div>
-                <button class="close-btn" onclick="closeLeadModal()">✕</button>
-            </div>
-            <form id="leadForm" onsubmit="saveLead(event)">
-                <div class="form-grid">
-                    <div class="form-group">
-                        <label class="form-label">نوع لید *</label>
-                        <select name="lead_type" class="form-input" required>
-                            <option value="">انتخاب کنید</option>
-                            <option>گرم</option>
-                            <option>سرد</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label">مبدأ لید *</label>
-                        <select name="lead_source" class="form-input" required>
-                            <option value="">انتخاب کنید</option>
-                            <option>سرچ اینترنتی</option>
-                            <option>تماس مشتری</option>
-                            <option>بانک اطلاعاتی</option>
-                            <option>دایره طلایی</option>
-                            <option>پیامک تبلیغاتی</option>
-                            <option>سوشیال مدیا</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label">نام شرکت *</label>
-                        <input type="text" name="company_name" class="form-input" required>
-                    </div>
+<script>
+const SB_URL = 'https://uaydruhkevdmvpyefdjm.supabase.co';
+const SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVheWRydWhrZXZkbXZweWVmZGptIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODIxOTk4MjUsImV4cCI6MjA5Nzc3NTgyNX0.PYIOjf2OUOcgftxSHOEjwS7H5Gbx8xlSk7l8Pdc6PYc';
+const { createClient } = supabase;
+const db = createClient(SB_URL, SB_KEY);
 
-                    <div class="form-group">
-                        <label class="form-label">صنعت *</label>
-                        <select name="industry" class="form-input" required>
-                            <option value="">انتخاب کنید</option>
-                            <option>دارویی</option>
-                            <option>بانک</option>
-                            <option>فروشگاه اینترنتی</option>
-                            <option>خودرویی</option>
-                            <option>لوازم خانگی</option>
-                            <option>سازمانی</option>
-                            <option>لوازم آرایشی</option>
-                            <option>لوازم آشپزخانه</option>
-                            <option>لوازم جانبی</option>
-                            <option>فروشگاه حضوری</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label">دلیل انتخاب شرکت</label>
-                        <select name="selection_reason" class="form-input">
-                            <option value="">انتخاب کنید</option>
-                            <option>جغرافیای تحت پوشش</option>
-                            <option>ارسال پستی دارد</option>
-                            <option>حجم سفارش مناسب</option>
-                            <option>سابقه خوب با شرکت</option>
-                            <option>توصیه شده از منابع معتبر</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label">شماره تماس *</label>
-                        <input type="tel" name="phone" class="form-input" required>
-                    </div>
+let currentUser = {id:1,name:'مجتبی رنجبر',avatar:'م'};
+let kpiChart = null;
+let performanceChart = null;
 
-                    <div class="form-group">
-                        <label class="form-label">نام فرد تماس *</label>
-                        <input type="text" name="contact_name" class="form-input" required>
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label">سمت فرد تماس</label>
-                        <input type="text" name="contact_position" class="form-input">
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label">مرحله فروش *</label>
-                        <select name="sales_stage" class="form-input" required>
-                            <option value="1">1. لیدسازی</option>
-                            <option value="2">2. تماس اولیه</option>
-                            <option value="3">3. ارسال نرخ نامه</option>
-                            <option value="4">4. جلسه مذاکره</option>
-                            <option value="5">5. ارسال پروپوزال</option>
-                            <option value="6">6. عقد قرارداد</option>
-                        </select>
-                    </div>
+function tkey(){return new Date().toISOString().slice(0,10);}
+function faDate(){return new Date().toLocaleDateString('fa-IR',{weekday:'long',year:'numeric',month:'long',day:'numeric'});}
 
-                    <div class="form-group">
-                        <label class="form-label">تناسب با آن باکس</label>
-                        <select name="anbox_fit" class="form-input">
-                            <option value="">انتخاب کنید</option>
-                            <option>ارسال مرسوله روزانه</option>
-                            <option>تناسب با SLA</option>
-                            <option>تناسب با نرخ</option>
-                            <option>ارسال ترکیبی</option>
-                            <option>ارسال مرسولات کم حجم</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label">مانع اصلی</label>
-                        <select name="main_obstacle" class="form-input">
-                            <option value="">انتخاب کنید</option>
-                            <option>عدم توافق نرخ</option>
-                            <option>عدم توافق SLA</option>
-                            <option>عدم توافق قراردادی</option>
-                            <option>شکایت مشتری از خدمات</option>
-                            <option>مانع ندارد</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label">اقدام بعدی</label>
-                        <select name="next_action" class="form-input">
-                            <option value="">انتخاب کنید</option>
-                            <option>ارسال پروپوزال</option>
-                            <option>برقراری جلسه مذاکره</option>
-                            <option>جلسه متقاعد سازی</option>
-                            <option>ارسال درفت قرارداد</option>
-                            <option>عقد قرارداد</option>
-                            <option>عدم توافق</option>
-                        </select>
-                    </div>
+function toggleSidebar(){
+  const sidebar = document.getElementById('sidebar');
+  const overlay = document.getElementById('overlay');
+  sidebar.classList.toggle('hidden');
+  overlay.classList.toggle('show');
+}
 
-                    <div class="form-group">
-                        <label class="form-label">کارشناس فروش</label>
-                        <select name="sales_expert" class="form-input">
-                            <option value="">انتخاب کنید</option>
-                            <option>امیرحسین ریواز</option>
-                            <option>مجتبی رنجبر</option>
-                            <option>ندا شریفی</option>
-                            <option>سمن خوشکلام</option>
-                            <option>پرستو احمدی</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label">وضعیت لید</label>
-                        <select name="lead_status" class="form-input">
-                            <option>در حال پیگیری</option>
-                            <option>عدم توافق</option>
-                            <option>انحلال شرکت</option>
-                            <option>در حال عقد قرارداد</option>
-                            <option>در حال مذاکره</option>
-                            <option>در حال تست</option>
-                        </select>
-                    </div>
-                    <div class="form-group form-grid full">
-                        <label class="form-label">یادداشت‌ها</label>
-                        <textarea name="notes" class="form-input" style="min-height: 70px; resize: vertical;"></textarea>
-                    </div>
-                </div>
+function switchTab(tabName){
+  document.querySelectorAll('.tab-content').forEach(el=>el.classList.remove('active'));
+  document.getElementById(tabName+'-tab').classList.add('active');
+  document.querySelectorAll('.nav-item').forEach(el=>el.classList.remove('active'));
+  event.target.classList.add('active');
+  if(window.innerWidth < 768) toggleSidebar();
+}
 
-                <div style="display: flex; gap: 10px; margin-top: 20px;">
-                    <button type="submit" class="btn">ذخیره</button>
-                    <button type="button" class="btn secondary" onclick="closeLeadModal()">لغو</button>
-                </div>
-            </form>
-        </div>
-    </div>
+function setRating(stars){
+  document.querySelectorAll('.stars').forEach((el,i)=>{
+    if(i===0) el.textContent='⭐'.repeat(stars)+'☆'.repeat(5-stars);
+  });
+}
 
-    <div class="notification" id="notification"></div>
+function setMood(el,mood){
+  document.querySelectorAll('.mood-btn').forEach(b=>b.classList.remove('active'));
+  el.classList.add('active');
+}
 
-    <script>
-        const USERS = {
-            'mojabi': { name: 'مجتبی رنجبر', password: 'pass123' },
-            'neda': { name: 'ندا شریفی', password: 'pass123' },
-            'saman': { name: 'سمن خوشکلام', password: 'pass123' },
-            'parasto': { name: 'پرستو احمدی', password: 'pass123' },
-            'amirhossein': { name: 'امیرحسین ریواز', password: 'sales2025' },
-            'admin': { name: 'ادمین سیستم', password: 'admin2025' }
-        };
+function updateEnergyLabel(val){
+  const labels=['کم','متوسط','خوب','بسیار خوب','عالی'];
+  document.getElementById('energyLabel').textContent=labels[val-1];
+}
 
-        const SALES_STAGES = [
-            { id: 1, name: 'لیدسازی' },
-            { id: 2, name: 'تماس اولیه و امکان سنجی' },
-            { id: 3, name: 'ارسال نرخ نامه' },
-            { id: 4, name: 'جلسه مذاکره' },
-            { id: 5, name: 'ارسال پروپوزال' },
-            { id: 6, name: 'عقد قرارداد' }
-        ];
+async function saveDailyReport(){
+  const notes = document.getElementById('dailyNotes').value;
+  const payload={eid:currentUser.id,date:tkey(),notes:notes};
+  await db.from('reports').upsert(payload,{onConflict:'eid,date'});
+  alert('✅ گزارش ذخیره شد!');
+}
 
-        const OBSTACLES = ['عدم توافق نرخ', 'عدم توافق SLA', 'عدم توافق قراردادی', 'شکایت مشتری از خدمات', 'مانع ندارد'];
-        const NEXT_ACTIONS = ['ارسال پروپوزال', 'برقراری جلسه مذاکره', 'جلسه متقاعد سازی', 'ارسال درفت قرارداد', 'عقد قرارداد', 'عدم توافق'];
-        const LEAD_STATUSES = ['در حال پیگیری', 'عدم توافق', 'انحلال شرکت', 'در حال عقد قرارداد', 'در حال مذاکره', 'در حال تست'];
-        const SALES_EXPERTS = ['امیرحسین ریواز', 'مجتبی رنجبر', 'ندا شریفی', 'سمن خوشکلام', 'پرستو احمدی'];
-        const TEAM_MEMBERS = [
-            { name: 'مجتبی رنجبر' },
-            { name: 'ندا شریفی' },
-            { name: 'سمن خوشکلام' },
-            { name: 'پرستو احمدی' }
-        ];
+function exportPDF(){
+  alert('📄 خروجی PDF در حال ساخت...');
+}
 
-        const CHECKLIST_ITEMS = [
-            'لیست لیدهای امروز دریافت شد',
-            'گزارش دیروز بررسی شد',
-            'اهداف روز با مدیر هماهنگ شد',
-            'تماس با تمام لیدهای امروز انجام شد',
-            'فالوآپ مشتریان دیروز انجام شد',
-            'اطلاعات مشتریان تأییدشده دریافت شد',
-            'پنل‌های جدید ساخته و تحویل داده شد',
-            'آموزش شارژ و ارسال به مشتریان انجام شد',
-            'بارکد سفارشات امروز صادر شد',
-            'گزارش پایان روز در CRM ثبت شد'
-        ];
+function logout(){
+  if(confirm('مطمئن هستید؟')) window.location.reload();
+}
 
-        let currentUser = null;
-        let leads = [];
-        let filteredLeads = [];
+function initCharts(){
+  const kpiCtx = document.getElementById('kpiChart');
+  if(!kpiCtx) return;
+  if(kpiChart) kpiChart.destroy();
+  if(performanceChart) performanceChart.destroy();
+  
+  kpiChart = new Chart(kpiCtx,{
+    type:'line',
+    data:{
+      labels:['۱۲','۲','۴','۶','۸','۱۰'],
+      datasets:[{
+        label:'KPI Score',
+        data:[45,52,58,68,74,78],
+        borderColor:'#e53e3e',
+        backgroundColor:'rgba(229,62,62,0.1)',
+        tension:0.4,
+        fill:true,
+        pointBackgroundColor:'#e53e3e',
+        pointBorderColor:'#fff',
+        pointBorderWidth:2,
+        pointRadius:4
+      }]
+    },
+    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{y:{beginAtZero:true,max:100,grid:{color:'rgba(255,255,255,.05)'},ticks:{color:'#a0aec0',font:{size:10}}},x:{grid:{color:'rgba(255,255,255,.05)'},ticks:{color:'#a0aec0',font:{size:10}}}}}
+  });
 
-        window.addEventListener('DOMContentLoaded', () => {
-            const savedUser = localStorage.getItem('currentUser');
-            if (savedUser) {
-                currentUser = savedUser;
-                showDashboard();
-                loadLeads();
-                renderTeam();
-                renderChecklist();
-                updateDashboard();
-            }
-        });
+  const perfCtx = document.getElementById('performanceChart');
+  performanceChart = new Chart(perfCtx,{
+    type:'doughnut',
+    data:{
+      labels:['Performance','Activity','Notes','Team'],
+      datasets:[{
+        data:[85,72,75,68],
+        backgroundColor:['#e53e3e','#f97316','#2563eb','#22c55e'],
+        borderColor:'#1f2937',
+        borderWidth:2
+      }]
+    },
+    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{labels:{color:'#a0aec0',font:{size:11}}}}}
+  });
+}
 
-        function handleLogin() {
-            const username = document.getElementById('username').value.trim();
-            const password = document.getElementById('password').value;
-            const errorEl = document.getElementById('loginError');
+function updateUI(){
+  document.getElementById('todayDate').textContent=faDate();
+  document.getElementById('avatarUser').textContent=currentUser.avatar;
+  initCharts();
+}
 
-            if (!username || !password) {
-                errorEl.textContent = '❌ نام کاربری و رمز عبور را وارد کنید';
-                errorEl.style.display = 'block';
-                return;
-            }
-
-            const user = USERS[username];
-            if (!user || user.password !== password) {
-                errorEl.textContent = '❌ نام کاربری یا رمز عبور نادرست است';
-                errorEl.style.display = 'block';
-                return;
-            }
-
-            currentUser = username;
-            localStorage.setItem('currentUser', username);
-            showDashboard();
-            loadLeads();
-            renderTeam();
-            renderChecklist();
-            updateDashboard();
-        }
-
-        function showDashboard() {
-            const user = USERS[currentUser];
-            document.getElementById('loginPage').style.display = 'none';
-            document.getElementById('dashboardPage').style.display = 'flex';
-            document.getElementById('sidebarUsername').textContent = user.name;
-            document.getElementById('headerUsername').textContent = user.name;
-            document.getElementById('settingsUsername').value = currentUser;
-            showNotification('✅ خوش آمدید ' + user.name);
-        }
-
-        function handleLogout() {
-            localStorage.removeItem('currentUser');
-            currentUser = null;
-            document.getElementById('loginPage').style.display = 'flex';
-            document.getElementById('dashboardPage').style.display = 'none';
-            document.getElementById('username').value = '';
-            document.getElementById('password').value = '';
-            showNotification('👋 شما خارج شدید');
-        }
-
-        function switchPage(e, page) {
-            e.preventDefault();
-            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-            document.getElementById(page).classList.add('active');
-            document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active'));
-            e.target.classList.add('active');
-            
-            if (page === 'leads') loadLeads();
-            if (page === 'team') { renderTeam(); renderChecklist(); }
-            if (page === 'pipeline') renderPipelineDetails();
-        }
-
-        function switchTab(e, tabId) {
-            e.preventDefault();
-            document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
-            document.getElementById(tabId).classList.add('active');
-            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-            e.target.classList.add('active');
-            
-            if (tabId === 'checklist-tab') renderChecklist();
-        }
-
-        function calculateScore(lead) {
-            let score = 50;
-            if (lead.industry) score += 10;
-            if (parseInt(lead.sales_stage) >= 4) score += 30;
-            if (parseInt(lead.sales_stage) >= 5) score += 20;
-            return Math.min(100, score);
-        }
-
-        function getLeadStatus(score) {
-            if (score >= 85) return { type: 'hot', emoji: '🔴' };
-            if (score >= 60) return { type: 'warm', emoji: '🟡' };
-            return { type: 'cold', emoji: '🔵' };
-        }
-
-        function renderTeam() {
-            const teamGrid = document.getElementById('teamGrid');
-            let html = '';
-            TEAM_MEMBERS.forEach(member => {
-                html += `
-                    <div class="team-card">
-                        <div class="team-name">👤 ${member.name}</div>
-                        <div class="team-role">کارشناس فروش</div>
-                        <div style="font-size: 12px; color: #64748B;">
-                            <strong>وضعیت:</strong> فعال ✅
-                        </div>
-                    </div>
-                `;
-            });
-            teamGrid.innerHTML = html;
-        }
-
-        function renderChecklist() {
-            const user = currentUser;
-            const saved = localStorage.getItem('checklist_' + user);
-            const checklist = saved ? JSON.parse(saved) : new Array(10).fill(false);
-            
-            let html = '';
-            CHECKLIST_ITEMS.forEach((item, i) => {
-                html += `<div style="display: flex; align-items: center; padding: 12px; background: ${checklist[i] ? '#F0FDF4' : '#F8FAFC'}; border-radius: 8px; margin-bottom: 8px; border: 1px solid ${checklist[i] ? '#BBF7D0' : '#E2E8F0'};">
-                  <input type="checkbox" id="ck_${i}" ${checklist[i] ? 'checked' : ''} onchange="updateChecklist(${i})">
-                  <label for="ck_${i}" style="flex: 1; margin-right: 10px; cursor: pointer; color: ${checklist[i] ? '#16A34A' : '#374151'}; text-decoration: ${checklist[i] ? 'line-through' : 'none'};">${item}</label>
-                </div>`;
-            });
-            
-            document.getElementById('checklist-items').innerHTML = html;
-            updateChecklistProgress();
-        }
-
-        function updateChecklist(index) {
-            const user = currentUser;
-            const saved = localStorage.getItem('checklist_' + user);
-            const checklist = saved ? JSON.parse(saved) : new Array(10).fill(false);
-            checklist[index] = !checklist[index];
-            localStorage.setItem('checklist_' + user, JSON.stringify(checklist));
-            renderChecklist();
-        }
-
-        function updateChecklistProgress() {
-            const user = currentUser;
-            const saved = localStorage.getItem('checklist_' + user);
-            const checklist = saved ? JSON.parse(saved) : new Array(10).fill(false);
-            const done = checklist.filter(Boolean).length;
-            const percent = (done / 10) * 100;
-            
-            document.getElementById('checklist-progress').textContent = done;
-            document.getElementById('checklist-bar').style.width = percent + '%';
-        }
-
-        function saveChecklist() {
-            showNotification('✅ چک‌لیست ذخیره شد');
-        }
-
-        function openLeadModal() {
-            document.getElementById('leadModal').classList.add('active');
-        }
-
-        function closeLeadModal() {
-            document.getElementById('leadModal').classList.remove('active');
-            document.getElementById('leadForm').reset();
-        }
-
-        function downloadExcelTemplate() {
-            const headers = ['نوع لید', 'مبدأ لید', 'نام شرکت', 'صنعت', 'دلیل انتخاب شرکت', 'شماره تماس', 'نام فرد تماس', 'سمت فرد تماس', 'مرحله فروش', 'تناسب با آن باکس', 'مانع اصلی', 'اقدام بعدی', 'کارشناس فروش', 'وضعیت لید', 'یادداشت‌ها'];
-            const ws = XLSX.utils.aoa_to_sheet([headers]);
-            const wb = XLSX.utils.book_new();
-            XLSX.utils.book_append_sheet(wb, ws, 'لیدها');
-            XLSX.writeFile(wb, 'نمونه_لیدها.xlsx');
-            showNotification('✅ فایل نمونه دانلود شد');
-        }
-
-        function saveLead(e) {
-            e.preventDefault();
-            const formData = new FormData(document.getElementById('leadForm'));
-            const lead = Object.fromEntries(formData);
-            lead.id = Date.now();
-            lead.created_by = currentUser;
-            lead.created_at = new Date().toLocaleString('fa-IR');
-            lead.score = calculateScore(lead);
-            lead.status = getLeadStatus(lead.score);
-            
-            leads.push(lead);
-            localStorage.setItem('leads_' + currentUser, JSON.stringify(leads));
-            
-            showNotification('✅ لید با موفقیت ذخیره شد');
-            closeLeadModal();
-            loadLeads();
-            updateDashboard();
-        }
-
-        function loadLeads() {
-            const saved = localStorage.getItem('leads_' + currentUser);
-            leads = saved ? JSON.parse(saved) : [];
-            filteredLeads = leads;
-            renderLeads();
-        }
-
-        function filterLeads() {
-            const query = document.getElementById('searchInput').value.toLowerCase();
-            filteredLeads = leads.filter(lead => 
-                lead.company_name.toLowerCase().includes(query) ||
-                lead.contact_name.toLowerCase().includes(query) ||
-                lead.phone.includes(query)
-            );
-            renderLeads();
-        }
-
-        function renderLeads() {
-            const container = document.getElementById('leadsContainer');
-            if (filteredLeads.length === 0) {
-                container.innerHTML = '<div style="text-align: center; padding: 40px; color: #94A3B8;">لیدی موجود نیست</div>';
-                return;
-            }
-
-            let html = `<table class="lead-table"><thead><tr><th>نام شرکت</th><th>صنعت</th><th>تماس گیر</th><th>مرحله</th><th>مانع اصلی</th><th>اقدام بعدی</th><th>وضعیت</th><th>اقدام</th></tr></thead><tbody>`;
-            
-            filteredLeads.forEach(lead => {
-                const stage = SALES_STAGES.find(s => s.id == lead.sales_stage);
-                html += `<tr><td><strong>${lead.company_name}</strong></td><td>${lead.industry}</td><td>${lead.contact_name}</td><td><select class="inline-select" onchange="updateField(${lead.id}, 'sales_stage', this.value)">${SALES_STAGES.map(s => `<option value="${s.id}" ${s.id == lead.sales_stage ? 'selected' : ''}>${s.id}. ${s.name}</option>`).join('')}</select></td><td><select class="inline-select" onchange="updateField(${lead.id}, 'main_obstacle', this.value)"><option value="">-- انتخاب --</option>${OBSTACLES.map(obs => `<option value="${obs}" ${lead.main_obstacle === obs ? 'selected' : ''}>${obs}</option>`).join('')}</select></td><td><select class="inline-select" onchange="updateField(${lead.id}, 'next_action', this.value)"><option value="">-- انتخاب --</option>${NEXT_ACTIONS.map(action => `<option value="${action}" ${lead.next_action === action ? 'selected' : ''}>${action}</option>`).join('')}</select></td><td><select class="inline-select" onchange="updateField(${lead.id}, 'lead_status', this.value)">${LEAD_STATUSES.map(status => `<option value="${status}" ${lead.lead_status === status ? 'selected' : ''}>${status}</option>`).join('')}</select></td><td><button class="btn danger" style="padding: 4px 8px; font-size: 10px;" onclick="deleteLead(${lead.id})">حذف</button></td></tr>`;
-            });
-            
-            html += '</tbody></table>';
-            container.innerHTML = html;
-        }
-
-        function updateField(leadId, fieldName, value) {
-            const lead = leads.find(l => l.id === leadId);
-            if (lead) {
-                lead[fieldName] = value;
-                lead.score = calculateScore(lead);
-                lead.status = getLeadStatus(lead.score);
-                localStorage.setItem('leads_' + currentUser, JSON.stringify(leads));
-                showNotification('✅ به‌روزرسانی شد');
-                loadLeads();
-                updateDashboard();
-            }
-        }
-
-        function deleteLead(id) {
-            if (confirm('آیا مطمئن هستید؟')) {
-                leads = leads.filter(l => l.id !== id);
-                localStorage.setItem('leads_' + currentUser, JSON.stringify(leads));
-                showNotification('✅ لید حذف شد');
-                loadLeads();
-                updateDashboard();
-            }
-        }
-
-        function handleExcelUpload(event) {
-            const file = event.target.files[0];
-            if (!file) return;
-
-            const reader = new FileReader();
-            reader.onload = (e) => {
-                try {
-                    const data = new Uint8Array(e.target.result);
-                    const workbook = XLSX.read(data, { type: 'array' });
-                    const worksheet = workbook.Sheets[workbook.SheetNames[0]];
-                    const json = XLSX.utils.sheet_to_json(worksheet);
-
-                    let imported = 0;
-                    json.forEach(row => {
-                        if (row['نام شرکت'] && row['شماره تماس']) {
-                            const lead = {
-                                id: Date.now() + Math.random(),
-                                lead_type: row['نوع لید'] || 'سرد',
-                                lead_source: row['مبدأ لید'] || '',
-                                company_name: row['نام شرکت'],
-                                industry: row['صنعت'] || '',
-                                selection_reason: row['دلیل انتخاب شرکت'] || '',
-                                phone: row['شماره تماس'],
-                                contact_name: row['نام فرد تماس'] || '',
-                                contact_position: row['سمت فرد تماس'] || '',
-                                sales_stage: row['مرحله فروش'] || '1',
-                                anbox_fit: row['تناسب با آن باکس'] || '',
-                                main_obstacle: row['مانع اصلی'] || '',
-                                next_action: row['اقدام بعدی'] || '',
-                                sales_expert: row['کارشناس فروش'] || '',
-                                lead_status: row['وضعیت لید'] || 'در حال پیگیری',
-                                notes: row['یادداشت‌ها'] || '',
-                                created_by: currentUser,
-                                created_at: new Date().toLocaleString('fa-IR')
-                            };
-                            lead.score = calculateScore(lead);
-                            lead.status = getLeadStatus(lead.score);
-                            leads.push(lead);
-                            imported++;
-                        }
-                    });
-
-                    localStorage.setItem('leads_' + currentUser, JSON.stringify(leads));
-                    showNotification(`✅ ${imported} لید آپلود شد`);
-                    loadLeads();
-                    updateDashboard();
-                    document.getElementById('excelInput').value = '';
-                } catch (err) {
-                    showNotification('❌ خطا در پردازش فایل', 'error');
-                }
-            };
-            reader.readAsArrayBuffer(file);
-        }
-
-        function updateDashboard() {
-            document.getElementById('stat-total').textContent = leads.length;
-            document.getElementById('stat-hot').textContent = leads.filter(l => l.status?.type === 'hot').length;
-            document.getElementById('stat-warm').textContent = leads.filter(l => l.status?.type === 'warm').length;
-            document.getElementById('stat-qualified').textContent = leads.filter(l => parseInt(l.sales_stage) >= 5).length;
-            renderPipeline();
-        }
-
-        function renderPipeline() {
-            const grid = document.getElementById('pipelineGrid');
-            let html = '';
-            const total = leads.length || 1;
-
-            SALES_STAGES.forEach(stage => {
-                const count = leads.filter(l => parseInt(l.sales_stage) === stage.id).length;
-                const percent = Math.round((count / total) * 100);
-                html += `<div class="pipeline-box"><div class="pipeline-stage">${stage.name}</div><div class="pipeline-count">${count}</div><div class="progress-bar"><div class="progress-fill" style="width: ${percent}%"></div></div><div class="pipeline-percent">${percent}%</div></div>`;
-            });
-
-            grid.innerHTML = html;
-        }
-
-        function renderPipelineDetails() {
-            const details = document.getElementById('pipelineDetails');
-            let html = '';
-
-            SALES_STAGES.forEach(stage => {
-                const stageLeads = leads.filter(l => parseInt(l.sales_stage) === stage.id);
-                html += `<div style="padding: 15px; background: #F8FAFC; border-radius: 8px; border-right: 4px solid #2563EB;"><h3 style="margin-bottom: 10px; color: #1B3A5C;">Stage ${stage.id}: ${stage.name}</h3><div style="font-size: 12px; color: #64748B;"><strong>تعداد:</strong> ${stageLeads.length} لید<br><strong>شرکت‌ها:</strong> ${stageLeads.map(l => l.company_name).join(', ') || 'هیچ‌کدام'}</div></div>`;
-            });
-
-            details.innerHTML = html;
-        }
-
-        function showNotification(msg, type = 'success') {
-            const el = document.getElementById('notification');
-            el.textContent = msg;
-            el.className = 'notification ' + (type === 'error' ? 'error' : '') + ' show';
-            setTimeout(() => el.classList.remove('show'), 3000);
-        }
-    </script>
+window.addEventListener('load',updateUI);
+window.addEventListener('resize',function(){
+  if(window.innerWidth >= 768){
+    document.getElementById('sidebar').classList.remove('hidden');
+    document.getElementById('overlay').classList.remove('show');
+  }
+});
+</script>
 </body>
 </html>
