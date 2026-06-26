@@ -1,840 +1,328 @@
 <!DOCTYPE html>
 <html dir="rtl" lang="fa">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>داشبورد V4 | آن‌باکس</title>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.min.js"></script>
-    <style>
-        * { box-sizing: border-box; margin: 0; padding: 0; }
-        body { font-family: Tahoma, 'Segoe UI', sans-serif; background: #F0F4F8; color: #1E293B; min-height: 100vh; }
-        
-        /* LOGIN */
-        .login-container { display: flex; align-items: center; justify-content: center; min-height: 100vh; background: linear-gradient(135deg, #1B3A5C, #2563EB); }
-        .login-box { background: #fff; padding: 40px; border-radius: 12px; box-shadow: 0 10px 40px rgba(0,0,0,.2); width: 100%; max-width: 400px; }
-        .login-logo { text-align: center; font-size: 48px; margin-bottom: 20px; }
-        .login-title { text-align: center; font-size: 24px; font-weight: 700; color: #1B3A5C; margin-bottom: 30px; }
-        .form-group { margin-bottom: 20px; }
-        .form-label { display: block; font-size: 14px; font-weight: 600; margin-bottom: 8px; color: #1B3A5C; }
-        .form-input, select { width: 100%; padding: 12px; border: 1px solid #E2E8F0; border-radius: 8px; font-size: 14px; font-family: Tahoma; }
-        .form-input:focus, select:focus { outline: none; border-color: #2563EB; box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1); }
-        .login-button { width: 100%; padding: 12px; background: #2563EB; color: #fff; border: none; border-radius: 8px; font-size: 16px; font-weight: 700; cursor: pointer; }
-        .login-button:hover { background: #1B5BB3; }
-        .login-error { background: #FEE2E2; color: #DC2626; padding: 12px; border-radius: 8px; margin-bottom: 20px; font-size: 14px; display: none; }
-        
-        /* DASHBOARD */
-        .dashboard-container { display: flex; min-height: 100vh; }
-        .sidebar { width: 250px; background: #1B3A5C; color: #fff; padding: 20px; position: fixed; height: 100vh; overflow-y: auto; z-index: 1000; }
-        .logo { display: flex; align-items: center; gap: 10px; margin-bottom: 30px; }
-        .logo-text { font-size: 14px; font-weight: 700; }
-        .user-info { background: rgba(255,255,255,.1); padding: 12px; border-radius: 8px; margin-bottom: 20px; font-size: 12px; }
-        .user-name { font-weight: 700; margin-bottom: 5px; }
-        .logout-btn { width: 100%; padding: 8px; background: #DC2626; color: #fff; border: none; border-radius: 6px; font-size: 12px; cursor: pointer; margin-top: 10px; }
-        .nav-menu { display: flex; flex-direction: column; gap: 5px; }
-        .nav-item { padding: 12px 15px; border-radius: 8px; cursor: pointer; font-size: 13px; transition: all .2s; }
-        .nav-item:hover { background: rgba(255,255,255,.1); }
-        .nav-item.active { background: #2563EB; }
-        .main { margin-right: 250px; flex: 1; }
-        .header { background: #fff; border-bottom: 1px solid #E2E8F0; padding: 15px 30px; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 100; }
-        .header-title { font-size: 18px; font-weight: 700; color: #1B3A5C; }
-        .content { padding: 30px; max-width: 1600px; margin: 0 auto; }
-        .page { display: none; }
-        .page.active { display: block; }
-        .card { background: #fff; border-radius: 12px; border: 1px solid #E2E8F0; padding: 20px; margin-bottom: 20px; box-shadow: 0 1px 3px rgba(0,0,0,.05); }
-        .card-title { font-size: 16px; font-weight: 700; margin-bottom: 15px; color: #1B3A5C; }
-        
-        /* TABS */
-        .tabs { display: flex; gap: 0; border-bottom: 2px solid #E2E8F0; margin-bottom: 20px; }
-        .tab { padding: 12px 24px; cursor: pointer; font-weight: 600; color: #64748B; border-bottom: 3px solid transparent; margin-bottom: -2px; transition: all .2s; }
-        .tab:hover { color: #1B3A5C; }
-        .tab.active { color: #2563EB; border-bottom-color: #2563EB; }
-        .tab-content { display: none; }
-        .tab-content.active { display: block; }
-        
-        /* PIPELINE */
-        .pipeline-grid { display: grid; grid-template-columns: repeat(6, 1fr); gap: 15px; margin-bottom: 20px; }
-        .pipeline-box { background: linear-gradient(135deg, #F8FAFC, #E2E8F0); padding: 15px; border-radius: 10px; text-align: center; border: 1px solid #E2E8F0; }
-        .pipeline-stage { font-size: 12px; color: #64748B; margin-bottom: 5px; }
-        .pipeline-count { font-size: 24px; font-weight: 700; color: #2563EB; }
-        .pipeline-percent { font-size: 11px; color: #94A3B8; margin-top: 5px; }
-        .progress-bar { width: 100%; height: 6px; background: #E2E8F0; border-radius: 3px; margin-top: 8px; overflow: hidden; }
-        .progress-fill { height: 100%; background: linear-gradient(90deg, #2563EB, #1B5BB3); }
-        
-        /* LEAD FORM */
-        .toolbar { display: flex; gap: 10px; margin-bottom: 20px; flex-wrap: wrap; align-items: center; }
-        .btn { padding: 10px 20px; background: #2563EB; color: #fff; border: none; border-radius: 8px; cursor: pointer; font-weight: 700; font-family: Tahoma; transition: all .2s; }
-        .btn:hover { background: #1B5BB3; }
-        .btn.secondary { background: #E2E8F0; color: #1B3A5C; }
-        .btn.danger { background: #DC2626; }
-        .btn.success { background: #16A34A; }
-        .search-box { padding: 10px 15px; border: 1px solid #E2E8F0; border-radius: 8px; width: 250px; font-family: Tahoma; }
-        
-        .modal { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,.7); z-index: 2000; align-items: flex-start; justify-content: center; overflow-y: auto; padding: 20px 0; }
-        .modal.active { display: flex; }
-        .modal-content { background: #fff; border-radius: 12px; padding: 30px; max-width: 1000px; width: 95%; margin: 20px auto; max-height: 90vh; overflow-y: auto; }
-        .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
-        .modal-title { font-size: 18px; font-weight: 700; color: #1B3A5C; }
-        .close-btn { font-size: 24px; cursor: pointer; background: none; border: none; color: #64748B; }
-        .form-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 15px; }
-        .form-grid.full { grid-template-columns: 1fr; }
-        
-        /* TABLE */
-        .lead-table { width: 100%; border-collapse: collapse; margin-top: 20px; font-size: 12px; }
-        .lead-table th { background: #F1F5F9; padding: 12px; text-align: right; font-weight: 700; color: #1B3A5C; border-bottom: 2px solid #E2E8F0; }
-        .lead-table td { padding: 10px; border-bottom: 1px solid #E2E8F0; }
-        .lead-table tr:hover { background: #F8FAFC; }
-        .stage-badge { display: inline-block; padding: 4px 10px; border-radius: 20px; font-size: 10px; font-weight: 700; background: #DBEAFE; color: #2563EB; }
-        
-        /* INLINE EDIT */
-        .inline-select { padding: 6px; border: 1px solid #2563EB; border-radius: 6px; font-size: 11px; width: 100%; font-family: Tahoma; }
-        
-        /* TEAM */
-        .team-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 15px; margin-bottom: 20px; }
-        .team-card { background: linear-gradient(135deg, #F8FAFC, #E2E8F0); padding: 20px; border-radius: 10px; border: 1px solid #E2E8F0; text-align: center; }
-        .team-name { font-size: 16px; font-weight: 700; color: #1B3A5C; margin-bottom: 8px; }
-        .team-role { font-size: 12px; color: #64748B; margin-bottom: 12px; }
-        
-        .notification { position: fixed; top: 20px; left: 50%; transform: translateX(-50%); background: #16A34A; color: #fff; padding: 12px 24px; border-radius: 8px; z-index: 9999; font-weight: 600; display: none; }
-        .notification.show { display: block; }
-        .notification.error { background: #DC2626; }
-        
-        @media(max-width: 768px) {
-            .sidebar { width: 100%; height: auto; position: relative; }
-            .main { margin-right: 0; }
-            .pipeline-grid { grid-template-columns: repeat(2, 1fr); }
-            .form-grid { grid-template-columns: 1fr; }
-            .lead-table { font-size: 10px; }
-            .modal-content { width: 98%; }
-            .team-grid { grid-template-columns: 1fr; }
-        }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>داشبورد V4 | آن‌باکس</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.min.js"></script>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{--p:#2563EB;--pl:#3B82F6;--bg:#0a0f1e;--card:rgba(15,23,42,.65);--txt:#e2e8f0;--txt2:#94a3b8;--bd:rgba(59,130,246,.18)}
+body{font-family:Tahoma,'Segoe UI',sans-serif;background:linear-gradient(135deg,#0a0f1e 0%,#0f172a 50%,#111c3a 100%);background-attachment:fixed;color:var(--txt);min-height:100vh}
+@keyframes fadeUp{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:translateY(0)}}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+@keyframes pop{from{opacity:0;transform:scale(.96)}to{opacity:1;transform:scale(1)}}
+.login-container{display:flex;align-items:center;justify-content:center;min-height:100vh;padding:20px}
+.login-box{background:var(--card);backdrop-filter:blur(22px);-webkit-backdrop-filter:blur(22px);padding:44px;border-radius:22px;border:1px solid var(--bd);box-shadow:0 24px 60px rgba(0,0,0,.5),inset 0 1px 0 rgba(255,255,255,.06);width:100%;max-width:410px;animation:pop .5s ease}
+.login-logo{text-align:center;font-size:54px;margin-bottom:14px;filter:drop-shadow(0 6px 18px rgba(59,130,246,.5))}
+.login-title{text-align:center;font-size:27px;font-weight:800;letter-spacing:-.5px;background:linear-gradient(135deg,#fff,#93c5fd);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:30px}
+.form-group{margin-bottom:18px}
+.form-label{display:block;font-size:13px;font-weight:600;margin-bottom:8px;color:var(--txt2)}
+.form-input,select,textarea{width:100%;padding:12px 14px;border:1px solid var(--bd);border-radius:11px;font-size:14px;font-family:Tahoma;background:rgba(15,23,42,.55);color:var(--txt);transition:.25s}
+.form-input::placeholder,textarea::placeholder{color:#64748b}
+.form-input:focus,select:focus,textarea:focus{outline:none;border-color:var(--pl);background:rgba(30,41,59,.7);box-shadow:0 0 0 4px rgba(59,130,246,.16)}
+select option{background:#0f172a;color:var(--txt)}
+.login-button{width:100%;padding:13px;background:linear-gradient(135deg,#2563EB,#3B82F6);color:#fff;border:none;border-radius:11px;font-size:16px;font-weight:700;cursor:pointer;font-family:Tahoma;box-shadow:0 10px 26px rgba(37,99,235,.45);transition:.25s}
+.login-button:hover{transform:translateY(-2px);box-shadow:0 16px 36px rgba(37,99,235,.6)}
+.login-error{background:rgba(220,38,38,.16);color:#fca5a5;border:1px solid rgba(220,38,38,.35);padding:12px;border-radius:11px;margin-bottom:18px;font-size:14px;display:none}
+.dashboard-container{display:flex;min-height:100vh}
+.sidebar{width:255px;background:var(--card);backdrop-filter:blur(22px);-webkit-backdrop-filter:blur(22px);border-left:1px solid var(--bd);color:#fff;padding:22px;position:fixed;height:100vh;overflow-y:auto;right:0;z-index:1000;transition:transform .3s ease}
+.logo{display:flex;align-items:center;gap:10px;margin-bottom:26px}
+.logo-text{font-size:16px;font-weight:800;background:linear-gradient(135deg,#fff,#93c5fd);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
+.user-info{background:linear-gradient(135deg,rgba(37,99,235,.18),rgba(59,130,246,.07));border:1px solid var(--bd);padding:14px;border-radius:13px;margin-bottom:18px;font-size:12px}
+.user-name{font-weight:700;margin-bottom:5px;color:#fff;font-size:14px}
+.logout-btn{width:100%;padding:9px;background:linear-gradient(135deg,#dc2626,#b91c1c);color:#fff;border:none;border-radius:9px;font-size:12px;cursor:pointer;margin-top:10px;font-family:Tahoma;font-weight:600;transition:.25s}
+.logout-btn:hover{transform:translateY(-1px);box-shadow:0 8px 18px rgba(220,38,38,.45)}
+.nav-menu{display:flex;flex-direction:column;gap:6px}
+.nav-item{padding:12px 14px;border-radius:11px;cursor:pointer;font-size:13.5px;font-weight:500;color:var(--txt2);transition:.22s;border:1px solid transparent}
+.nav-item:hover{background:rgba(59,130,246,.1);color:#fff;transform:translateX(-3px)}
+.nav-item.active{background:linear-gradient(135deg,#2563EB,#3B82F6);color:#fff;box-shadow:0 8px 22px rgba(37,99,235,.4);border-color:rgba(255,255,255,.1)}
+.main{margin-right:255px;flex:1;min-width:0}
+.header{background:var(--card);backdrop-filter:blur(22px);-webkit-backdrop-filter:blur(22px);border-bottom:1px solid var(--bd);padding:16px 30px;display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;z-index:100}
+.header-title{font-size:18px;font-weight:700;color:#fff}
+.content{padding:28px;max-width:1600px;margin:0 auto;animation:fadeIn .4s ease}
+.page{display:none}
+.page.active{display:block;animation:fadeUp .45s ease}
+h2{color:#fff!important}
+.card{background:var(--card);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);border-radius:16px;border:1px solid var(--bd);padding:22px;margin-bottom:20px;box-shadow:0 10px 30px rgba(0,0,0,.28);transition:.3s;animation:fadeUp .5s ease}
+.card:hover{transform:translateY(-3px);border-color:rgba(59,130,246,.35);box-shadow:0 18px 44px rgba(37,99,235,.22)}
+.card-title{font-size:16px;font-weight:700;margin-bottom:16px;color:#fff}
+.tabs{display:flex;gap:0;border-bottom:1px solid var(--bd);margin-bottom:20px}
+.tab{padding:12px 24px;cursor:pointer;font-weight:600;color:var(--txt2);border-bottom:3px solid transparent;margin-bottom:-1px;transition:.25s}
+.tab:hover{color:#fff}
+.tab.active{color:var(--pl);border-bottom-color:var(--pl)}
+.tab-content{display:none}
+.tab-content.active{display:block;animation:fadeIn .4s ease}
+.pipeline-grid{display:grid;grid-template-columns:repeat(6,1fr);gap:14px;margin-bottom:20px}
+.pipeline-box{background:linear-gradient(135deg,rgba(37,99,235,.16),rgba(15,23,42,.4));padding:16px;border-radius:13px;text-align:center;border:1px solid var(--bd);transition:.28s}
+.pipeline-box:hover{transform:translateY(-5px);border-color:var(--pl);box-shadow:0 14px 30px rgba(37,99,235,.3)}
+.pipeline-stage{font-size:12px;color:var(--txt2);margin-bottom:6px}
+.pipeline-count{font-size:26px;font-weight:800;background:linear-gradient(135deg,#60a5fa,#3B82F6);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
+.pipeline-percent{font-size:11px;color:var(--txt2);margin-top:5px}
+.progress-bar{width:100%;height:6px;background:rgba(148,163,184,.18);border-radius:4px;margin-top:8px;overflow:hidden}
+.progress-fill{height:100%;background:linear-gradient(90deg,#2563EB,#60a5fa);border-radius:4px;transition:width .6s ease}
+.toolbar{display:flex;gap:10px;margin-bottom:20px;flex-wrap:wrap;align-items:center}
+.btn{padding:10px 20px;background:linear-gradient(135deg,#2563EB,#3B82F6);color:#fff;border:none;border-radius:10px;cursor:pointer;font-weight:700;font-family:Tahoma;transition:.25s;box-shadow:0 6px 16px rgba(37,99,235,.32)}
+.btn:hover{transform:translateY(-2px);box-shadow:0 12px 26px rgba(37,99,235,.5)}
+.btn.secondary{background:rgba(148,163,184,.16);color:var(--txt);box-shadow:none;border:1px solid var(--bd)}
+.btn.secondary:hover{background:rgba(148,163,184,.26)}
+.btn.danger{background:linear-gradient(135deg,#dc2626,#b91c1c);box-shadow:0 6px 16px rgba(220,38,38,.32)}
+.btn.success{background:linear-gradient(135deg,#16a34a,#22c55e);box-shadow:0 6px 16px rgba(22,163,74,.32)}
+.search-box{padding:10px 15px;border:1px solid var(--bd);border-radius:10px;width:250px;font-family:Tahoma;background:rgba(15,23,42,.55);color:var(--txt);transition:.25s}
+.search-box::placeholder{color:#64748b}
+.search-box:focus{outline:none;border-color:var(--pl);box-shadow:0 0 0 4px rgba(59,130,246,.16)}
+.modal{display:none;position:fixed;inset:0;background:rgba(2,6,23,.78);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);z-index:2000;align-items:flex-start;justify-content:center;overflow-y:auto;padding:20px 0}
+.modal.active{display:flex}
+.modal-content{background:linear-gradient(135deg,rgba(15,23,42,.96),rgba(17,28,58,.96));backdrop-filter:blur(22px);-webkit-backdrop-filter:blur(22px);border:1px solid var(--bd);border-radius:18px;padding:30px;max-width:1000px;width:95%;margin:20px auto;max-height:90vh;overflow-y:auto;box-shadow:0 30px 70px rgba(0,0,0,.6);animation:pop .35s ease}
+.modal-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:20px}
+.modal-title{font-size:18px;font-weight:700;color:#fff}
+.close-btn{font-size:24px;cursor:pointer;background:none;border:none;color:var(--txt2);transition:.2s}
+.close-btn:hover{color:#fff;transform:rotate(90deg)}
+.form-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:15px}
+.form-grid.full{grid-template-columns:1fr}
+.lead-table{width:100%;border-collapse:collapse;margin-top:20px;font-size:12px}
+.lead-table th{background:rgba(37,99,235,.14);padding:12px;text-align:right;font-weight:700;color:#fff;border-bottom:1px solid var(--bd)}
+.lead-table td{padding:10px;border-bottom:1px solid rgba(148,163,184,.1);color:var(--txt)}
+.lead-table tr:hover{background:rgba(59,130,246,.07)}
+.lead-table td strong{color:#fff}
+.stage-badge{display:inline-block;padding:4px 10px;border-radius:20px;font-size:10px;font-weight:700;background:rgba(59,130,246,.2);color:#93c5fd}
+.inline-select{padding:6px;border:1px solid var(--bd);border-radius:7px;font-size:11px;width:100%;font-family:Tahoma;background:rgba(15,23,42,.7);color:var(--txt)}
+.inline-select:focus{outline:none;border-color:var(--pl)}
+.team-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:15px;margin-bottom:20px}
+.team-card{background:linear-gradient(135deg,rgba(37,99,235,.14),rgba(15,23,42,.4));padding:20px;border-radius:13px;border:1px solid var(--bd);text-align:center;transition:.28s}
+.team-card:hover{transform:translateY(-5px);border-color:var(--pl);box-shadow:0 14px 30px rgba(37,99,235,.28)}
+.team-name{font-size:16px;font-weight:700;color:#fff;margin-bottom:8px}
+.team-role{font-size:12px;color:var(--txt2);margin-bottom:12px}
+.notification{position:fixed;top:20px;left:50%;transform:translateX(-50%);background:linear-gradient(135deg,#16a34a,#22c55e);color:#fff;padding:12px 24px;border-radius:11px;z-index:9999;font-weight:600;display:none;box-shadow:0 12px 30px rgba(22,163,74,.45)}
+.notification.show{display:block;animation:pop .3s ease}
+.notification.error{background:linear-gradient(135deg,#dc2626,#b91c1c);box-shadow:0 12px 30px rgba(220,38,38,.45)}
+.hamburger{display:none;position:fixed;top:14px;right:14px;z-index:1100;background:var(--card);border:1px solid var(--bd);color:#fff;width:44px;height:44px;border-radius:11px;font-size:20px;cursor:pointer;backdrop-filter:blur(12px)}
+.overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:999}
+.overlay.show{display:block}
+@media(max-width:768px){
+.hamburger{display:block}
+.sidebar{transform:translateX(100%);width:80%;max-width:300px}
+.sidebar.open{transform:translateX(0)}
+.main{margin-right:0}
+.header{padding:14px 16px;padding-left:64px}
+.content{padding:16px}
+.pipeline-grid{grid-template-columns:repeat(2,1fr)}
+.form-grid{grid-template-columns:1fr}
+.lead-table{font-size:10px}
+.lead-table th,.lead-table td{padding:6px}
+.modal-content{width:96%;padding:20px}
+.team-grid{grid-template-columns:1fr}
+.toolbar{gap:8px}
+.search-box{width:100%}
+}
+</style>
 </head>
 <body>
-    <!-- LOGIN PAGE -->
-    <div id="loginPage" class="login-container">
-        <div class="login-box">
-            <div class="login-logo">📦</div>
-            <div class="login-title">آن‌باکس</div>
-            <div class="login-error" id="loginError"></div>
-            <div class="form-group">
-                <label class="form-label">نام کاربری</label>
-                <input type="text" id="username" class="form-input" placeholder="نام کاربری">
-            </div>
-            <div class="form-group">
-                <label class="form-label">رمز عبور</label>
-                <input type="password" id="password" class="form-input" placeholder="رمز عبور">
-            </div>
-            <button class="login-button" onclick="handleLogin()">ورود</button>
-        </div>
-    </div>
-
-    <!-- DASHBOARD -->
-    <div id="dashboardPage" class="dashboard-container" style="display: none;">
-        <div class="sidebar">
-            <div class="logo">
-                <div class="logo-text">📦 آن‌باکس</div>
-            </div>
-            <div class="user-info">
-                <div class="user-name" id="sidebarUsername">مجتبی</div>
-                <div style="font-size: 11px; opacity: 0.8;">فعال</div>
-                <button class="logout-btn" onclick="handleLogout()">خروج</button>
-            </div>
-            <div class="nav-menu">
-                <div class="nav-item active" onclick="switchPage(event, 'dashboard')">📊 داشبورد</div>
-                <div class="nav-item" onclick="switchPage(event, 'leads')">📋 لیدها</div>
-                <div class="nav-item" onclick="switchPage(event, 'team')">👥 تیم</div>
-                <div class="nav-item" onclick="switchPage(event, 'pipeline')">🔄 Pipeline</div>
-                <div class="nav-item" onclick="switchPage(event, 'reports')">📈 گزارش‌ها</div>
-                <div class="nav-item" onclick="switchPage(event, 'settings')">⚙️ تنظیمات</div>
-            </div>
-        </div>
-
-        <div class="main">
-            <div class="header">
-                <div class="header-title">داشبورد | آن‌باکس</div>
-                <div>👤 <span id="headerUsername">مجتبی</span></div>
-            </div>
-
-            <div class="content">
-                <!-- DASHBOARD PAGE -->
-                <div class="page active" id="dashboard">
-                    <h2 style="margin-bottom: 20px; color: #1B3A5C;">مدیریت Sales Pipeline</h2>
-                    
-                    <div class="card">
-                        <div class="card-title">📊 وضعیت Pipeline</div>
-                        <div class="pipeline-grid" id="pipelineGrid">
-                            <!-- Dynamic Content -->
-                        </div>
-                    </div>
-
-                    <div class="card">
-                        <div class="card-title">📈 آمار کلی</div>
-                        <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px;">
-                            <div style="text-align: center; padding: 20px; background: #F8FAFC; border-radius: 8px;">
-                                <div style="font-size: 24px; font-weight: 700; color: #2563EB;" id="stat-total">0</div>
-                                <div style="font-size: 12px; color: #64748B; margin-top: 5px;">کل لیدها</div>
-                            </div>
-                            <div style="text-align: center; padding: 20px; background: #F8FAFC; border-radius: 8px;">
-                                <div style="font-size: 24px; font-weight: 700; color: #DC2626;" id="stat-hot">0</div>
-                                <div style="font-size: 12px; color: #64748B; margin-top: 5px;">🔴 لیدهای گرم</div>
-                            </div>
-                            <div style="text-align: center; padding: 20px; background: #F8FAFC; border-radius: 8px;">
-                                <div style="font-size: 24px; font-weight: 700; color: #D97706;" id="stat-warm">0</div>
-                                <div style="font-size: 12px; color: #64748B; margin-top: 5px;">🟡 لیدهای معمولی</div>
-                            </div>
-                            <div style="text-align: center; padding: 20px; background: #F8FAFC; border-radius: 8px;">
-                                <div style="font-size: 24px; font-weight: 700; color: #2563EB;" id="stat-qualified">0</div>
-                                <div style="font-size: 12px; color: #64748B; margin-top: 5px;">✅ Qualified</div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- LEADS PAGE -->
-                <div class="page" id="leads">
-                    <h2 style="margin-bottom: 20px; color: #1B3A5C;">مدیریت لیدها</h2>
-                    
-                    <div class="toolbar">
-                        <button class="btn" onclick="openLeadModal()">➕ افزودن لید</button>
-                        <button class="btn success" onclick="downloadExcelTemplate()">📥 دانلود نمونه Excel</button>
-                        <button class="btn secondary" onclick="document.getElementById('excelInput').click()">📊 Import Excel</button>
-                        <input type="file" id="excelInput" accept=".xlsx,.xls" style="display:none;" onchange="handleExcelUpload(event)">
-                        <input type="text" class="search-box" id="searchInput" placeholder="جستجو..." onkeyup="filterLeads()">
-                    </div>
-
-                    <div class="card">
-                        <div id="leadsContainer" style="text-align: center; padding: 40px; color: #94A3B8;">
-                            ⏳ بارگذاری لیدها...
-                        </div>
-                    </div>
-                </div>
-
-                <!-- TEAM PAGE -->
-                <div class="page" id="team">
-                    <h2 style="margin-bottom: 20px; color: #1B3A5C;">تیم کارشناسان</h2>
-                    
-                    <div class="tabs">
-                        <div class="tab active" onclick="switchTab(event, 'team-members-tab')">👥 اعضای تیم</div>
-                        <div class="tab" onclick="switchTab(event, 'checklist-tab')">✅ چک‌لیست</div>
-                    </div>
-
-                    <!-- TEAM MEMBERS TAB -->
-                    <div id="team-members-tab" class="tab-content active">
-                        <div class="card">
-                            <div class="card-title">👥 کارشناسان فروش</div>
-                            <div class="team-grid" id="teamGrid">
-                                <!-- Dynamic Content -->
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- CHECKLIST TAB -->
-                    <div id="checklist-tab" class="tab-content">
-                        <div class="card">
-                            <div class="card-title">✅ چک‌لیست روزانه</div>
-                            <div style="margin-bottom: 20px;">
-                                <div style="font-size: 14px; font-weight: 700; margin-bottom: 10px;">
-                                    پیشرفت: <span id="checklist-progress">0</span>/10
-                                </div>
-                                <div class="progress-bar">
-                                    <div class="progress-fill" id="checklist-bar" style="width: 0%; background: linear-gradient(90deg, #16A34A, #22C55E);"></div>
-                                </div>
-                            </div>
-                            <div id="checklist-items"></div>
-                            <button class="btn" style="margin-top: 15px;" onclick="saveChecklist()">💾 ذخیره</button>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- PIPELINE PAGE -->
-                <div class="page" id="pipeline">
-                    <h2 style="margin-bottom: 20px; color: #1B3A5C;">مراحل فروش (Pipeline)</h2>
-                    
-                    <div class="card">
-                        <div class="card-title">🔄 توزیع لیدها در مراحل</div>
-                        <div id="pipelineDetails" style="display: grid; gap: 20px;">
-                            <!-- Dynamic Content -->
-                        </div>
-                    </div>
-                </div>
-
-                <!-- REPORTS PAGE -->
-                <div class="page" id="reports">
-                    <h2 style="margin-bottom: 20px; color: #1B3A5C;">گزارش‌ها</h2>
-                    <div class="card">
-                        <div class="card-title">📈 گزارش‌های سیستم</div>
-                        <div style="color: #64748B; font-size: 13px; line-height: 1.8;">
-                            • گزارش Pipeline<br>
-                            • گزارش لیدهای Hot/Warm<br>
-                            • گزارش مرحله‌ای فروش<br>
-                            • گزارش تبدیل (Conversion)
-                        </div>
-                    </div>
-                </div>
-
-                <!-- SETTINGS PAGE -->
-                <div class="page" id="settings">
-                    <h2 style="margin-bottom: 20px; color: #1B3A5C;">تنظیمات</h2>
-                    <div class="card">
-                        <div class="card-title">اطلاعات کاربری</div>
-                        <div style="margin-bottom: 15px;">
-                            <label class="form-label">نام کاربری</label>
-                            <input type="text" id="settingsUsername" class="form-input" disabled>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- LEAD MODAL -->
-    <div id="leadModal" class="modal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <div class="modal-title">افزودن لید جدید</div>
-                <button class="close-btn" onclick="closeLeadModal()">✕</button>
-            </div>
-            <form id="leadForm" onsubmit="saveLead(event)">
-                <div class="form-grid">
-                    <div class="form-group">
-                        <label class="form-label">نوع لید *</label>
-                        <select name="lead_type" class="form-input" required>
-                            <option value="">انتخاب کنید</option>
-                            <option>گرم</option>
-                            <option>سرد</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label">مبدأ لید *</label>
-                        <select name="lead_source" class="form-input" required>
-                            <option value="">انتخاب کنید</option>
-                            <option>سرچ اینترنتی</option>
-                            <option>تماس مشتری</option>
-                            <option>بانک اطلاعاتی</option>
-                            <option>دایره طلایی</option>
-                            <option>پیامک تبلیغاتی</option>
-                            <option>سوشیال مدیا</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label">نام شرکت *</label>
-                        <input type="text" name="company_name" class="form-input" required>
-                    </div>
-
-                    <div class="form-group">
-                        <label class="form-label">صنعت *</label>
-                        <select name="industry" class="form-input" required>
-                            <option value="">انتخاب کنید</option>
-                            <option>دارویی</option>
-                            <option>بانک</option>
-                            <option>فروشگاه اینترنتی</option>
-                            <option>خودرویی</option>
-                            <option>لوازم خانگی</option>
-                            <option>سازمانی</option>
-                            <option>لوازم آرایشی</option>
-                            <option>لوازم آشپزخانه</option>
-                            <option>لوازم جانبی</option>
-                            <option>فروشگاه حضوری</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label">دلیل انتخاب شرکت</label>
-                        <select name="selection_reason" class="form-input">
-                            <option value="">انتخاب کنید</option>
-                            <option>جغرافیای تحت پوشش</option>
-                            <option>ارسال پستی دارد</option>
-                            <option>حجم سفارش مناسب</option>
-                            <option>سابقه خوب با شرکت</option>
-                            <option>توصیه شده از منابع معتبر</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label">شماره تماس *</label>
-                        <input type="tel" name="phone" class="form-input" required>
-                    </div>
-
-                    <div class="form-group">
-                        <label class="form-label">نام فرد تماس *</label>
-                        <input type="text" name="contact_name" class="form-input" required>
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label">سمت فرد تماس</label>
-                        <input type="text" name="contact_position" class="form-input">
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label">مرحله فروش *</label>
-                        <select name="sales_stage" class="form-input" required>
-                            <option value="1">1. لیدسازی</option>
-                            <option value="2">2. تماس اولیه</option>
-                            <option value="3">3. ارسال نرخ نامه</option>
-                            <option value="4">4. جلسه مذاکره</option>
-                            <option value="5">5. ارسال پروپوزال</option>
-                            <option value="6">6. عقد قرارداد</option>
-                        </select>
-                    </div>
-
-                    <div class="form-group">
-                        <label class="form-label">تناسب با آن باکس</label>
-                        <select name="anbox_fit" class="form-input">
-                            <option value="">انتخاب کنید</option>
-                            <option>ارسال مرسوله روزانه</option>
-                            <option>تناسب با SLA</option>
-                            <option>تناسب با نرخ</option>
-                            <option>ارسال ترکیبی</option>
-                            <option>ارسال مرسولات کم حجم</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label">مانع اصلی</label>
-                        <select name="main_obstacle" class="form-input">
-                            <option value="">انتخاب کنید</option>
-                            <option>عدم توافق نرخ</option>
-                            <option>عدم توافق SLA</option>
-                            <option>عدم توافق قراردادی</option>
-                            <option>شکایت مشتری از خدمات</option>
-                            <option>مانع ندارد</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label">اقدام بعدی</label>
-                        <select name="next_action" class="form-input">
-                            <option value="">انتخاب کنید</option>
-                            <option>ارسال پروپوزال</option>
-                            <option>برقراری جلسه مذاکره</option>
-                            <option>جلسه متقاعد سازی</option>
-                            <option>ارسال درفت قرارداد</option>
-                            <option>عقد قرارداد</option>
-                            <option>عدم توافق</option>
-                        </select>
-                    </div>
-
-                    <div class="form-group">
-                        <label class="form-label">کارشناس فروش</label>
-                        <select name="sales_expert" class="form-input">
-                            <option value="">انتخاب کنید</option>
-                            <option>امیرحسین ریواز</option>
-                            <option>مجتبی رنجبر</option>
-                            <option>ندا شریفی</option>
-                            <option>سمن خوشکلام</option>
-                            <option>پرستو احمدی</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label">وضعیت لید</label>
-                        <select name="lead_status" class="form-input">
-                            <option>در حال پیگیری</option>
-                            <option>عدم توافق</option>
-                            <option>انحلال شرکت</option>
-                            <option>در حال عقد قرارداد</option>
-                            <option>در حال مذاکره</option>
-                            <option>در حال تست</option>
-                        </select>
-                    </div>
-                    <div class="form-group form-grid full">
-                        <label class="form-label">یادداشت‌ها</label>
-                        <textarea name="notes" class="form-input" style="min-height: 70px; resize: vertical;"></textarea>
-                    </div>
-                </div>
-
-                <div style="display: flex; gap: 10px; margin-top: 20px;">
-                    <button type="submit" class="btn">ذخیره</button>
-                    <button type="button" class="btn secondary" onclick="closeLeadModal()">لغو</button>
-                </div>
-            </form>
-        </div>
-    </div>
-
-    <div class="notification" id="notification"></div>
-
-    <script>
-        const USERS = {
-            'mojabi': { name: 'مجتبی رنجبر', password: 'pass123' },
-            'neda': { name: 'ندا شریفی', password: 'pass123' },
-            'saman': { name: 'سمن خوشکلام', password: 'pass123' },
-            'parasto': { name: 'پرستو احمدی', password: 'pass123' },
-            'amirhossein': { name: 'امیرحسین ریواز', password: 'sales2025' },
-            'admin': { name: 'ادمین سیستم', password: 'admin2025' }
-        };
-
-        const SALES_STAGES = [
-            { id: 1, name: 'لیدسازی' },
-            { id: 2, name: 'تماس اولیه و امکان سنجی' },
-            { id: 3, name: 'ارسال نرخ نامه' },
-            { id: 4, name: 'جلسه مذاکره' },
-            { id: 5, name: 'ارسال پروپوزال' },
-            { id: 6, name: 'عقد قرارداد' }
-        ];
-
-        const OBSTACLES = ['عدم توافق نرخ', 'عدم توافق SLA', 'عدم توافق قراردادی', 'شکایت مشتری از خدمات', 'مانع ندارد'];
-        const NEXT_ACTIONS = ['ارسال پروپوزال', 'برقراری جلسه مذاکره', 'جلسه متقاعد سازی', 'ارسال درفت قرارداد', 'عقد قرارداد', 'عدم توافق'];
-        const LEAD_STATUSES = ['در حال پیگیری', 'عدم توافق', 'انحلال شرکت', 'در حال عقد قرارداد', 'در حال مذاکره', 'در حال تست'];
-        const SALES_EXPERTS = ['امیرحسین ریواز', 'مجتبی رنجبر', 'ندا شریفی', 'سمن خوشکلام', 'پرستو احمدی'];
-        const TEAM_MEMBERS = [
-            { name: 'مجتبی رنجبر' },
-            { name: 'ندا شریفی' },
-            { name: 'سمن خوشکلام' },
-            { name: 'پرستو احمدی' }
-        ];
-
-        const CHECKLIST_ITEMS = [
-            'لیست لیدهای امروز دریافت شد',
-            'گزارش دیروز بررسی شد',
-            'اهداف روز با مدیر هماهنگ شد',
-            'تماس با تمام لیدهای امروز انجام شد',
-            'فالوآپ مشتریان دیروز انجام شد',
-            'اطلاعات مشتریان تأییدشده دریافت شد',
-            'پنل‌های جدید ساخته و تحویل داده شد',
-            'آموزش شارژ و ارسال به مشتریان انجام شد',
-            'بارکد سفارشات امروز صادر شد',
-            'گزارش پایان روز در CRM ثبت شد'
-        ];
-
-        let currentUser = null;
-        let leads = [];
-        let filteredLeads = [];
-
-        window.addEventListener('DOMContentLoaded', () => {
-            const savedUser = localStorage.getItem('currentUser');
-            if (savedUser) {
-                currentUser = savedUser;
-                showDashboard();
-                loadLeads();
-                renderTeam();
-                renderChecklist();
-                updateDashboard();
-            }
-        });
-
-        function handleLogin() {
-            const username = document.getElementById('username').value.trim();
-            const password = document.getElementById('password').value;
-            const errorEl = document.getElementById('loginError');
-
-            if (!username || !password) {
-                errorEl.textContent = '❌ نام کاربری و رمز عبور را وارد کنید';
-                errorEl.style.display = 'block';
-                return;
-            }
-
-            const user = USERS[username];
-            if (!user || user.password !== password) {
-                errorEl.textContent = '❌ نام کاربری یا رمز عبور نادرست است';
-                errorEl.style.display = 'block';
-                return;
-            }
-
-            currentUser = username;
-            localStorage.setItem('currentUser', username);
-            showDashboard();
-            loadLeads();
-            renderTeam();
-            renderChecklist();
-            updateDashboard();
-        }
-
-        function showDashboard() {
-            const user = USERS[currentUser];
-            document.getElementById('loginPage').style.display = 'none';
-            document.getElementById('dashboardPage').style.display = 'flex';
-            document.getElementById('sidebarUsername').textContent = user.name;
-            document.getElementById('headerUsername').textContent = user.name;
-            document.getElementById('settingsUsername').value = currentUser;
-            showNotification('✅ خوش آمدید ' + user.name);
-        }
-
-        function handleLogout() {
-            localStorage.removeItem('currentUser');
-            currentUser = null;
-            document.getElementById('loginPage').style.display = 'flex';
-            document.getElementById('dashboardPage').style.display = 'none';
-            document.getElementById('username').value = '';
-            document.getElementById('password').value = '';
-            showNotification('👋 شما خارج شدید');
-        }
-
-        function switchPage(e, page) {
-            e.preventDefault();
-            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-            document.getElementById(page).classList.add('active');
-            document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active'));
-            e.target.classList.add('active');
-            
-            if (page === 'leads') loadLeads();
-            if (page === 'team') { renderTeam(); renderChecklist(); }
-            if (page === 'pipeline') renderPipelineDetails();
-        }
-
-        function switchTab(e, tabId) {
-            e.preventDefault();
-            document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
-            document.getElementById(tabId).classList.add('active');
-            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-            e.target.classList.add('active');
-            
-            if (tabId === 'checklist-tab') renderChecklist();
-        }
-
-        function calculateScore(lead) {
-            let score = 50;
-            if (lead.industry) score += 10;
-            if (parseInt(lead.sales_stage) >= 4) score += 30;
-            if (parseInt(lead.sales_stage) >= 5) score += 20;
-            return Math.min(100, score);
-        }
-
-        function getLeadStatus(score) {
-            if (score >= 85) return { type: 'hot', emoji: '🔴' };
-            if (score >= 60) return { type: 'warm', emoji: '🟡' };
-            return { type: 'cold', emoji: '🔵' };
-        }
-
-        function renderTeam() {
-            const teamGrid = document.getElementById('teamGrid');
-            let html = '';
-            TEAM_MEMBERS.forEach(member => {
-                html += `
-                    <div class="team-card">
-                        <div class="team-name">👤 ${member.name}</div>
-                        <div class="team-role">کارشناس فروش</div>
-                        <div style="font-size: 12px; color: #64748B;">
-                            <strong>وضعیت:</strong> فعال ✅
-                        </div>
-                    </div>
-                `;
-            });
-            teamGrid.innerHTML = html;
-        }
-
-        function renderChecklist() {
-            const user = currentUser;
-            const saved = localStorage.getItem('checklist_' + user);
-            const checklist = saved ? JSON.parse(saved) : new Array(10).fill(false);
-            
-            let html = '';
-            CHECKLIST_ITEMS.forEach((item, i) => {
-                html += `<div style="display: flex; align-items: center; padding: 12px; background: ${checklist[i] ? '#F0FDF4' : '#F8FAFC'}; border-radius: 8px; margin-bottom: 8px; border: 1px solid ${checklist[i] ? '#BBF7D0' : '#E2E8F0'};">
-                  <input type="checkbox" id="ck_${i}" ${checklist[i] ? 'checked' : ''} onchange="updateChecklist(${i})">
-                  <label for="ck_${i}" style="flex: 1; margin-right: 10px; cursor: pointer; color: ${checklist[i] ? '#16A34A' : '#374151'}; text-decoration: ${checklist[i] ? 'line-through' : 'none'};">${item}</label>
-                </div>`;
-            });
-            
-            document.getElementById('checklist-items').innerHTML = html;
-            updateChecklistProgress();
-        }
-
-        function updateChecklist(index) {
-            const user = currentUser;
-            const saved = localStorage.getItem('checklist_' + user);
-            const checklist = saved ? JSON.parse(saved) : new Array(10).fill(false);
-            checklist[index] = !checklist[index];
-            localStorage.setItem('checklist_' + user, JSON.stringify(checklist));
-            renderChecklist();
-        }
-
-        function updateChecklistProgress() {
-            const user = currentUser;
-            const saved = localStorage.getItem('checklist_' + user);
-            const checklist = saved ? JSON.parse(saved) : new Array(10).fill(false);
-            const done = checklist.filter(Boolean).length;
-            const percent = (done / 10) * 100;
-            
-            document.getElementById('checklist-progress').textContent = done;
-            document.getElementById('checklist-bar').style.width = percent + '%';
-        }
-
-        function saveChecklist() {
-            showNotification('✅ چک‌لیست ذخیره شد');
-        }
-
-        function openLeadModal() {
-            document.getElementById('leadModal').classList.add('active');
-        }
-
-        function closeLeadModal() {
-            document.getElementById('leadModal').classList.remove('active');
-            document.getElementById('leadForm').reset();
-        }
-
-        function downloadExcelTemplate() {
-            const headers = ['نوع لید', 'مبدأ لید', 'نام شرکت', 'صنعت', 'دلیل انتخاب شرکت', 'شماره تماس', 'نام فرد تماس', 'سمت فرد تماس', 'مرحله فروش', 'تناسب با آن باکس', 'مانع اصلی', 'اقدام بعدی', 'کارشناس فروش', 'وضعیت لید', 'یادداشت‌ها'];
-            const ws = XLSX.utils.aoa_to_sheet([headers]);
-            const wb = XLSX.utils.book_new();
-            XLSX.utils.book_append_sheet(wb, ws, 'لیدها');
-            XLSX.writeFile(wb, 'نمونه_لیدها.xlsx');
-            showNotification('✅ فایل نمونه دانلود شد');
-        }
-
-        function saveLead(e) {
-            e.preventDefault();
-            const formData = new FormData(document.getElementById('leadForm'));
-            const lead = Object.fromEntries(formData);
-            lead.id = Date.now();
-            lead.created_by = currentUser;
-            lead.created_at = new Date().toLocaleString('fa-IR');
-            lead.score = calculateScore(lead);
-            lead.status = getLeadStatus(lead.score);
-            
-            leads.push(lead);
-            localStorage.setItem('leads_' + currentUser, JSON.stringify(leads));
-            
-            showNotification('✅ لید با موفقیت ذخیره شد');
-            closeLeadModal();
-            loadLeads();
-            updateDashboard();
-        }
-
-        function loadLeads() {
-            const saved = localStorage.getItem('leads_' + currentUser);
-            leads = saved ? JSON.parse(saved) : [];
-            filteredLeads = leads;
-            renderLeads();
-        }
-
-        function filterLeads() {
-            const query = document.getElementById('searchInput').value.toLowerCase();
-            filteredLeads = leads.filter(lead => 
-                lead.company_name.toLowerCase().includes(query) ||
-                lead.contact_name.toLowerCase().includes(query) ||
-                lead.phone.includes(query)
-            );
-            renderLeads();
-        }
-
-        function renderLeads() {
-            const container = document.getElementById('leadsContainer');
-            if (filteredLeads.length === 0) {
-                container.innerHTML = '<div style="text-align: center; padding: 40px; color: #94A3B8;">لیدی موجود نیست</div>';
-                return;
-            }
-
-            let html = `<table class="lead-table"><thead><tr><th>نام شرکت</th><th>صنعت</th><th>تماس گیر</th><th>مرحله</th><th>مانع اصلی</th><th>اقدام بعدی</th><th>وضعیت</th><th>اقدام</th></tr></thead><tbody>`;
-            
-            filteredLeads.forEach(lead => {
-                const stage = SALES_STAGES.find(s => s.id == lead.sales_stage);
-                html += `<tr><td><strong>${lead.company_name}</strong></td><td>${lead.industry}</td><td>${lead.contact_name}</td><td><select class="inline-select" onchange="updateField(${lead.id}, 'sales_stage', this.value)">${SALES_STAGES.map(s => `<option value="${s.id}" ${s.id == lead.sales_stage ? 'selected' : ''}>${s.id}. ${s.name}</option>`).join('')}</select></td><td><select class="inline-select" onchange="updateField(${lead.id}, 'main_obstacle', this.value)"><option value="">-- انتخاب --</option>${OBSTACLES.map(obs => `<option value="${obs}" ${lead.main_obstacle === obs ? 'selected' : ''}>${obs}</option>`).join('')}</select></td><td><select class="inline-select" onchange="updateField(${lead.id}, 'next_action', this.value)"><option value="">-- انتخاب --</option>${NEXT_ACTIONS.map(action => `<option value="${action}" ${lead.next_action === action ? 'selected' : ''}>${action}</option>`).join('')}</select></td><td><select class="inline-select" onchange="updateField(${lead.id}, 'lead_status', this.value)">${LEAD_STATUSES.map(status => `<option value="${status}" ${lead.lead_status === status ? 'selected' : ''}>${status}</option>`).join('')}</select></td><td><button class="btn danger" style="padding: 4px 8px; font-size: 10px;" onclick="deleteLead(${lead.id})">حذف</button></td></tr>`;
-            });
-            
-            html += '</tbody></table>';
-            container.innerHTML = html;
-        }
-
-        function updateField(leadId, fieldName, value) {
-            const lead = leads.find(l => l.id === leadId);
-            if (lead) {
-                lead[fieldName] = value;
-                lead.score = calculateScore(lead);
-                lead.status = getLeadStatus(lead.score);
-                localStorage.setItem('leads_' + currentUser, JSON.stringify(leads));
-                showNotification('✅ به‌روزرسانی شد');
-                loadLeads();
-                updateDashboard();
-            }
-        }
-
-        function deleteLead(id) {
-            if (confirm('آیا مطمئن هستید؟')) {
-                leads = leads.filter(l => l.id !== id);
-                localStorage.setItem('leads_' + currentUser, JSON.stringify(leads));
-                showNotification('✅ لید حذف شد');
-                loadLeads();
-                updateDashboard();
-            }
-        }
-
-        function handleExcelUpload(event) {
-            const file = event.target.files[0];
-            if (!file) return;
-
-            const reader = new FileReader();
-            reader.onload = (e) => {
-                try {
-                    const data = new Uint8Array(e.target.result);
-                    const workbook = XLSX.read(data, { type: 'array' });
-                    const worksheet = workbook.Sheets[workbook.SheetNames[0]];
-                    const json = XLSX.utils.sheet_to_json(worksheet);
-
-                    let imported = 0;
-                    json.forEach(row => {
-                        if (row['نام شرکت'] && row['شماره تماس']) {
-                            const lead = {
-                                id: Date.now() + Math.random(),
-                                lead_type: row['نوع لید'] || 'سرد',
-                                lead_source: row['مبدأ لید'] || '',
-                                company_name: row['نام شرکت'],
-                                industry: row['صنعت'] || '',
-                                selection_reason: row['دلیل انتخاب شرکت'] || '',
-                                phone: row['شماره تماس'],
-                                contact_name: row['نام فرد تماس'] || '',
-                                contact_position: row['سمت فرد تماس'] || '',
-                                sales_stage: row['مرحله فروش'] || '1',
-                                anbox_fit: row['تناسب با آن باکس'] || '',
-                                main_obstacle: row['مانع اصلی'] || '',
-                                next_action: row['اقدام بعدی'] || '',
-                                sales_expert: row['کارشناس فروش'] || '',
-                                lead_status: row['وضعیت لید'] || 'در حال پیگیری',
-                                notes: row['یادداشت‌ها'] || '',
-                                created_by: currentUser,
-                                created_at: new Date().toLocaleString('fa-IR')
-                            };
-                            lead.score = calculateScore(lead);
-                            lead.status = getLeadStatus(lead.score);
-                            leads.push(lead);
-                            imported++;
-                        }
-                    });
-
-                    localStorage.setItem('leads_' + currentUser, JSON.stringify(leads));
-                    showNotification(`✅ ${imported} لید آپلود شد`);
-                    loadLeads();
-                    updateDashboard();
-                    document.getElementById('excelInput').value = '';
-                } catch (err) {
-                    showNotification('❌ خطا در پردازش فایل', 'error');
-                }
-            };
-            reader.readAsArrayBuffer(file);
-        }
-
-        function updateDashboard() {
-            document.getElementById('stat-total').textContent = leads.length;
-            document.getElementById('stat-hot').textContent = leads.filter(l => l.status?.type === 'hot').length;
-            document.getElementById('stat-warm').textContent = leads.filter(l => l.status?.type === 'warm').length;
-            document.getElementById('stat-qualified').textContent = leads.filter(l => parseInt(l.sales_stage) >= 5).length;
-            renderPipeline();
-        }
-
-        function renderPipeline() {
-            const grid = document.getElementById('pipelineGrid');
-            let html = '';
-            const total = leads.length || 1;
-
-            SALES_STAGES.forEach(stage => {
-                const count = leads.filter(l => parseInt(l.sales_stage) === stage.id).length;
-                const percent = Math.round((count / total) * 100);
-                html += `<div class="pipeline-box"><div class="pipeline-stage">${stage.name}</div><div class="pipeline-count">${count}</div><div class="progress-bar"><div class="progress-fill" style="width: ${percent}%"></div></div><div class="pipeline-percent">${percent}%</div></div>`;
-            });
-
-            grid.innerHTML = html;
-        }
-
-        function renderPipelineDetails() {
-            const details = document.getElementById('pipelineDetails');
-            let html = '';
-
-            SALES_STAGES.forEach(stage => {
-                const stageLeads = leads.filter(l => parseInt(l.sales_stage) === stage.id);
-                html += `<div style="padding: 15px; background: #F8FAFC; border-radius: 8px; border-right: 4px solid #2563EB;"><h3 style="margin-bottom: 10px; color: #1B3A5C;">Stage ${stage.id}: ${stage.name}</h3><div style="font-size: 12px; color: #64748B;"><strong>تعداد:</strong> ${stageLeads.length} لید<br><strong>شرکت‌ها:</strong> ${stageLeads.map(l => l.company_name).join(', ') || 'هیچ‌کدام'}</div></div>`;
-            });
-
-            details.innerHTML = html;
-        }
-
-        function showNotification(msg, type = 'success') {
-            const el = document.getElementById('notification');
-            el.textContent = msg;
-            el.className = 'notification ' + (type === 'error' ? 'error' : '') + ' show';
-            setTimeout(() => el.classList.remove('show'), 3000);
-        }
-    </script>
+<div id="loginPage" class="login-container">
+<div class="login-box">
+<div class="login-logo">📦</div>
+<div class="login-title">آن‌باکس</div>
+<div class="login-error" id="loginError"></div>
+<div class="form-group">
+<label class="form-label">نام کاربری</label>
+<input type="text" id="username" class="form-input" placeholder="نام کاربری">
+</div>
+<div class="form-group">
+<label class="form-label">رمز عبور</label>
+<input type="password" id="password" class="form-input" placeholder="رمز عبور">
+</div>
+<button class="login-button" onclick="handleLogin()">ورود</button>
+</div>
+</div>
+<button class="hamburger" onclick="toggleSidebar()">☰</button>
+<div class="overlay" id="overlay" onclick="toggleSidebar()"></div>
+<div id="dashboardPage" class="dashboard-container" style="display:none">
+<div class="sidebar" id="sidebar">
+<div class="logo"><div class="logo-text">📦 آن‌باکس</div></div>
+<div class="user-info">
+<div class="user-name" id="sidebarUsername">مجتبی</div>
+<div style="font-size:11px;opacity:.8">فعال</div>
+<button class="logout-btn" onclick="handleLogout()">خروج</button>
+</div>
+<div class="nav-menu">
+<div class="nav-item active" onclick="switchPage(event,'dashboard')">📊 داشبورد</div>
+<div class="nav-item" onclick="switchPage(event,'leads')">📋 لیدها</div>
+<div class="nav-item" onclick="switchPage(event,'team')">👥 تیم</div>
+<div class="nav-item" onclick="switchPage(event,'pipeline')">🔄 Pipeline</div>
+<div class="nav-item" onclick="switchPage(event,'reports')">📈 گزارش‌ها</div>
+<div class="nav-item" onclick="switchPage(event,'settings')">⚙️ تنظیمات</div>
+</div>
+</div>
+<div class="main">
+<div class="header">
+<div class="header-title">داشبورد | آن‌باکس</div>
+<div>👤 <span id="headerUsername">مجتبی</span></div>
+</div>
+<div class="content">
+<div class="page active" id="dashboard">
+<h2 style="margin-bottom:20px">مدیریت Sales Pipeline</h2>
+<div class="card">
+<div class="card-title">📊 وضعیت Pipeline</div>
+<div class="pipeline-grid" id="pipelineGrid"></div>
+</div>
+<div class="card">
+<div class="card-title">📈 آمار کلی</div>
+<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:15px">
+<div style="text-align:center;padding:20px;background:rgba(37,99,235,.1);border:1px solid var(--bd);border-radius:12px">
+<div style="font-size:24px;font-weight:700;color:#60a5fa" id="stat-total">0</div>
+<div style="font-size:12px;color:var(--txt2);margin-top:5px">کل لیدها</div>
+</div>
+<div style="text-align:center;padding:20px;background:rgba(220,38,38,.1);border:1px solid rgba(220,38,38,.2);border-radius:12px">
+<div style="font-size:24px;font-weight:700;color:#f87171" id="stat-hot">0</div>
+<div style="font-size:12px;color:var(--txt2);margin-top:5px">🔴 لیدهای گرم</div>
+</div>
+<div style="text-align:center;padding:20px;background:rgba(217,119,6,.1);border:1px solid rgba(217,119,6,.2);border-radius:12px">
+<div style="font-size:24px;font-weight:700;color:#fbbf24" id="stat-warm">0</div>
+<div style="font-size:12px;color:var(--txt2);margin-top:5px">🟡 لیدهای معمولی</div>
+</div>
+<div style="text-align:center;padding:20px;background:rgba(22,163,74,.1);border:1px solid rgba(22,163,74,.2);border-radius:12px">
+<div style="font-size:24px;font-weight:700;color:#4ade80" id="stat-qualified">0</div>
+<div style="font-size:12px;color:var(--txt2);margin-top:5px">✅ Qualified</div>
+</div>
+</div>
+</div>
+</div>
+<div class="page" id="leads">
+<h2 style="margin-bottom:20px">مدیریت لیدها</h2>
+<div class="toolbar">
+<button class="btn" onclick="openLeadModal()">➕ افزودن لید</button>
+<button class="btn success" onclick="downloadExcelTemplate()">📥 دانلود نمونه Excel</button>
+<button class="btn secondary" onclick="document.getElementById('excelInput').click()">📊 Import Excel</button>
+<input type="file" id="excelInput" accept=".xlsx,.xls" style="display:none" onchange="handleExcelUpload(event)">
+<input type="text" class="search-box" id="searchInput" placeholder="جستجو..." onkeyup="filterLeads()">
+</div>
+<div class="card">
+<div id="leadsContainer" style="text-align:center;padding:40px;color:var(--txt2)">⏳ بارگذاری لیدها...</div>
+</div>
+</div>
+<div class="page" id="team">
+<h2 style="margin-bottom:20px">تیم کارشناسان</h2>
+<div class="tabs">
+<div class="tab active" onclick="switchTab(event,'team-members-tab')">👥 اعضای تیم</div>
+<div class="tab" onclick="switchTab(event,'checklist-tab')">✅ چک‌لیست</div>
+</div>
+<div id="team-members-tab" class="tab-content active">
+<div class="card">
+<div class="card-title">👥 کارشناسان فروش</div>
+<div class="team-grid" id="teamGrid"></div>
+</div>
+</div>
+<div id="checklist-tab" class="tab-content">
+<div class="card">
+<div class="card-title">✅ چک‌لیست روزانه</div>
+<div style="margin-bottom:20px">
+<div style="font-size:14px;font-weight:700;margin-bottom:10px;color:#fff">پیشرفت: <span id="checklist-progress">0</span>/10</div>
+<div class="progress-bar"><div class="progress-fill" id="checklist-bar" style="width:0%;background:linear-gradient(90deg,#16a34a,#22c55e)"></div></div>
+</div>
+<div id="checklist-items"></div>
+<button class="btn" style="margin-top:15px" onclick="saveChecklist()">💾 ذخیره</button>
+</div>
+</div>
+</div>
+<div class="page" id="pipeline">
+<h2 style="margin-bottom:20px">مراحل فروش (Pipeline)</h2>
+<div class="card">
+<div class="card-title">🔄 توزیع لیدها در مراحل</div>
+<div id="pipelineDetails" style="display:grid;gap:20px"></div>
+</div>
+</div>
+<div class="page" id="reports">
+<h2 style="margin-bottom:20px">گزارش‌ها</h2>
+<div class="card">
+<div class="card-title">📈 گزارش‌های سیستم</div>
+<div style="color:var(--txt2);font-size:13px;line-height:1.8">
+• گزارش Pipeline<br>• گزارش لیدهای Hot/Warm<br>• گزارش مرحله‌ای فروش<br>• گزارش تبدیل (Conversion)
+</div>
+</div>
+</div>
+<div class="page" id="settings">
+<h2 style="margin-bottom:20px">تنظیمات</h2>
+<div class="card">
+<div class="card-title">اطلاعات کاربری</div>
+<div style="margin-bottom:15px">
+<label class="form-label">نام کاربری</label>
+<input type="text" id="settingsUsername" class="form-input" disabled>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div id="leadModal" class="modal">
+<div class="modal-content">
+<div class="modal-header">
+<div class="modal-title">افزودن لید جدید</div>
+<button class="close-btn" onclick="closeLeadModal()">✕</button>
+</div>
+<form id="leadForm" onsubmit="saveLead(event)">
+<div class="form-grid">
+<div class="form-group"><label class="form-label">نوع لید *</label><select name="lead_type" class="form-input" required><option value="">انتخاب کنید</option><option>گرم</option><option>سرد</option></select></div>
+<div class="form-group"><label class="form-label">مبدأ لید *</label><select name="lead_source" class="form-input" required><option value="">انتخاب کنید</option><option>سرچ اینترنتی</option><option>تماس مشتری</option><option>بانک اطلاعاتی</option><option>دایره طلایی</option><option>پیامک تبلیغاتی</option><option>سوشیال مدیا</option></select></div>
+<div class="form-group"><label class="form-label">نام شرکت *</label><input type="text" name="company_name" class="form-input" required></div>
+<div class="form-group"><label class="form-label">صنعت *</label><select name="industry" class="form-input" required><option value="">انتخاب کنید</option><option>دارویی</option><option>بانک</option><option>فروشگاه اینترنتی</option><option>خودرویی</option><option>لوازم خانگی</option><option>سازمانی</option><option>لوازم آرایشی</option><option>لوازم آشپزخانه</option><option>لوازم جانبی</option><option>فروشگاه حضوری</option></select></div>
+<div class="form-group"><label class="form-label">دلیل انتخاب شرکت</label><select name="selection_reason" class="form-input"><option value="">انتخاب کنید</option><option>جغرافیای تحت پوشش</option><option>ارسال پستی دارد</option><option>حجم سفارش مناسب</option><option>سابقه خوب با شرکت</option><option>توصیه شده از منابع معتبر</option></select></div>
+<div class="form-group"><label class="form-label">شماره تماس *</label><input type="tel" name="phone" class="form-input" required></div>
+<div class="form-group"><label class="form-label">نام فرد تماس *</label><input type="text" name="contact_name" class="form-input" required></div>
+<div class="form-group"><label class="form-label">سمت فرد تماس</label><input type="text" name="contact_position" class="form-input"></div>
+<div class="form-group"><label class="form-label">مرحله فروش *</label><select name="sales_stage" class="form-input" required><option value="1">1. لیدسازی</option><option value="2">2. تماس اولیه</option><option value="3">3. ارسال نرخ نامه</option><option value="4">4. جلسه مذاکره</option><option value="5">5. ارسال پروپوزال</option><option value="6">6. عقد قرارداد</option></select></div>
+<div class="form-group"><label class="form-label">تناسب با آن باکس</label><select name="anbox_fit" class="form-input"><option value="">انتخاب کنید</option><option>ارسال مرسوله روزانه</option><option>تناسب با SLA</option><option>تناسب با نرخ</option><option>ارسال ترکیبی</option><option>ارسال مرسولات کم حجم</option></select></div>
+<div class="form-group"><label class="form-label">مانع اصلی</label><select name="main_obstacle" class="form-input"><option value="">انتخاب کنید</option><option>عدم توافق نرخ</option><option>عدم توافق SLA</option><option>عدم توافق قراردادی</option><option>شکایت مشتری از خدمات</option><option>مانع ندارد</option></select></div>
+<div class="form-group"><label class="form-label">اقدام بعدی</label><select name="next_action" class="form-input"><option value="">انتخاب کنید</option><option>ارسال پروپوزال</option><option>برقراری جلسه مذاکره</option><option>جلسه متقاعد سازی</option><option>ارسال درفت قرارداد</option><option>عقد قرارداد</option><option>عدم توافق</option></select></div>
+<div class="form-group"><label class="form-label">کارشناس فروش</label><select name="sales_expert" class="form-input"><option value="">انتخاب کنید</option><option>امیرحسین ریواز</option><option>مجتبی رنجبر</option><option>ندا شریفی</option><option>سمن خوشکلام</option><option>پرستو احمدی</option></select></div>
+<div class="form-group"><label class="form-label">وضعیت لید</label><select name="lead_status" class="form-input"><option>در حال پیگیری</option><option>عدم توافق</option><option>انحلال شرکت</option><option>در حال عقد قرارداد</option><option>در حال مذاکره</option><option>در حال تست</option></select></div>
+<div class="form-group form-grid full"><label class="form-label">یادداشت‌ها</label><textarea name="notes" class="form-input" style="min-height:70px;resize:vertical"></textarea></div>
+</div>
+<div style="display:flex;gap:10px;margin-top:20px">
+<button type="submit" class="btn">ذخیره</button>
+<button type="button" class="btn secondary" onclick="closeLeadModal()">لغو</button>
+</div>
+</form>
+</div>
+</div>
+<div class="notification" id="notification"></div>
+<script>
+const USERS={'mojabi':{name:'مجتبی رنجبر',password:'pass123'},'neda':{name:'ندا شریفی',password:'pass123'},'saman':{name:'سمن خوشکلام',password:'pass123'},'parasto':{name:'پرستو احمدی',password:'pass123'},'amirhossein':{name:'امیرحسین ریواز',password:'sales2025'},'admin':{name:'ادمین سیستم',password:'admin2025'}};
+const SALES_STAGES=[{id:1,name:'لیدسازی'},{id:2,name:'تماس اولیه و امکان سنجی'},{id:3,name:'ارسال نرخ نامه'},{id:4,name:'جلسه مذاکره'},{id:5,name:'ارسال پروپوزال'},{id:6,name:'عقد قرارداد'}];
+const OBSTACLES=['عدم توافق نرخ','عدم توافق SLA','عدم توافق قراردادی','شکایت مشتری از خدمات','مانع ندارد'];
+const NEXT_ACTIONS=['ارسال پروپوزال','برقراری جلسه مذاکره','جلسه متقاعد سازی','ارسال درفت قرارداد','عقد قرارداد','عدم توافق'];
+const LEAD_STATUSES=['در حال پیگیری','عدم توافق','انحلال شرکت','در حال عقد قرارداد','در حال مذاکره','در حال تست'];
+const SALES_EXPERTS=['امیرحسین ریواز','مجتبی رنجبر','ندا شریفی','سمن خوشکلام','پرستو احمدی'];
+const TEAM_MEMBERS=[{name:'مجتبی رنجبر'},{name:'ندا شریفی'},{name:'سمن خوشکلام'},{name:'پرستو احمدی'}];
+const CHECKLIST_ITEMS=['لیست لیدهای امروز دریافت شد','گزارش دیروز بررسی شد','اهداف روز با مدیر هماهنگ شد','تماس با تمام لیدهای امروز انجام شد','فالوآپ مشتریان دیروز انجام شد','اطلاعات مشتریان تأییدشده دریافت شد','پنل‌های جدید ساخته و تحویل داده شد','آموزش شارژ و ارسال به مشتریان انجام شد','بارکد سفارشات امروز صادر شد','گزارش پایان روز در CRM ثبت شد'];
+let currentUser=null,leads=[],filteredLeads=[];
+window.addEventListener('DOMContentLoaded',()=>{const savedUser=localStorage.getItem('currentUser');if(savedUser){currentUser=savedUser;showDashboard();loadLeads();renderTeam();renderChecklist();updateDashboard();}});
+function toggleSidebar(){document.getElementById('sidebar').classList.toggle('open');document.getElementById('overlay').classList.toggle('show');}
+function handleLogin(){const username=document.getElementById('username').value.trim();const password=document.getElementById('password').value;const errorEl=document.getElementById('loginError');if(!username||!password){errorEl.textContent='❌ نام کاربری و رمز عبور را وارد کنید';errorEl.style.display='block';return;}const user=USERS[username];if(!user||user.password!==password){errorEl.textContent='❌ نام کاربری یا رمز عبور نادرست است';errorEl.style.display='block';return;}currentUser=username;localStorage.setItem('currentUser',username);showDashboard();loadLeads();renderTeam();renderChecklist();updateDashboard();}
+function showDashboard(){const user=USERS[currentUser];document.getElementById('loginPage').style.display='none';document.getElementById('dashboardPage').style.display='flex';document.getElementById('sidebarUsername').textContent=user.name;document.getElementById('headerUsername').textContent=user.name;document.getElementById('settingsUsername').value=currentUser;showNotification('✅ خوش آمدید '+user.name);}
+function handleLogout(){localStorage.removeItem('currentUser');currentUser=null;document.getElementById('loginPage').style.display='flex';document.getElementById('dashboardPage').style.display='none';document.getElementById('username').value='';document.getElementById('password').value='';showNotification('👋 شما خارج شدید');}
+function switchPage(e,page){e.preventDefault();document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));document.getElementById(page).classList.add('active');document.querySelectorAll('.nav-item').forEach(item=>item.classList.remove('active'));e.target.classList.add('active');if(page==='leads')loadLeads();if(page==='team'){renderTeam();renderChecklist();}if(page==='pipeline')renderPipelineDetails();if(window.innerWidth<=768){document.getElementById('sidebar').classList.remove('open');document.getElementById('overlay').classList.remove('show');}}
+function switchTab(e,tabId){e.preventDefault();document.querySelectorAll('.tab-content').forEach(t=>t.classList.remove('active'));document.getElementById(tabId).classList.add('active');document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));e.target.classList.add('active');if(tabId==='checklist-tab')renderChecklist();}
+function calculateScore(lead){let score=50;if(lead.industry)score+=10;if(parseInt(lead.sales_stage)>=4)score+=30;if(parseInt(lead.sales_stage)>=5)score+=20;return Math.min(100,score);}
+function getLeadStatus(score){if(score>=85)return{type:'hot',emoji:'🔴'};if(score>=60)return{type:'warm',emoji:'🟡'};return{type:'cold',emoji:'🔵'};}
+function renderTeam(){const teamGrid=document.getElementById('teamGrid');let html='';TEAM_MEMBERS.forEach(member=>{html+=`<div class="team-card"><div class="team-name">👤 ${member.name}</div><div class="team-role">کارشناس فروش</div><div style="font-size:12px;color:var(--txt2)"><strong>وضعیت:</strong> فعال ✅</div></div>`;});teamGrid.innerHTML=html;}
+function renderChecklist(){const user=currentUser;const saved=localStorage.getItem('checklist_'+user);const checklist=saved?JSON.parse(saved):new Array(10).fill(false);let html='';CHECKLIST_ITEMS.forEach((item,i)=>{html+=`<div style="display:flex;align-items:center;padding:12px;background:${checklist[i]?'rgba(22,163,74,.12)':'rgba(15,23,42,.4)'};border-radius:10px;margin-bottom:8px;border:1px solid ${checklist[i]?'rgba(22,163,74,.35)':'var(--bd)'}"><input type="checkbox" id="ck_${i}" ${checklist[i]?'checked':''} onchange="updateChecklist(${i})"><label for="ck_${i}" style="flex:1;margin-right:10px;cursor:pointer;color:${checklist[i]?'#4ade80':'var(--txt)'};text-decoration:${checklist[i]?'line-through':'none'}">${item}</label></div>`;});document.getElementById('checklist-items').innerHTML=html;updateChecklistProgress();}
+function updateChecklist(index){const user=currentUser;const saved=localStorage.getItem('checklist_'+user);const checklist=saved?JSON.parse(saved):new Array(10).fill(false);checklist[index]=!checklist[index];localStorage.setItem('checklist_'+user,JSON.stringify(checklist));renderChecklist();}
+function updateChecklistProgress(){const user=currentUser;const saved=localStorage.getItem('checklist_'+user);const checklist=saved?JSON.parse(saved):new Array(10).fill(false);const done=checklist.filter(Boolean).length;const percent=(done/10)*100;document.getElementById('checklist-progress').textContent=done;document.getElementById('checklist-bar').style.width=percent+'%';}
+function saveChecklist(){showNotification('✅ چک‌لیست ذخیره شد');}
+function openLeadModal(){document.getElementById('leadModal').classList.add('active');}
+function closeLeadModal(){document.getElementById('leadModal').classList.remove('active');document.getElementById('leadForm').reset();}
+function downloadExcelTemplate(){const headers=['نوع لید','مبدأ لید','نام شرکت','صنعت','دلیل انتخاب شرکت','شماره تماس','نام فرد تماس','سمت فرد تماس','مرحله فروش','تناسب با آن باکس','مانع اصلی','اقدام بعدی','کارشناس فروش','وضعیت لید','یادداشت‌ها'];const ws=XLSX.utils.aoa_to_sheet([headers]);const wb=XLSX.utils.book_new();XLSX.utils.book_append_sheet(wb,ws,'لیدها');XLSX.writeFile(wb,'نمونه_لیدها.xlsx');showNotification('✅ فایل نمونه دانلود شد');}
+function saveLead(e){e.preventDefault();const formData=new FormData(document.getElementById('leadForm'));const lead=Object.fromEntries(formData);lead.id=Date.now();lead.created_by=currentUser;lead.created_at=new Date().toLocaleString('fa-IR');lead.score=calculateScore(lead);lead.status=getLeadStatus(lead.score);leads.push(lead);localStorage.setItem('leads_'+currentUser,JSON.stringify(leads));showNotification('✅ لید با موفقیت ذخیره شد');closeLeadModal();loadLeads();updateDashboard();}
+function loadLeads(){const saved=localStorage.getItem('leads_'+currentUser);leads=saved?JSON.parse(saved):[];filteredLeads=leads;renderLeads();}
+function filterLeads(){const query=document.getElementById('searchInput').value.toLowerCase();filteredLeads=leads.filter(lead=>lead.company_name.toLowerCase().includes(query)||lead.contact_name.toLowerCase().includes(query)||lead.phone.includes(query));renderLeads();}
+function renderLeads(){const container=document.getElementById('leadsContainer');if(filteredLeads.length===0){container.innerHTML='<div style="text-align:center;padding:40px;color:var(--txt2)">لیدی موجود نیست</div>';return;}let html=`<table class="lead-table"><thead><tr><th>نام شرکت</th><th>صنعت</th><th>تماس گیر</th><th>مرحله</th><th>مانع اصلی</th><th>اقدام بعدی</th><th>وضعیت</th><th>اقدام</th></tr></thead><tbody>`;filteredLeads.forEach(lead=>{const stage=SALES_STAGES.find(s=>s.id==lead.sales_stage);html+=`<tr><td><strong>${lead.company_name}</strong></td><td>${lead.industry}</td><td>${lead.contact_name}</td><td><select class="inline-select" onchange="updateField(${lead.id},'sales_stage',this.value)">${SALES_STAGES.map(s=>`<option value="${s.id}" ${s.id==lead.sales_stage?'selected':''}>${s.id}. ${s.name}</option>`).join('')}</select></td><td><select class="inline-select" onchange="updateField(${lead.id},'main_obstacle',this.value)"><option value="">-- انتخاب --</option>${OBSTACLES.map(obs=>`<option value="${obs}" ${lead.main_obstacle===obs?'selected':''}>${obs}</option>`).join('')}</select></td><td><select class="inline-select" onchange="updateField(${lead.id},'next_action',this.value)"><option value="">-- انتخاب --</option>${NEXT_ACTIONS.map(action=>`<option value="${action}" ${lead.next_action===action?'selected':''}>${action}</option>`).join('')}</select></td><td><select class="inline-select" onchange="updateField(${lead.id},'lead_status',this.value)">${LEAD_STATUSES.map(status=>`<option value="${status}" ${lead.lead_status===status?'selected':''}>${status}</option>`).join('')}</select></td><td><button class="btn danger" style="padding:4px 8px;font-size:10px" onclick="deleteLead(${lead.id})">حذف</button></td></tr>`;});html+='</tbody></table>';container.innerHTML=html;}
+function updateField(leadId,fieldName,value){const lead=leads.find(l=>l.id===leadId);if(lead){lead[fieldName]=value;lead.score=calculateScore(lead);lead.status=getLeadStatus(lead.score);localStorage.setItem('leads_'+currentUser,JSON.stringify(leads));showNotification('✅ به‌روزرسانی شد');loadLeads();updateDashboard();}}
+function deleteLead(id){if(confirm('آیا مطمئن هستید؟')){leads=leads.filter(l=>l.id!==id);localStorage.setItem('leads_'+currentUser,JSON.stringify(leads));showNotification('✅ لید حذف شد');loadLeads();updateDashboard();}}
+function handleExcelUpload(event){const file=event.target.files[0];if(!file)return;const reader=new FileReader();reader.onload=(e)=>{try{const data=new Uint8Array(e.target.result);const workbook=XLSX.read(data,{type:'array'});const worksheet=workbook.Sheets[workbook.SheetNames[0]];const json=XLSX.utils.sheet_to_json(worksheet);let imported=0;json.forEach(row=>{if(row['نام شرکت']&&row['شماره تماس']){const lead={id:Date.now()+Math.random(),lead_type:row['نوع لید']||'سرد',lead_source:row['مبدأ لید']||'',company_name:row['نام شرکت'],industry:row['صنعت']||'',selection_reason:row['دلیل انتخاب شرکت']||'',phone:row['شماره تماس'],contact_name:row['نام فرد تماس']||'',contact_position:row['سمت فرد تماس']||'',sales_stage:row['مرحله فروش']||'1',anbox_fit:row['تناسب با آن باکس']||'',main_obstacle:row['مانع اصلی']||'',next_action:row['اقدام بعدی']||'',sales_expert:row['کارشناس فروش']||'',lead_status:row['وضعیت لید']||'در حال پیگیری',notes:row['یادداشت‌ها']||'',created_by:currentUser,created_at:new Date().toLocaleString('fa-IR')};lead.score=calculateScore(lead);lead.status=getLeadStatus(lead.score);leads.push(lead);imported++;}});localStorage.setItem('leads_'+currentUser,JSON.stringify(leads));showNotification(`✅ ${imported} لید آپلود شد`);loadLeads();updateDashboard();document.getElementById('excelInput').value='';}catch(err){showNotification('❌ خطا در پردازش فایل','error');}};reader.readAsArrayBuffer(file);}
+function updateDashboard(){document.getElementById('stat-total').textContent=leads.length;document.getElementById('stat-hot').textContent=leads.filter(l=>l.status?.type==='hot').length;document.getElementById('stat-warm').textContent=leads.filter(l=>l.status?.type==='warm').length;document.getElementById('stat-qualified').textContent=leads.filter(l=>parseInt(l.sales_stage)>=5).length;renderPipeline();}
+function renderPipeline(){const grid=document.getElementById('pipelineGrid');let html='';const total=leads.length||1;SALES_STAGES.forEach(stage=>{const count=leads.filter(l=>parseInt(l.sales_stage)===stage.id).length;const percent=Math.round((count/total)*100);html+=`<div class="pipeline-box"><div class="pipeline-stage">${stage.name}</div><div class="pipeline-count">${count}</div><div class="progress-bar"><div class="progress-fill" style="width:${percent}%"></div></div><div class="pipeline-percent">${percent}%</div></div>`;});grid.innerHTML=html;}
+function renderPipelineDetails(){const details=document.getElementById('pipelineDetails');let html='';SALES_STAGES.forEach(stage=>{const stageLeads=leads.filter(l=>parseInt(l.sales_stage)===stage.id);html+=`<div style="padding:15px;background:rgba(15,23,42,.4);border-radius:10px;border-right:4px solid #2563EB;border:1px solid var(--bd)"><h3 style="margin-bottom:10px;color:#fff">Stage ${stage.id}: ${stage.name}</h3><div style="font-size:12px;color:var(--txt2)"><strong>تعداد:</strong> ${stageLeads.length} لید<br><strong>شرکت‌ها:</strong> ${stageLeads.map(l=>l.company_name).join(', ')||'هیچ‌کدام'}</div></div>`;});details.innerHTML=html;}
+function showNotification(msg,type='success'){const el=document.getElementById('notification');el.textContent=msg;el.className='notification '+(type==='error'?'error':'')+' show';setTimeout(()=>el.classList.remove('show'),3000);}
+</script>
 </body>
 </html>
