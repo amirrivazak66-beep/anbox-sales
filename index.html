@@ -205,6 +205,7 @@ h2{color:#fff!important}
 <div class="tabs">
 <div class="tab active" onclick="switchTab(event,'team-members-tab')">👥 اعضای تیم</div>
 <div class="tab" onclick="switchTab(event,'checklist-tab')">✅ چک‌لیست</div>
+<div class="tab" onclick="switchTab(event,'kpi-tab')">📊 KPI</div>
 </div>
 <div id="team-members-tab" class="tab-content active">
 <div class="card">
@@ -221,6 +222,39 @@ h2{color:#fff!important}
 </div>
 <div id="checklist-items"></div>
 <button class="btn" style="margin-top:15px" onclick="saveChecklist()">💾 ذخیره</button>
+</div>
+</div>
+<div id="kpi-tab" class="tab-content">
+<div class="card">
+<div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;margin-bottom:6px">
+<div>
+<div style="font-size:18px;font-weight:800;color:#fff">سلام، <span id="kpiUserName">کاربر</span> 👋</div>
+<div style="font-size:12px;color:var(--txt2);margin-top:4px" id="kpiDate"></div>
+</div>
+<div style="text-align:center">
+<div style="font-size:22px;font-weight:800;color:#60a5fa" id="kpiOverall">0/10</div>
+<div style="font-size:11px;color:var(--txt2)">چک‌لیست</div>
+</div>
+</div>
+<div style="font-size:12px;color:#4ade80;background:rgba(22,163,74,.12);border:1px solid rgba(22,163,74,.3);padding:8px 12px;border-radius:9px;margin-top:10px">🟢 داده‌ها به‌صورت محلی ذخیره می‌شود</div>
+</div>
+<div class="card">
+<div class="card-title">📝 ورود اطلاعات روزانه</div>
+<div style="font-size:12px;color:var(--txt2);margin-bottom:16px">اعداد هر بخش را وارد کنید — خودکار ذخیره می‌شود</div>
+<div id="kpiInputs" style="display:grid;gap:14px"></div>
+<div style="display:flex;align-items:center;padding:12px;background:rgba(15,23,42,.4);border-radius:10px;margin-top:14px;border:1px solid var(--bd)">
+<input type="checkbox" id="kpiCrm" onchange="saveKpi()">
+<label for="kpiCrm" style="flex:1;margin-right:10px;cursor:pointer;color:var(--txt)">ثبت اطلاعات در CRM انجام شد</label>
+</div>
+<div style="margin-top:14px">
+<label class="form-label">📝 یادداشت / موارد باز برای فردا</label>
+<textarea id="kpiNotes" class="form-input" style="min-height:80px;resize:vertical" oninput="saveKpi()"></textarea>
+</div>
+<button class="btn success" style="margin-top:16px;width:100%" onclick="saveKpiFinal()">💾 ذخیره نهایی گزارش</button>
+</div>
+<div class="card">
+<div class="card-title">🎯 خلاصه عملکرد امروز</div>
+<div id="kpiSummary" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:12px"></div>
 </div>
 </div>
 </div>
@@ -242,11 +276,34 @@ h2{color:#fff!important}
 </div>
 <div class="page" id="settings">
 <h2 style="margin-bottom:20px">تنظیمات</h2>
+<div class="tabs" id="settingsTabs">
+<div class="tab active" onclick="switchTab(event,'settings-user-tab')">👤 اطلاعات کاربری</div>
+<div class="tab" id="adminTabBtn" style="display:none" onclick="switchTab(event,'settings-admin-tab')">🛠 مدیریت کارشناسان و KPI</div>
+</div>
+<div id="settings-user-tab" class="tab-content active">
 <div class="card">
 <div class="card-title">اطلاعات کاربری</div>
 <div style="margin-bottom:15px">
 <label class="form-label">نام کاربری</label>
 <input type="text" id="settingsUsername" class="form-input" disabled>
+</div>
+</div>
+</div>
+<div id="settings-admin-tab" class="tab-content">
+<div class="card">
+<div class="card-title">👥 مدیریت کارشناسان</div>
+<div style="font-size:13px;font-weight:700;color:#fff;margin-bottom:10px">افزودن کارشناس (<span id="expertCount">0</span>/10)</div>
+<div style="display:flex;gap:10px;flex-wrap:wrap">
+<input type="text" id="newExpertName" class="form-input" placeholder="نام و نام خانوادگی" style="flex:1;min-width:180px">
+<button class="btn" onclick="addExpert()">➕ افزودن</button>
+</div>
+<div id="expertList" style="margin-top:16px;display:grid;gap:10px"></div>
+</div>
+<div class="card">
+<div class="card-title">🎯 تنظیم KPI</div>
+<div style="font-size:12px;color:var(--txt2);margin-bottom:14px">هدف روزانه هر شاخص را تنظیم کنید</div>
+<div id="kpiTargetList" style="display:grid;gap:10px"></div>
+<button class="btn success" style="margin-top:14px;width:100%" onclick="addKpiTarget()">➕ افزودن KPI جدید</button>
 </div>
 </div>
 </div>
@@ -273,7 +330,7 @@ h2{color:#fff!important}
 <div class="form-group"><label class="form-label">تناسب با آن باکس</label><select name="anbox_fit" class="form-input"><option value="">انتخاب کنید</option><option>ارسال مرسوله روزانه</option><option>تناسب با SLA</option><option>تناسب با نرخ</option><option>ارسال ترکیبی</option><option>ارسال مرسولات کم حجم</option></select></div>
 <div class="form-group"><label class="form-label">مانع اصلی</label><select name="main_obstacle" class="form-input"><option value="">انتخاب کنید</option><option>عدم توافق نرخ</option><option>عدم توافق SLA</option><option>عدم توافق قراردادی</option><option>شکایت مشتری از خدمات</option><option>مانع ندارد</option></select></div>
 <div class="form-group"><label class="form-label">اقدام بعدی</label><select name="next_action" class="form-input"><option value="">انتخاب کنید</option><option>ارسال پروپوزال</option><option>برقراری جلسه مذاکره</option><option>جلسه متقاعد سازی</option><option>ارسال درفت قرارداد</option><option>عقد قرارداد</option><option>عدم توافق</option></select></div>
-<div class="form-group"><label class="form-label">کارشناس فروش</label><select name="sales_expert" class="form-input"><option value="">انتخاب کنید</option><option>امیرحسین ریواز</option><option>مجتبی رنجبر</option><option>ندا شریفی</option><option>سمن خوشکلام</option><option>پرستو احمدی</option></select></div>
+<div class="form-group"><label class="form-label">کارشناس فروش</label><select name="sales_expert" id="expertSelect" class="form-input"><option value="">انتخاب کنید</option></select></div>
 <div class="form-group"><label class="form-label">وضعیت لید</label><select name="lead_status" class="form-input"><option>در حال پیگیری</option><option>عدم توافق</option><option>انحلال شرکت</option><option>در حال عقد قرارداد</option><option>در حال مذاکره</option><option>در حال تست</option></select></div>
 <div class="form-group form-grid full"><label class="form-label">یادداشت‌ها</label><textarea name="notes" class="form-input" style="min-height:70px;resize:vertical"></textarea></div>
 </div>
@@ -292,24 +349,29 @@ const OBSTACLES=['عدم توافق نرخ','عدم توافق SLA','عدم تو
 const NEXT_ACTIONS=['ارسال پروپوزال','برقراری جلسه مذاکره','جلسه متقاعد سازی','ارسال درفت قرارداد','عقد قرارداد','عدم توافق'];
 const LEAD_STATUSES=['در حال پیگیری','عدم توافق','انحلال شرکت','در حال عقد قرارداد','در حال مذاکره','در حال تست'];
 const SALES_EXPERTS=['امیرحسین ریواز','مجتبی رنجبر','ندا شریفی','سمن خوشکلام','پرستو احمدی'];
-const TEAM_MEMBERS=[{name:'مجتبی رنجبر'},{name:'ندا شریفی'},{name:'سمن خوشکلام'},{name:'پرستو احمدی'}];
+const DEFAULT_TEAM=[{name:'مجتبی رنجبر'},{name:'ندا شریفی'},{name:'سمن خوشکلام'},{name:'پرستو احمدی'}];
+const DEFAULT_KPI=[{key:'calls',icon:'📞',name:'تماس با لید',target:8},{key:'followups',icon:'🔄',name:'فالوآپ',target:5},{key:'received',icon:'📋',name:'اطلاعات دریافتی',target:5},{key:'panels',icon:'🖥️',name:'پنل ساخته‌شده',target:3},{key:'training',icon:'🎓',name:'آموزش',target:3},{key:'barcodes',icon:'📦',name:'بارکد',target:10}];
+function getTeam(){try{const s=localStorage.getItem('shared_team');return s?JSON.parse(s):DEFAULT_TEAM.slice();}catch(e){return DEFAULT_TEAM.slice();}}
+function setTeam(arr){localStorage.setItem('shared_team',JSON.stringify(arr));}
+function getKpiTargets(){try{const s=localStorage.getItem('shared_kpi_targets');return s?JSON.parse(s):DEFAULT_KPI.slice();}catch(e){return DEFAULT_KPI.slice();}}
+function setKpiTargets(arr){localStorage.setItem('shared_kpi_targets',JSON.stringify(arr));}
 const CHECKLIST_ITEMS=['لیست لیدهای امروز دریافت شد','گزارش دیروز بررسی شد','اهداف روز با مدیر هماهنگ شد','تماس با تمام لیدهای امروز انجام شد','فالوآپ مشتریان دیروز انجام شد','اطلاعات مشتریان تأییدشده دریافت شد','پنل‌های جدید ساخته و تحویل داده شد','آموزش شارژ و ارسال به مشتریان انجام شد','بارکد سفارشات امروز صادر شد','گزارش پایان روز در CRM ثبت شد'];
 let currentUser=null,leads=[],filteredLeads=[];
 window.addEventListener('DOMContentLoaded',()=>{const savedUser=localStorage.getItem('currentUser');if(savedUser){currentUser=savedUser;showDashboard();loadLeads();renderTeam();renderChecklist();updateDashboard();}});
 function toggleSidebar(){document.getElementById('sidebar').classList.toggle('open');document.getElementById('overlay').classList.toggle('show');}
 function handleLogin(){const username=document.getElementById('username').value.trim();const password=document.getElementById('password').value;const errorEl=document.getElementById('loginError');if(!username||!password){errorEl.textContent='❌ نام کاربری و رمز عبور را وارد کنید';errorEl.style.display='block';return;}const user=USERS[username];if(!user||user.password!==password){errorEl.textContent='❌ نام کاربری یا رمز عبور نادرست است';errorEl.style.display='block';return;}currentUser=username;localStorage.setItem('currentUser',username);showDashboard();loadLeads();renderTeam();renderChecklist();updateDashboard();}
-function showDashboard(){const user=USERS[currentUser];document.getElementById('loginPage').style.display='none';document.getElementById('dashboardPage').style.display='flex';document.getElementById('sidebarUsername').textContent=user.name;document.getElementById('headerUsername').textContent=user.name;document.getElementById('settingsUsername').value=currentUser;showNotification('✅ خوش آمدید '+user.name);}
+function showDashboard(){const user=USERS[currentUser];document.getElementById('loginPage').style.display='none';document.getElementById('dashboardPage').style.display='flex';document.getElementById('sidebarUsername').textContent=user.name;document.getElementById('headerUsername').textContent=user.name;document.getElementById('settingsUsername').value=currentUser;document.getElementById('adminTabBtn').style.display=(currentUser==='admin')?'block':'none';showNotification('✅ خوش آمدید '+user.name);}
 function handleLogout(){localStorage.removeItem('currentUser');currentUser=null;document.getElementById('loginPage').style.display='flex';document.getElementById('dashboardPage').style.display='none';document.getElementById('username').value='';document.getElementById('password').value='';showNotification('👋 شما خارج شدید');}
 function switchPage(e,page){e.preventDefault();document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));document.getElementById(page).classList.add('active');document.querySelectorAll('.nav-item').forEach(item=>item.classList.remove('active'));e.target.classList.add('active');if(page==='leads')loadLeads();if(page==='team'){renderTeam();renderChecklist();}if(page==='pipeline')renderPipelineDetails();if(window.innerWidth<=768){document.getElementById('sidebar').classList.remove('open');document.getElementById('overlay').classList.remove('show');}}
-function switchTab(e,tabId){e.preventDefault();document.querySelectorAll('.tab-content').forEach(t=>t.classList.remove('active'));document.getElementById(tabId).classList.add('active');document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));e.target.classList.add('active');if(tabId==='checklist-tab')renderChecklist();}
+function switchTab(e,tabId){e.preventDefault();document.querySelectorAll('.tab-content').forEach(t=>t.classList.remove('active'));document.getElementById(tabId).classList.add('active');document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));e.target.classList.add('active');if(tabId==='checklist-tab')renderChecklist();if(tabId==='kpi-tab')renderKpi();if(tabId==='settings-admin-tab')renderAdmin();}
 function calculateScore(lead){let score=50;if(lead.industry)score+=10;if(parseInt(lead.sales_stage)>=4)score+=30;if(parseInt(lead.sales_stage)>=5)score+=20;return Math.min(100,score);}
 function getLeadStatus(score){if(score>=85)return{type:'hot',emoji:'🔴'};if(score>=60)return{type:'warm',emoji:'🟡'};return{type:'cold',emoji:'🔵'};}
-function renderTeam(){const teamGrid=document.getElementById('teamGrid');let html='';TEAM_MEMBERS.forEach(member=>{html+=`<div class="team-card"><div class="team-name">👤 ${member.name}</div><div class="team-role">کارشناس فروش</div><div style="font-size:12px;color:var(--txt2)"><strong>وضعیت:</strong> فعال ✅</div></div>`;});teamGrid.innerHTML=html;}
+function renderTeam(){const teamGrid=document.getElementById('teamGrid');let html='';getTeam().forEach(member=>{html+=`<div class="team-card"><div class="team-name">👤 ${member.name}</div><div class="team-role">کارشناس فروش</div><div style="font-size:12px;color:var(--txt2)"><strong>وضعیت:</strong> فعال ✅</div></div>`;});teamGrid.innerHTML=html;}
 function renderChecklist(){const user=currentUser;const saved=localStorage.getItem('checklist_'+user);const checklist=saved?JSON.parse(saved):new Array(10).fill(false);let html='';CHECKLIST_ITEMS.forEach((item,i)=>{html+=`<div style="display:flex;align-items:center;padding:12px;background:${checklist[i]?'rgba(22,163,74,.12)':'rgba(15,23,42,.4)'};border-radius:10px;margin-bottom:8px;border:1px solid ${checklist[i]?'rgba(22,163,74,.35)':'var(--bd)'}"><input type="checkbox" id="ck_${i}" ${checklist[i]?'checked':''} onchange="updateChecklist(${i})"><label for="ck_${i}" style="flex:1;margin-right:10px;cursor:pointer;color:${checklist[i]?'#4ade80':'var(--txt)'};text-decoration:${checklist[i]?'line-through':'none'}">${item}</label></div>`;});document.getElementById('checklist-items').innerHTML=html;updateChecklistProgress();}
 function updateChecklist(index){const user=currentUser;const saved=localStorage.getItem('checklist_'+user);const checklist=saved?JSON.parse(saved):new Array(10).fill(false);checklist[index]=!checklist[index];localStorage.setItem('checklist_'+user,JSON.stringify(checklist));renderChecklist();}
 function updateChecklistProgress(){const user=currentUser;const saved=localStorage.getItem('checklist_'+user);const checklist=saved?JSON.parse(saved):new Array(10).fill(false);const done=checklist.filter(Boolean).length;const percent=(done/10)*100;document.getElementById('checklist-progress').textContent=done;document.getElementById('checklist-bar').style.width=percent+'%';}
 function saveChecklist(){showNotification('✅ چک‌لیست ذخیره شد');}
-function openLeadModal(){document.getElementById('leadModal').classList.add('active');}
+function openLeadModal(){const sel=document.getElementById('expertSelect');if(sel){let o='<option value="">انتخاب کنید</option>';getTeam().forEach(m=>{o+=`<option>${m.name}</option>`;});sel.innerHTML=o;}document.getElementById('leadModal').classList.add('active');}
 function closeLeadModal(){document.getElementById('leadModal').classList.remove('active');document.getElementById('leadForm').reset();}
 function downloadExcelTemplate(){const headers=['نوع لید','مبدأ لید','نام شرکت','صنعت','دلیل انتخاب شرکت','شماره تماس','نام فرد تماس','سمت فرد تماس','مرحله فروش','تناسب با آن باکس','مانع اصلی','اقدام بعدی','کارشناس فروش','وضعیت لید','یادداشت‌ها'];const ws=XLSX.utils.aoa_to_sheet([headers]);const wb=XLSX.utils.book_new();XLSX.utils.book_append_sheet(wb,ws,'لیدها');XLSX.writeFile(wb,'نمونه_لیدها.xlsx');showNotification('✅ فایل نمونه دانلود شد');}
 function saveLead(e){e.preventDefault();const formData=new FormData(document.getElementById('leadForm'));const lead=Object.fromEntries(formData);lead.id=Date.now();lead.created_by=currentUser;lead.created_at=new Date().toLocaleString('fa-IR');lead.score=calculateScore(lead);lead.status=getLeadStatus(lead.score);leads.push(lead);localStorage.setItem('leads_'+currentUser,JSON.stringify(leads));showNotification('✅ لید با موفقیت ذخیره شد');closeLeadModal();loadLeads();updateDashboard();}
@@ -322,6 +384,21 @@ function handleExcelUpload(event){const file=event.target.files[0];if(!file)retu
 function updateDashboard(){document.getElementById('stat-total').textContent=leads.length;document.getElementById('stat-hot').textContent=leads.filter(l=>l.status?.type==='hot').length;document.getElementById('stat-warm').textContent=leads.filter(l=>l.status?.type==='warm').length;document.getElementById('stat-qualified').textContent=leads.filter(l=>parseInt(l.sales_stage)>=5).length;renderPipeline();}
 function renderPipeline(){const grid=document.getElementById('pipelineGrid');let html='';const total=leads.length||1;SALES_STAGES.forEach(stage=>{const count=leads.filter(l=>parseInt(l.sales_stage)===stage.id).length;const percent=Math.round((count/total)*100);html+=`<div class="pipeline-box"><div class="pipeline-stage">${stage.name}</div><div class="pipeline-count">${count}</div><div class="progress-bar"><div class="progress-fill" style="width:${percent}%"></div></div><div class="pipeline-percent">${percent}%</div></div>`;});grid.innerHTML=html;}
 function renderPipelineDetails(){const details=document.getElementById('pipelineDetails');let html='';SALES_STAGES.forEach(stage=>{const stageLeads=leads.filter(l=>parseInt(l.sales_stage)===stage.id);html+=`<div style="padding:15px;background:rgba(15,23,42,.4);border-radius:10px;border-right:4px solid #2563EB;border:1px solid var(--bd)"><h3 style="margin-bottom:10px;color:#fff">Stage ${stage.id}: ${stage.name}</h3><div style="font-size:12px;color:var(--txt2)"><strong>تعداد:</strong> ${stageLeads.length} لید<br><strong>شرکت‌ها:</strong> ${stageLeads.map(l=>l.company_name).join(', ')||'هیچ‌کدام'}</div></div>`;});details.innerHTML=html;}
+function kpiKey(){return 'kpi_'+currentUser+'_'+new Date().toLocaleDateString('fa-IR');}
+function getKpi(){const saved=localStorage.getItem(kpiKey());return saved?JSON.parse(saved):{values:{},crm:false,notes:''};}
+function saveKpi(){const data=getKpi();getKpiTargets().forEach(f=>{const el=document.getElementById('kpi_'+f.key);if(el)data.values[f.key]=parseInt(el.value)||0;});const crm=document.getElementById('kpiCrm');if(crm)data.crm=crm.checked;const notes=document.getElementById('kpiNotes');if(notes)data.notes=notes.value;localStorage.setItem(kpiKey(),JSON.stringify(data));renderKpiSummary();}
+function saveKpiFinal(){saveKpi();showNotification('✅ گزارش نهایی ذخیره شد');}
+function renderKpi(){document.getElementById('kpiUserName').textContent=USERS[currentUser].name;document.getElementById('kpiDate').textContent=new Date().toLocaleDateString('fa-IR',{weekday:'long',year:'numeric',month:'long',day:'numeric'});const saved=localStorage.getItem('checklist_'+currentUser);const cl=saved?JSON.parse(saved):new Array(10).fill(false);document.getElementById('kpiOverall').textContent=cl.filter(Boolean).length+'/10';const data=getKpi();let html='';getKpiTargets().forEach(f=>{const v=data.values[f.key]||0;const pct=f.target>0?Math.round((v/f.target)*100):0;html+=`<div style="background:rgba(15,23,42,.4);border:1px solid var(--bd);border-radius:11px;padding:14px"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px"><span style="color:var(--txt);font-size:13px;font-weight:600">${f.icon} ${f.name} (هدف: ${f.target})</span><span style="color:#60a5fa;font-size:12px;font-weight:700">${pct}٪</span></div><div style="display:flex;align-items:center;gap:10px"><input type="number" min="0" id="kpi_${f.key}" value="${v}" onchange="saveKpi()" class="form-input" style="width:90px"><span style="color:var(--txt2);font-size:13px">/ ${f.target}</span></div><div class="progress-bar"><div class="progress-fill" style="width:${Math.min(pct,100)}%"></div></div></div>`;});document.getElementById('kpiInputs').innerHTML=html;document.getElementById('kpiCrm').checked=data.crm;document.getElementById('kpiNotes').value=data.notes;renderKpiSummary();}
+function renderKpiSummary(){const data=getKpi();let html='';getKpiTargets().forEach(f=>{const v=data.values[f.key]||0;html+=`<div style="background:linear-gradient(135deg,rgba(37,99,235,.14),rgba(15,23,42,.4));border:1px solid var(--bd);border-radius:11px;padding:14px;text-align:center"><div style="font-size:22px">${f.icon}</div><div style="font-size:24px;font-weight:800;color:#60a5fa;margin:4px 0">${v}</div><div style="font-size:11px;color:var(--txt2)">${f.name}</div></div>`;});document.getElementById('kpiSummary').innerHTML=html;}
+function renderAdmin(){renderExpertAdmin();renderKpiAdmin();}
+function renderExpertAdmin(){const team=getTeam();document.getElementById('expertCount').textContent=team.length;let html='';team.forEach((m,i)=>{html+=`<div style="display:flex;align-items:center;gap:10px;background:rgba(15,23,42,.4);border:1px solid var(--bd);border-radius:11px;padding:12px"><span style="flex:1;color:#fff;font-weight:600">👤 ${m.name}</span><button class="btn secondary" style="padding:6px 12px;font-size:11px" onclick="editExpert(${i})">ویرایش</button><button class="btn danger" style="padding:6px 12px;font-size:11px" onclick="deleteExpert(${i})">حذف</button></div>`;});document.getElementById('expertList').innerHTML=html;}
+function addExpert(){const inp=document.getElementById('newExpertName');const name=inp.value.trim();if(!name){showNotification('❌ نام را وارد کنید','error');return;}const team=getTeam();if(team.length>=10){showNotification('❌ حداکثر ۱۰ کارشناس','error');return;}team.push({name:name});setTeam(team);inp.value='';renderExpertAdmin();showNotification('✅ کارشناس افزوده شد');}
+function editExpert(i){const team=getTeam();const nn=prompt('نام جدید:',team[i].name);if(nn&&nn.trim()){team[i].name=nn.trim();setTeam(team);renderExpertAdmin();showNotification('✅ ویرایش شد');}}
+function deleteExpert(i){if(confirm('حذف کارشناس؟')){const team=getTeam();team.splice(i,1);setTeam(team);renderExpertAdmin();showNotification('✅ حذف شد');}}
+function renderKpiAdmin(){const list=getKpiTargets();let html='';list.forEach((f,i)=>{html+=`<div style="display:flex;align-items:center;gap:8px;background:rgba(15,23,42,.4);border:1px solid var(--bd);border-radius:11px;padding:12px"><input type="text" value="${f.name}" onchange="updateKpiTarget(${i},'name',this.value)" class="form-input" style="flex:1;min-width:90px" placeholder="عنوان"><input type="text" value="${f.icon}" onchange="updateKpiTarget(${i},'icon',this.value)" class="form-input" style="width:54px;text-align:center" placeholder="آیکون"><input type="number" min="0" value="${f.target}" onchange="updateKpiTarget(${i},'target',this.value)" class="form-input" style="width:70px;text-align:center" placeholder="هدف"><button class="btn danger" style="padding:6px 10px;font-size:11px" onclick="deleteKpiTarget(${i})">حذف</button></div>`;});document.getElementById('kpiTargetList').innerHTML=html;}
+function updateKpiTarget(i,field,val){const list=getKpiTargets();if(field==='target')list[i].target=parseInt(val)||0;else list[i][field]=val;setKpiTargets(list);}
+function addKpiTarget(){const list=getKpiTargets();list.push({key:'kpi'+Date.now(),icon:'⭐',name:'شاخص جدید',target:1});setKpiTargets(list);renderKpiAdmin();showNotification('✅ KPI افزوده شد');}
+function deleteKpiTarget(i){if(confirm('حذف این KPI؟')){const list=getKpiTargets();list.splice(i,1);setKpiTargets(list);renderKpiAdmin();showNotification('✅ حذف شد');}}
 function showNotification(msg,type='success'){const el=document.getElementById('notification');el.textContent=msg;el.className='notification '+(type==='error'?'error':'')+' show';setTimeout(()=>el.classList.remove('show'),3000);}
 </script>
 </body>
