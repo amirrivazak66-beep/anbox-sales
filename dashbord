@@ -1,4 +1,4 @@
-<!DOCTYPE html
+<!DOCTYPE html>
 <html dir="rtl" lang="fa">
 <head>
     <meta charset="UTF-8">
@@ -495,13 +495,15 @@
 
         window.addEventListener('DOMContentLoaded', () => {
             const savedUser = localStorage.getItem('currentUser');
-            if (savedUser) {
+            if (savedUser && USERS[savedUser]) {
                 currentUser = savedUser;
                 showDashboard();
                 loadLeads();
                 renderTeam();
                 renderChecklist();
                 updateDashboard();
+            } else if (savedUser) {
+                localStorage.removeItem('currentUser');
             }
         });
 
@@ -838,3 +840,4 @@
     </script>
 </body>
 </html>
+
