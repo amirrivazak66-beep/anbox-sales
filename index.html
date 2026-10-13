@@ -271,36 +271,24 @@ h2{color:#fff!important}
 </div>
 <div id="kpi-tab" class="tab-content">
 <div class="card">
-<div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;margin-bottom:6px">
+<div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;margin-bottom:12px">
 <div>
-<div style="font-size:18px;font-weight:800;color:#fff">سلام، <span id="kpiUserName">کاربر</span> 👋</div>
+<div style="font-size:18px;font-weight:800;color:#fff">📊 عملکرد شاخص‌ها — <span id="kpiUserName">کاربر</span></div>
 <div style="font-size:12px;color:var(--txt2);margin-top:4px" id="kpiDate"></div>
 </div>
 <div style="text-align:center">
-<div style="font-size:22px;font-weight:800;color:#60a5fa" id="kpiOverall">0/10</div>
-<div style="font-size:11px;color:var(--txt2)">چک‌لیست</div>
+<div style="font-size:12px;color:var(--txt2)">منبع اطلاعات</div>
+<div style="font-size:13px;font-weight:700;color:#4ade80">لیدهای ثبت‌شده در CRM</div>
 </div>
 </div>
-<div style="font-size:12px;color:#4ade80;background:rgba(22,163,74,.12);border:1px solid rgba(22,163,74,.3);padding:8px 12px;border-radius:9px;margin-top:10px">🟢 داده‌ها به‌صورت محلی ذخیره می‌شود</div>
+<div id="kpiManagerPicker" style="display:none;margin-bottom:14px">
+<label class="form-label">انتخاب کارشناس برای مشاهده عملکرد</label>
+<select id="kpiOwnerViewSelect" class="form-input" onchange="renderKpi()"><option value="">انتخاب کارشناس</option></select>
 </div>
-<div class="card">
-<div class="card-title">📝 ورود اطلاعات روزانه</div>
-<div style="font-size:12px;color:var(--txt2);margin-bottom:16px">اعداد هر بخش را وارد کنید — خودکار ذخیره می‌شود</div>
+<div style="font-size:12px;color:var(--txt2);line-height:1.9;background:rgba(37,99,235,.1);border:1px solid rgba(37,99,235,.3);padding:10px 12px;border-radius:9px;margin-bottom:14px">مقادیر و درصد تحقق به‌صورت خودکار از اطلاعات لیدها محاسبه می‌شوند؛ ورود دستی عدد KPI غیرفعال است. هدف روزانه و ماهیانه از تنظیمات مدیر خوانده می‌شود.</div>
+<div class="card-title">🎯 تحقق روزانه و ماهیانه</div>
 <div id="kpiInputs" style="display:grid;gap:14px"></div>
-<div style="display:flex;align-items:center;padding:12px;background:rgba(15,23,42,.4);border-radius:10px;margin-top:14px;border:1px solid var(--bd)">
-<input type="checkbox" id="kpiCrm" onchange="saveKpi()">
-<label for="kpiCrm" style="flex:1;margin-right:10px;cursor:pointer;color:var(--txt)">ثبت اطلاعات در CRM انجام شد</label>
-</div>
-<div style="margin-top:14px">
-<label class="form-label">📝 یادداشت / موارد باز برای فردا</label>
-<textarea id="kpiNotes" class="form-input" style="min-height:80px;resize:vertical" oninput="saveKpi()"></textarea>
-</div>
-<button class="btn success" style="margin-top:16px;width:100%" onclick="saveKpiFinal()">💾 ذخیره نهایی گزارش</button>
-</div>
-<div class="card">
-<div class="card-title">🎯 خلاصه عملکرد امروز</div>
-<div id="kpiSummary" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:12px"></div>
-</div>
+<div id="kpiSummary" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:12px;margin-top:14px"></div>
 </div>
 </div>
 <div class="page" id="pipeline">
@@ -509,12 +497,62 @@ function parseCsvRows(text){const lines=[];let row=[],field='',quoted=false;for(
 function updateDashboard(){document.getElementById('stat-total').textContent=leads.length;document.getElementById('stat-hot').textContent=leads.filter(l=>l.status?.type==='hot').length;document.getElementById('stat-warm').textContent=leads.filter(l=>l.status?.type==='warm').length;document.getElementById('stat-qualified').textContent=leads.filter(l=>parseInt(l.sales_stage)>=5).length;renderPipeline();}
 function renderPipeline(){const grid=document.getElementById('pipelineGrid');let html='';const total=leads.length||1;SALES_STAGES.forEach(stage=>{const count=leads.filter(l=>parseInt(l.sales_stage)===stage.id).length;const percent=Math.round((count/total)*100);html+=`<div class="pipeline-box"><div class="pipeline-stage">${stage.name}</div><div class="pipeline-count">${count}</div><div class="progress-bar"><div class="progress-fill" style="width:${percent}%"></div></div><div class="pipeline-percent">${percent}%</div></div>`;});grid.innerHTML=html;}
 function renderPipelineDetails(){const details=document.getElementById('pipelineDetails');let html='';SALES_STAGES.forEach(stage=>{const stageLeads=leads.filter(l=>parseInt(l.sales_stage)===stage.id);html+=`<div style="padding:15px;background:rgba(15,23,42,.4);border-radius:10px;border-right:4px solid #2563EB;border:1px solid var(--bd)"><h3 style="margin-bottom:10px;color:#fff">Stage ${stage.id}: ${stage.name}</h3><div style="font-size:12px;color:var(--txt2)"><strong>تعداد:</strong> ${stageLeads.length} لید<br><strong>شرکت‌ها:</strong> ${stageLeads.map(l=>escapeLeadHtml(l.company_name)).join(', ')||'هیچ‌کدام'}</div></div>`;});details.innerHTML=html;}
-function kpiKey(){return 'kpi_'+currentUser+'_'+new Date().toLocaleDateString('fa-IR');}
-function getKpi(){const saved=localStorage.getItem(kpiKey());return saved?JSON.parse(saved):{values:{},crm:false,notes:''};}
-function saveKpi(){const data=getKpi();activeKpiTargets.forEach(f=>{const el=document.getElementById('kpi_'+f.key);if(el)data.values[f.key]=parseInt(el.value)||0;});const crm=document.getElementById('kpiCrm');if(crm)data.crm=crm.checked;const notes=document.getElementById('kpiNotes');if(notes)data.notes=notes.value;localStorage.setItem(kpiKey(),JSON.stringify(data));renderKpiSummary();}
-function saveKpiFinal(){saveKpi();showNotification('✅ گزارش نهایی ذخیره شد');}
-async function renderKpi(){document.getElementById('kpiUserName').textContent=currentProfile?.display_name||currentUser;document.getElementById('kpiDate').textContent=new Date().toLocaleDateString('fa-IR',{weekday:'long',year:'numeric',month:'long',day:'numeric'});const saved=localStorage.getItem('checklist_'+currentUser);const cl=saved?JSON.parse(saved):new Array(10).fill(false);document.getElementById('kpiOverall').textContent=cl.filter(Boolean).length+'/10';activeKpiTargets=getKpiTargets();try{const {data,error}=await sb.from('crm_kpi_definitions').select('key,name,icon,target').eq('owner_auth_id',currentProfile.id).order('created_at');if(error)throw error;if(data?.length)activeKpiTargets=data;}catch(err){console.error('KPI definitions load failed',err);showNotification('دریافت KPI اختصاصی ناموفق بود؛ مقادیر پیش‌فرض نمایش داده می‌شوند','error');}const data=getKpi();let html='';activeKpiTargets.forEach(f=>{const v=data.values[f.key]||0;const pct=f.target>0?Math.round((v/f.target)*100):0;html+=`<div style="background:rgba(15,23,42,.4);border:1px solid var(--bd);border-radius:11px;padding:14px"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px"><span style="color:var(--txt);font-size:13px;font-weight:600">${escapeLeadHtml(f.icon)} ${escapeLeadHtml(f.name)} (هدف: ${Number(f.target)||0})</span><span style="color:#60a5fa;font-size:12px;font-weight:700">${pct}٪</span></div><div style="display:flex;align-items:center;gap:10px"><input type="number" min="0" id="kpi_${f.key}" value="${v}" onchange="saveKpi()" class="form-input" style="width:90px"><span style="color:var(--txt2);font-size:13px">/ ${f.target}</span></div><div class="progress-bar"><div class="progress-fill" style="width:${Math.min(pct,100)}%"></div></div></div>`;});document.getElementById('kpiInputs').innerHTML=html;document.getElementById('kpiCrm').checked=data.crm;document.getElementById('kpiNotes').value=data.notes;renderKpiSummary();}
-function renderKpiSummary(){const data=getKpi();let html='';activeKpiTargets.forEach(f=>{const v=data.values[f.key]||0;html+=`<div style="background:linear-gradient(135deg,rgba(37,99,235,.14),rgba(15,23,42,.4));border:1px solid var(--bd);border-radius:11px;padding:14px;text-align:center"><div style="font-size:22px">${f.icon}</div><div style="font-size:24px;font-weight:800;color:#60a5fa;margin:4px 0">${v}</div><div style="font-size:11px;color:var(--txt2)">${f.name}</div></div>`;});document.getElementById('kpiSummary').innerHTML=html;}
+function kpiDateInRange(value,start,end){if(!value)return false;const d=new Date(value);return !Number.isNaN(d.getTime())&&d>=start&&d<end;}
+function kpiText(lead){return [lead.company_name,lead.industry,lead.selection_reason,lead.anbox_fit,lead.main_obstacle,lead.next_action,lead.lead_status,lead.notes,lead.followup_note].filter(Boolean).join(' ').toLowerCase();}
+function kpiMetricForLead(kpi,lead,start,end){
+ const key=String(kpi.key||'').toLowerCase(),name=String(kpi.name||'').toLowerCase();
+ const created=kpiDateInRange(lead.created_at,start,end),updated=kpiDateInRange(lead.updated_at||lead.created_at,start,end);
+ const stage=Number(lead.sales_stage)||0,followDate=String(lead.followup_date||'');
+ const isFollowup=followDate>=start.toISOString().slice(0,10)&&followDate<end.toISOString().slice(0,10);
+ if(key==='received'||name.includes('دریافت')||name.includes('ثبت لید'))return created;
+ if(key==='calls'||name.includes('تماس'))return updated&&stage>=2;
+ if(key==='followups'||name.includes('فالوآپ')||name.includes('پیگیری'))return isFollowup||(updated&&!!String(lead.followup_note||'').trim());
+ if(key==='panels'||name.includes('پنل'))return updated&&/پنل|panel/.test(kpiText(lead));
+ if(key==='training'||name.includes('آموزش'))return updated&&/آموزش|training/.test(kpiText(lead));
+ if(key==='barcodes'||name.includes('بارکد'))return updated&&/بارکد|مرسوله|barcode/.test(kpiText(lead));
+ const words=name.split(/[\\s_-]+/).filter(w=>w.length>2&&!['شاخص','تعداد','میزان','عملکرد'].includes(w));
+ return updated&&words.length>0&&words.some(w=>kpiText(lead).includes(w));
+}
+function kpiPercent(actual,target){return Number(target)>0?Math.round(Number(actual)*100/Number(target)):0;}
+async function renderKpi(){
+ const title=document.getElementById('kpiUserName'),dateEl=document.getElementById('kpiDate'),picker=document.getElementById('kpiManagerPicker'),ownerSelect=document.getElementById('kpiOwnerViewSelect'),inputWrap=document.getElementById('kpiInputs'),summary=document.getElementById('kpiSummary');
+ if(!inputWrap||!summary||!currentProfile)return;
+ const now=new Date(),dayStart=new Date(now.getFullYear(),now.getMonth(),now.getDate()),dayEnd=new Date(now.getFullYear(),now.getMonth(),now.getDate()+1),monthStart=new Date(now.getFullYear(),now.getMonth(),1),monthEnd=new Date(now.getFullYear(),now.getMonth()+1,1);
+ dateEl.textContent=now.toLocaleDateString('fa-IR',{weekday:'long',year:'numeric',month:'long',day:'numeric'})+' | ماه جاری';
+ let ownerId=currentProfile.id,ownerName=currentProfile.display_name||currentUser;
+ if(currentProfile.role==='manager'){
+  picker.style.display='block';
+  const {data:users,error}=await sb.from('profiles').select('id,display_name,username').eq('role','sales').order('display_name');
+  if(error){inputWrap.innerHTML='<div style="color:#fca5a5">دریافت کارشناسان ناموفق بود.</div>';return;}
+  const previous=ownerSelect.value;ownerSelect.innerHTML='<option value="">انتخاب کارشناس</option>'+(users||[]).map(u=>'<option value="'+escapeLeadHtml(u.id)+'">'+escapeLeadHtml(u.display_name||u.username)+'</option>').join('');
+  if(previous&&(users||[]).some(u=>u.id===previous))ownerSelect.value=previous;
+  if(!ownerSelect.value){title.textContent='همه کارشناسان';inputWrap.innerHTML='<div style="color:var(--txt2)">برای مشاهده عملکرد، یک کارشناس را انتخاب کنید.</div>';summary.innerHTML='';return;}
+  ownerId=ownerSelect.value;const chosen=(users||[]).find(u=>u.id===ownerId);ownerName=chosen?.display_name||chosen?.username||'کارشناس';
+ }else{picker.style.display='none';}
+ title.textContent=ownerName;
+ let targets=[];
+ const {data:targetRows,error:targetError}=await sb.from('crm_kpi_definitions').select('key,name,icon,target,target_daily,target_monthly').eq('owner_auth_id',ownerId).order('created_at');
+ if(targetError){console.error('KPI target fetch failed',targetError);inputWrap.innerHTML='<div style="color:#fca5a5">دریافت اهداف KPI ناموفق بود.</div>';return;}
+ targets=targetRows||[];
+ if(!targets.length){inputWrap.innerHTML='<div style="color:var(--txt2)">برای این کارشناس هنوز شاخصی در تنظیمات مدیر تعریف نشده است.</div>';summary.innerHTML='';return;}
+ const {data:leadRows,error:leadError}=await sb.from('leads').select('*').order('updated_at',{ascending:false});
+ if(leadError){console.error('KPI lead data fetch failed',leadError);inputWrap.innerHTML='<div style="color:#fca5a5">خواندن داده‌های لید ناموفق بود؛ درصدها محاسبه نشدند.</div>';return;}
+ const expertProfile=(await sb.from('profiles').select('display_name,username').eq('id',ownerId).single()).data;
+ const expertName=String(expertProfile?.display_name||expertProfile?.username||ownerName).trim().toLowerCase();
+ const expertLeads=(leadRows||[]).filter(l=>String(l.sales_expert||'').trim().toLowerCase()===expertName||l.owner_auth_id===ownerId).map(leadFromDb);
+ const rows=targets.map(k=>{
+  const daily=expertLeads.filter(l=>kpiMetricForLead(k,l,dayStart,dayEnd)).length;
+  const monthly=expertLeads.filter(l=>kpiMetricForLead(k,l,monthStart,monthEnd)).length;
+  const dailyTarget=Math.max(0,Number(k.target_daily??k.target)||0),monthlyTarget=Math.max(0,Number(k.target_monthly??((Number(k.target)||0)*22))||0);
+  const dp=kpiPercent(daily,dailyTarget),mp=kpiPercent(monthly,monthlyTarget);
+  return {k,daily,monthly,dailyTarget,monthlyTarget,dp,mp};
+ });
+ inputWrap.innerHTML=rows.map(({k,daily,monthly,dailyTarget,monthlyTarget,dp,mp})=>'<div style="background:rgba(15,23,42,.4);border:1px solid var(--bd);border-radius:12px;padding:14px"><div style="font-size:14px;font-weight:700;margin-bottom:12px">'+escapeLeadHtml(k.icon||'🎯')+' '+escapeLeadHtml(k.name)+'</div><div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px"><div style="border:1px solid var(--bd);border-radius:10px;padding:12px"><div style="display:flex;justify-content:space-between;gap:8px;margin-bottom:8px"><span>امروز</span><strong>'+daily+' / '+dailyTarget+'</strong><strong style="color:'+(dp>=100?'#4ade80':'#60a5fa')+'">'+dp+'٪</strong></div><div class="progress-bar"><div class="progress-fill" style="width:'+Math.min(dp,100)+'%;background:'+(dp>=100?'#22c55e':'#2563eb')+'"></div></div></div><div style="border:1px solid var(--bd);border-radius:10px;padding:12px"><div style="display:flex;justify-content:space-between;gap:8px;margin-bottom:8px"><span>ماه جاری</span><strong>'+monthly+' / '+monthlyTarget+'</strong><strong style="color:'+(mp>=100?'#4ade80':'#60a5fa')+'">'+mp+'٪</strong></div><div class="progress-bar"><div class="progress-fill" style="width:'+Math.min(mp,100)+'%;background:'+(mp>=100?'#22c55e':'#2563eb')+'"></div></div></div></div></div>').join('');
+ summary.innerHTML='<div style="padding:12px;border:1px solid var(--bd);border-radius:10px"><div style="color:var(--txt2);font-size:12px">لیدهای تخصیص‌یافته</div><div style="font-size:24px;font-weight:800">'+expertLeads.length+'</div></div><div style="padding:12px;border:1px solid var(--bd);border-radius:10px"><div style="color:var(--txt2);font-size:12px">شاخص‌های تعریف‌شده</div><div style="font-size:24px;font-weight:800">'+targets.length+'</div></div>';
+}
+function saveKpi(){showNotification('مقادیر KPI از لیدها محاسبه می‌شوند و ورود دستی غیرفعال است');}
+function saveKpiFinal(){renderKpi();showNotification('گزارش KPI از داده‌های فعلی لیدها به‌روزرسانی شد');}
+function renderKpiSummary(){renderKpi();}
 async function renderAdmin(){await renderExpertAdmin();renderKpiAdmin();try{const {data,error}=await sb.from('profiles').select('id,username,display_name,role').order('display_name');if(error)throw error;const sel=document.getElementById('cloudUserSelect');if(sel)sel.innerHTML='<option value="">انتخاب حساب برای بازنشانی رمز</option>'+(data||[]).map(u=>'<option value="'+escapeLeadHtml(u.id)+'">'+escapeLeadHtml(u.display_name)+' — '+escapeLeadHtml(u.username)+' ('+escapeLeadHtml(u.role)+')</option>').join('');}catch(err){console.error('Profile list failed',err);showNotification('❌ دریافت حساب‌های ابری ناموفق بود','error');}}
 async function createCloudUserFromForm(){const username=(document.getElementById('newExpertUsername')?.value||'').trim().toLowerCase();const display_name=(document.getElementById('newExpertName')?.value||'').trim();const result=document.getElementById('cloudUserCreateResult');if(!/^[a-z0-9._-]{2,40}$/.test(username)){showNotification('نام کاربری باید ۲ تا ۴۰ نویسه و فقط شامل حروف کوچک انگلیسی، عدد، نقطه، خط تیره یا زیرخط باشد','error');return;}if(!display_name){showNotification('نام و نام خانوادگی کارشناس را وارد کنید','error');return;}const button=document.querySelector('button[onclick="createCloudUserFromForm()"]');if(button){button.disabled=true;button.textContent='در حال ساخت حساب…';}if(result){result.style.display='block';result.textContent='در حال ساخت حساب…';}try{const {data,error}=await sb.functions.invoke('admin-users',{body:{action:'create',username,display_name,role:'sales'}});if(error||!data?.temporary_password)throw new Error(data?.error||error?.message||'invalid_response');if(result){result.innerHTML='<strong>✅ حساب ورود ساخته شد</strong><br>نام کارشناس: '+escapeLeadHtml(data.display_name)+'<br>نام کاربری: <code id="createdUsernameValue">'+escapeLeadHtml(data.username)+'</code><br>رمز موقت: <code id="createdPasswordValue" style="user-select:all;overflow-wrap:anywhere">'+escapeLeadHtml(data.temporary_password)+'</code><div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:10px"><button class="btn secondary" type="button" onclick="copyCreatedCredentials()">📋 کپی نام کاربری و رمز</button><button class="btn secondary" type="button" onclick="copyCreatedPassword()">📋 کپی فقط رمز</button></div><span style="display:block;color:#fcd34d;margin-top:8px">در اولین ورود، تغییر رمز اجباری است. رمز را امن تحویل بده.</span><div id="createdCopyStatus" style="font-size:12px;color:var(--txt2);margin-top:5px"></div>';result.dataset.username=data.username;result.dataset.password=data.temporary_password;result.style.display='block';}document.getElementById('newExpertUsername').value='';await renderAdmin();}catch(err){console.error('Create user failed',err);if(result){result.textContent='ساخت حساب ناموفق بود. لطفاً نام کاربری تکراری بودن و تنظیمات سرور را بررسی کنید.';result.style.display='block';}showNotification('❌ ساخت حساب ناموفق بود؛ گزارش خطا را بررسی می‌کنیم','error');}finally{if(button){button.disabled=false;button.textContent='🔐 ساخت حساب ورود و رمز موقت';}}}
 async function copyCreatedPassword(){const result=document.getElementById('cloudUserCreateResult');const password=result?.dataset.password||'';const status=document.getElementById('createdCopyStatus');try{if(!password)throw new Error('no_password');await navigator.clipboard.writeText(password);if(status)status.textContent='رمز موقت کپی شد.';}catch(err){if(status)status.textContent='کپی خودکار ممکن نیست؛ رمز را از متن بالا انتخاب و کپی کن.';}}
