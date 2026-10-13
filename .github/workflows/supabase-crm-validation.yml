@@ -1,0 +1,55 @@
+name: CRM Supabase static validation
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [feature/supabase-crm-integration]
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: Check inline JavaScript syntax
+        run: |
+          python3 - <<'PY'
+          from html.parser import HTMLParser
+          from pathlib import Path
+          class Scripts(HTMLParser):
+              def __init__(self):
+                  super().__init__()
+                  self.inline = False
+                  self.src = False
+                  self.buf = []
+                  self.scripts = []
+              def handle_starttag(self, tag, attrs):
+                  if tag.lower() == "script":
+                      self.inline = True
+                      self.src = any(k.lower() == "src" for k, _ in attrs)
+                      self.buf = []
+              def handle_data(self, data):
+                  if self.inline and not self.src:
+                      self.buf.append(data)
+              def handle_endtag(self, tag):
+                  if tag.lower() == "script" and self.inline:
+                      if not self.src and "".join(self.buf).strip():
+                          self.scripts.append("".join(self.buf))
+                      self.inline = False
+                      self.src = False
+          parser = Scripts()
+          parser.feed(Path("index.html").read_text(encoding="utf-8"))
+          if not parser.scripts:
+              raise SystemExit("No inline scripts found")
+          for i, script in enumerate(parser.scripts, 1):
+              Path(f"/tmp/onbox-script-{i}.js").write_text(script, encoding="utf-8")
+          print(f"Extracted {len(parser.scripts)} inline scripts")
+          PY
+          for file in /tmp/onbox-script-*.js; do node --check "$file"; done
+      - name: Check integration guards
+        run: |
+          ! grep -q "pass123\|sales2025\|admin2025" index.html
+          grep -q "owner_auth_id" supabase/migrations/20261013000200_crm_auth_integration.sql
+          grep -q "leads_select_owner_or_manager" supabase/migrations/20261013000200_crm_auth_integration.sql
+          grep -q "must_change_password" supabase/functions/admin-users/index.ts
