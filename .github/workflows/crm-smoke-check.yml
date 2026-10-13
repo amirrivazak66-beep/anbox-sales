@@ -17,7 +17,7 @@ jobs:
           node <<'NODE'
           const fs = require('fs');
           const html = fs.readFileSync('index.html', 'utf8');
-          const scripts = [...html.matchAll(/<script(?:\\s[^>]*)?>([\\s\\S]*?)<\\/script>/gi)].map(m => m[1]).filter(s => s.trim());
+          const scripts = [...html.matchAll(/<script(?:\s[^>]*)?>([\s\S]*?)<\/script>/gi)].map(m => m[1]).filter(s => s.trim());
           if (!scripts.length) throw new Error('No inline scripts found');
           scripts.forEach((script, i) => {
             const file = `/tmp/anbox-inline-${i}.js`;
