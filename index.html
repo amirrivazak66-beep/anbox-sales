@@ -323,10 +323,11 @@ h2{color:#fff!important}
 </div>
 <div class="card">
 <div class="card-title">🔐 امنیت و پشتیبان‌گیری</div>
-<div style="font-size:12px;line-height:1.9;color:#fcd34d;background:rgba(217,119,6,.12);border:1px solid rgba(217,119,6,.3);padding:12px;border-radius:10px;margin-bottom:14px">هشدار: ورود فعلی هنوز احراز هویت واقعیِ سمت سرور نیست و اطلاعات در مرورگر همین دستگاه ذخیره می‌شود. این تغییر فقط ماندگاری نشست را محدود می‌کند؛ برای حفاظت واقعی باید احراز هویت و پایگاه داده سمت سرور راه‌اندازی شود.</div>
+<div style="font-size:12px;line-height:1.9;color:#fcd34d;background:rgba(217,119,6,.12);border:1px solid rgba(217,119,6,.3);padding:12px;border-radius:10px;margin-bottom:14px">پس از استقرار نسخه جدید، ورود و لیدها از Supabase استفاده می‌کنند. گزارش‌ها، چک‌لیست و تنظیمات تیم هنوز محلی هستند. پیش از مهاجرت، از اطلاعات همین مرورگر پشتیبان بگیرید؛ داده محلی خودکار حذف نمی‌شود.</div>
 <div style="display:flex;gap:10px;flex-wrap:wrap">
 <button class="btn success" onclick="exportCrmBackup()">⬇️ پشتیبان کامل اطلاعات</button>
 <button class="btn secondary" onclick="document.getElementById('crmBackupInput').click()">⬆️ بازیابی پشتیبان</button>
+<button class="btn" onclick="migrateMyLocalLeads()">☁️ انتقال لیدهای محلی من به Supabase</button>
 <input id="crmBackupInput" type="file" accept=".json,application/json" style="display:none" onchange="importCrmBackup(event)">
 </div>
 <div style="font-size:11px;line-height:1.8;color:var(--txt2);margin-top:10px">پشتیبان شامل لیدها، تیم، KPI و چک‌لیست‌های ذخیره‌شده در این مرورگر است. فایل پشتیبان را در محل امن نگه دارید؛ ممکن است اطلاعات مشتریان را در بر داشته باشد.</div>
@@ -494,6 +495,20 @@ function addKpiTarget(){const list=getKpiTargets();list.push({key:'kpi'+Date.now
 function deleteKpiTarget(i){if(confirm('حذف این KPI؟')){const list=getKpiTargets();list.splice(i,1);setKpiTargets(list);renderKpiAdmin();showNotification('✅ حذف شد');}}
 const CRM_BACKUP_VERSION=1;
 const CRM_BACKUP_KEY_PATTERN=/^(leads_.+|checklist_.+|kpi_.+|shared_team|shared_kpi_targets)$/;
+async function migrateMyLocalLeads(){
+ if(!currentProfile){showNotification('ابتدا وارد حساب شوید','error');return;}
+ const key='leads_'+currentUser;const raw=localStorage.getItem(key);
+ if(!raw){showNotification('برای این نام کاربری لید محلی در این مرورگر پیدا نشد','error');return;}
+ let oldRows;try{oldRows=JSON.parse(raw);if(!Array.isArray(oldRows))throw new Error('invalid');}catch{showNotification('❌ داده محلی قابل خواندن نیست؛ ابتدا فایل پشتیبان JSON بگیرید','error');return;}
+ const already=leads;const accepted=[];let duplicates=0;
+ for(const row of oldRows){if(findDuplicateLead(row,[...already,...accepted])){duplicates++;continue;}accepted.push(row);}
+ if(!accepted.length){showNotification('لید جدیدی برای انتقال نیست'+(duplicates?'؛ موارد تکراری شناسایی شدند':''));return;}
+ if(!confirm('تعداد '+accepted.length+' لید به حساب ابری شما منتقل شود؟ داده محلی حذف نخواهد شد. موارد تکراری: '+duplicates))return;
+ const payload=accepted.map(row=>({...leadDbPayload(row),owner_auth_id:currentProfile.id}));
+ const {error}=await sb.from('leads').insert(payload);
+ if(error){console.error('Local lead migration failed',error);showNotification('❌ انتقال انجام نشد: '+error.message,'error');return;}
+ await loadLeads();updateDashboard();showNotification('✅ '+accepted.length+' لید به Supabase منتقل شد؛ داده محلی حفظ شد.');
+}
 function exportCrmBackup(){
   try{
     const data={format:'anbox-crm-backup',version:CRM_BACKUP_VERSION,exportedAt:new Date().toISOString(),keys:{}};
