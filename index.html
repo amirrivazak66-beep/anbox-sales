@@ -503,7 +503,7 @@ function kpiMetricForLead(kpi,lead,start,end){
  const key=String(kpi.key||'').toLowerCase(),name=String(kpi.name||'').toLowerCase();
  const created=kpiDateInRange(lead.created_at,start,end),updated=kpiDateInRange(lead.updated_at||lead.created_at,start,end);
  const stage=Number(lead.sales_stage)||0,followDate=String(lead.followup_date||'');
- const isFollowup=followDate>=start.toISOString().slice(0,10)&&followDate<end.toISOString().slice(0,10);
+ const isFollowup=followDate>=getLocalDateKey(start)&&followDate<getLocalDateKey(end);
  if(key==='received'||name.includes('دریافت')||name.includes('ثبت لید'))return created;
  if(key==='calls'||name.includes('تماس'))return updated&&stage>=2;
  if(key==='followups'||name.includes('فالوآپ')||name.includes('پیگیری'))return isFollowup||(updated&&!!String(lead.followup_note||'').trim());
