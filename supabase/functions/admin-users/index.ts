@@ -36,7 +36,8 @@ Deno.serve(async(req:Request)=>{
  if(action==="create"){
    const username=typeof body.username==="string"?body.username.trim().toLowerCase():"";
    const displayName=typeof body.display_name==="string"?body.display_name.trim():"";
-   const role=body.role==="manager"?"manager":"sales";
+   // Manager creation is intentionally disabled here; provision manager roles only through a trusted server-side bootstrap.
+   const role="sales";
    if(!validUsername(username)||!displayName)return reply(400,{error:"invalid_user_data"});
    const temporaryPassword=crypto.randomUUID().replaceAll("-","")+"Aa1!";
    const {data:created,error:createError}=await admin.auth.admin.createUser({email:`${username}@auth.anbox.invalid`,password:temporaryPassword,email_confirm:true,user_metadata:{username}});
