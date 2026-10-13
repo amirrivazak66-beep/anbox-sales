@@ -408,6 +408,7 @@ function deleteLead(id){if(confirm('آیا مطمئن هستید؟')){leads=lead
 const EXCEL_HEADERS=['نوع لید','مبدأ لید','نام شرکت','صنعت','دلیل انتخاب شرکت','شماره تماس','نام فرد تماس','سمت فرد تماس','مرحله فروش','تناسب با آن باکس','مانع اصلی','اقدام بعدی','کارشناس فروش','وضعیت لید','یادداشت‌ها'];
 const EXCEL_FIELD_MAP={'نوع لید':'lead_type','مبدأ لید':'lead_source','نام شرکت':'company_name','صنعت':'industry','دلیل انتخاب شرکت':'selection_reason','شماره تماس':'phone','نام فرد تماس':'contact_name','سمت فرد تماس':'contact_position','مرحله فروش':'sales_stage','تناسب با آن باکس':'anbox_fit','مانع اصلی':'main_obstacle','اقدام بعدی':'next_action','کارشناس فروش':'sales_expert','وضعیت لید':'lead_status','یادداشت‌ها':'notes'};
 
+function normalizeExcelHeader(value){return excelText(value).replace(/[\\s\\u200c\\u200f\\u200e]+/g,'').toLowerCase();}
 function excelText(value){return String(value??'').trim().replace(/[٠-٩]/g,d=>String('٠١٢٣٤٥٦٧٨٩'.indexOf(d))).replace(/[۰-۹]/g,d=>String('۰۱۲۳۴۵۶۷۸۹'.indexOf(d))).replace(/ي/g,'ی').replace(/ك/g,'ک');}
 function parseExcelStage(value){const text=excelText(value);const number=text.match(/[1-6]/);if(number)return Number(number[0]);const stage=SALES_STAGES.find(item=>text.includes(item.name));return stage?stage.id:null;}
 function excelReady(){if(window.XLSX&&XLSX.utils)return true;showNotification('کتابخانه Excel هنوز بارگذاری نشده؛ چند ثانیه صبر کنید یا فایل CSV را استفاده کنید.','error');return false;}
