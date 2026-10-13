@@ -321,6 +321,16 @@ h2{color:#fff!important}
 <input type="text" id="settingsUsername" class="form-input" disabled>
 </div>
 </div>
+<div class="card">
+<div class="card-title">🔐 امنیت و پشتیبان‌گیری</div>
+<div style="font-size:12px;line-height:1.9;color:#fcd34d;background:rgba(217,119,6,.12);border:1px solid rgba(217,119,6,.3);padding:12px;border-radius:10px;margin-bottom:14px">هشدار: ورود فعلی هنوز احراز هویت واقعیِ سمت سرور نیست و اطلاعات در مرورگر همین دستگاه ذخیره می‌شود. این تغییر فقط ماندگاری نشست را محدود می‌کند؛ برای حفاظت واقعی باید احراز هویت و پایگاه داده سمت سرور راه‌اندازی شود.</div>
+<div style="display:flex;gap:10px;flex-wrap:wrap">
+<button class="btn success" onclick="exportCrmBackup()">⬇️ پشتیبان کامل اطلاعات</button>
+<button class="btn secondary" onclick="document.getElementById('crmBackupInput').click()">⬆️ بازیابی پشتیبان</button>
+<input id="crmBackupInput" type="file" accept=".json,application/json" style="display:none" onchange="importCrmBackup(event)">
+</div>
+<div style="font-size:11px;line-height:1.8;color:var(--txt2);margin-top:10px">پشتیبان شامل لیدها، تیم، KPI و چک‌لیست‌های ذخیره‌شده در این مرورگر است. فایل پشتیبان را در محل امن نگه دارید؛ ممکن است اطلاعات مشتریان را در بر داشته باشد.</div>
+</div>
 </div>
 <div id="settings-admin-tab" class="tab-content">
 <div class="card">
@@ -392,11 +402,11 @@ function getKpiTargets(){try{const s=localStorage.getItem('shared_kpi_targets');
 function setKpiTargets(arr){localStorage.setItem('shared_kpi_targets',JSON.stringify(arr));}
 const CHECKLIST_ITEMS=['لیست لیدهای امروز دریافت شد','گزارش دیروز بررسی شد','اهداف روز با مدیر هماهنگ شد','تماس با تمام لیدهای امروز انجام شد','فالوآپ مشتریان دیروز انجام شد','اطلاعات مشتریان تأییدشده دریافت شد','پنل‌های جدید ساخته و تحویل داده شد','آموزش شارژ و ارسال به مشتریان انجام شد','بارکد سفارشات امروز صادر شد','گزارش پایان روز در CRM ثبت شد'];
 let currentUser=null,leads=[],filteredLeads=[];
-window.addEventListener('DOMContentLoaded',()=>{const savedUser=localStorage.getItem('currentUser');if(savedUser){currentUser=savedUser;showDashboard();loadLeads();renderTeam();renderChecklist();updateDashboard();}});
+window.addEventListener('DOMContentLoaded',()=>{const savedUser=sessionStorage.getItem('currentUser');if(savedUser&&USERS[savedUser]){currentUser=savedUser;showDashboard();loadLeads();renderTeam();renderChecklist();updateDashboard();}});
 function toggleSidebar(){document.getElementById('sidebar').classList.toggle('open');document.getElementById('overlay').classList.toggle('show');}
-function handleLogin(){const username=document.getElementById('username').value.trim();const password=document.getElementById('password').value;const errorEl=document.getElementById('loginError');if(!username||!password){errorEl.textContent='❌ نام کاربری و رمز عبور را وارد کنید';errorEl.style.display='block';return;}const user=USERS[username];if(!user||user.password!==password){errorEl.textContent='❌ نام کاربری یا رمز عبور نادرست است';errorEl.style.display='block';return;}currentUser=username;localStorage.setItem('currentUser',username);showDashboard();loadLeads();renderTeam();renderChecklist();updateDashboard();}
+function handleLogin(){const username=document.getElementById('username').value.trim();const password=document.getElementById('password').value;const errorEl=document.getElementById('loginError');if(!username||!password){errorEl.textContent='❌ نام کاربری و رمز عبور را وارد کنید';errorEl.style.display='block';return;}const user=USERS[username];if(!user||user.password!==password){errorEl.textContent='❌ نام کاربری یا رمز عبور نادرست است';errorEl.style.display='block';return;}currentUser=username;sessionStorage.setItem('currentUser',username);localStorage.removeItem('currentUser');showDashboard();loadLeads();renderTeam();renderChecklist();updateDashboard();}
 function showDashboard(){const user=USERS[currentUser];document.getElementById('loginPage').style.display='none';document.getElementById('dashboardPage').style.display='flex';document.getElementById('sidebarUsername').textContent=user.name;document.getElementById('headerUsername').textContent=user.name;document.getElementById('settingsUsername').value=currentUser;document.getElementById('adminTabBtn').style.display=(currentUser==='admin')?'block':'none';showNotification('✅ خوش آمدید '+user.name);}
-function handleLogout(){localStorage.removeItem('currentUser');currentUser=null;document.getElementById('loginPage').style.display='flex';document.getElementById('dashboardPage').style.display='none';document.getElementById('username').value='';document.getElementById('password').value='';showNotification('👋 شما خارج شدید');}
+function handleLogout(){sessionStorage.removeItem('currentUser');localStorage.removeItem('currentUser');currentUser=null;document.getElementById('loginPage').style.display='flex';document.getElementById('dashboardPage').style.display='none';document.getElementById('username').value='';document.getElementById('password').value='';showNotification('👋 شما خارج شدید');}
 function switchPage(e,page){e.preventDefault();document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));document.getElementById(page).classList.add('active');document.querySelectorAll('.nav-item').forEach(item=>item.classList.remove('active'));e.target.classList.add('active');if(page==='leads')loadLeads();if(page==='team'){renderTeam();renderChecklist();}if(page==='pipeline')renderPipelineDetails();if(window.innerWidth<=768){document.getElementById('sidebar').classList.remove('open');document.getElementById('overlay').classList.remove('show');}}
 function switchTab(e,tabId){e.preventDefault();document.querySelectorAll('.tab-content').forEach(t=>t.classList.remove('active'));document.getElementById(tabId).classList.add('active');document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));e.target.classList.add('active');if(tabId==='checklist-tab')renderChecklist();if(tabId==='kpi-tab')renderKpi();if(tabId==='settings-admin-tab')renderAdmin();}
 function calculateScore(lead){let score=50;if(lead.industry)score+=10;if(parseInt(lead.sales_stage)>=4)score+=30;if(parseInt(lead.sales_stage)>=5)score+=20;return Math.min(100,score);}
@@ -467,6 +477,41 @@ function renderKpiAdmin(){const list=getKpiTargets();let html='';list.forEach((f
 function updateKpiTarget(i,field,val){const list=getKpiTargets();if(field==='target')list[i].target=parseInt(val)||0;else list[i][field]=val;setKpiTargets(list);}
 function addKpiTarget(){const list=getKpiTargets();list.push({key:'kpi'+Date.now(),icon:'⭐',name:'شاخص جدید',target:1});setKpiTargets(list);renderKpiAdmin();showNotification('✅ KPI افزوده شد');}
 function deleteKpiTarget(i){if(confirm('حذف این KPI؟')){const list=getKpiTargets();list.splice(i,1);setKpiTargets(list);renderKpiAdmin();showNotification('✅ حذف شد');}}
+const CRM_BACKUP_VERSION=1;
+const CRM_BACKUP_KEY_PATTERN=/^(leads_.+|checklist_.+|kpi_.+|shared_team|shared_kpi_targets)$/;
+function exportCrmBackup(){
+  try{
+    const data={format:'anbox-crm-backup',version:CRM_BACKUP_VERSION,exportedAt:new Date().toISOString(),keys:{}};
+    Object.keys(localStorage).filter(key=>CRM_BACKUP_KEY_PATTERN.test(key)).sort().forEach(key=>{
+      const raw=localStorage.getItem(key);
+      try{data.keys[key]=JSON.parse(raw);}catch(_){data.keys[key]=raw;}
+    });
+    const blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json;charset=utf-8'});
+    const url=URL.createObjectURL(blob),a=document.createElement('a');
+    a.href=url;a.download='anbox-crm-backup-'+new Date().toISOString().slice(0,10)+'.json';
+    document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),1000);
+    showNotification('✅ فایل پشتیبان دانلود شد');
+  }catch(err){console.error('CRM backup export failed',err);showNotification('❌ ساخت پشتیبان ناموفق بود','error');}
+}
+function importCrmBackup(event){
+  const input=event.target,file=input.files&&input.files[0];if(!file)return;
+  if(file.size>10*1024*1024){showNotification('❌ حجم فایل پشتیبان نباید بیشتر از ۱۰ مگابایت باشد','error');input.value='';return;}
+  const reader=new FileReader();
+  reader.onerror=()=>{showNotification('❌ خواندن فایل پشتیبان ناموفق بود','error');input.value='';};
+  reader.onload=()=>{
+    try{
+      const data=JSON.parse(String(reader.result||''));
+      if(!data||data.format!=='anbox-crm-backup'||data.version!==CRM_BACKUP_VERSION||!data.keys||typeof data.keys!=='object'||Array.isArray(data.keys))throw new Error('invalid backup');
+      const entries=Object.entries(data.keys);
+      if(!entries.length||entries.some(([key])=>!CRM_BACKUP_KEY_PATTERN.test(key)))throw new Error('invalid keys');
+      if(!confirm('بازیابی پشتیبان، مقادیر ذخیره‌شده با کلیدهای موجود در فایل را جایگزین می‌کند. قبل از ادامه یک پشتیبان از وضعیت فعلی بگیرید. ادامه می‌دهید؟'))return;
+      entries.forEach(([key,value])=>localStorage.setItem(key,typeof value==='string'?value:JSON.stringify(value)));
+      showNotification('✅ بازیابی انجام شد؛ برای بارگذاری دوباره صفحه را تازه‌سازی کنید');
+    }catch(err){console.error('CRM backup import failed',err);showNotification('❌ فایل پشتیبان معتبر نیست یا قابل بازیابی نیست','error');}
+    finally{input.value='';}
+  };
+  reader.readAsText(file,'UTF-8');
+}
 function showNotification(msg,type='success'){const el=document.getElementById('notification');el.textContent=msg;el.className='notification '+(type==='error'?'error':'')+' show';setTimeout(()=>el.classList.remove('show'),3000);}
 </script>
 </body>
