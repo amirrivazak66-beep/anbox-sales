@@ -1,0 +1,51 @@
+name: CRM smoke checks
+on:
+  push:
+    branches: ["feature/lead-management-followups"]
+  pull_request:
+    branches: ["main"]
+jobs:
+  syntax-and-feature-check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+      - name: Check inline JavaScript syntax
+        run: |
+          node <<'NODE'
+          const fs = require('fs');
+          const html = fs.readFileSync('index.html', 'utf8');
+          const scripts = [...html.matchAll(/<script(?:\\s[^>]*)?>([\\s\\S]*?)<\\/script>/gi)].map(m => m[1]).filter(s => s.trim());
+          if (!scripts.length) throw new Error('No inline scripts found');
+          scripts.forEach((script, i) => {
+            const file = `/tmp/anbox-inline-${i}.js`;
+            fs.writeFileSync(file, script);
+            require('child_process').execFileSync(process.execPath, ['--check', file], {stdio: 'inherit'});
+          });
+          console.log(`Syntax OK: ${scripts.length} inline scripts`);
+          NODE
+      - name: Check CRM and Excel feature markers
+        run: |
+          node <<'NODE'
+          const fs = require('fs');
+          const html = fs.readFileSync('index.html', 'utf8');
+          const required = [
+            'function downloadExcelTemplate()',
+            'function downloadLeadsExcel()',
+            'function handleExcelUpload(event)',
+            'function filterLeads()',
+            'function findDuplicateLead(',
+            'id="filterStage"',
+            'id="filterStatus"',
+            'id="filterExpert"',
+            'id="filterFollowup"',
+            'name="followup_date"',
+            'name="followup_note"',
+            'let duplicates=0'
+          ];
+          const missing = required.filter(marker => !html.includes(marker));
+          if (missing.length) throw new Error('Missing features: ' + missing.join(', '));
+          console.log('Feature marker checks OK');
+          NODE
