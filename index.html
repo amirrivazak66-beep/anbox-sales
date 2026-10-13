@@ -366,11 +366,23 @@ h2{color:#fff!important}
 </div>
 <div class="card">
 <div class="card-title">🎯 تنظیم KPI</div>
-<div style="font-size:12px;color:var(--txt2);margin-bottom:14px">هدف روزانه هر شاخص را تنظیم کنید</div>
+<div style="font-size:12px;color:var(--txt2);margin-bottom:14px;line-height:1.9">برای هر کارشناس می‌توانید تعداد دلخواهی شاخص تعریف کنید. هدف هر شاخص جداگانه برای بازه روزانه و ماهیانه ثبت می‌شود.</div>
 <select id="kpiOwnerSelect" class="form-input" style="width:100%;margin-bottom:12px" onchange="renderKpiAdmin()"><option value="">انتخاب کارشناس برای تنظیم KPI</option></select>
 <div id="kpiTargetList" style="display:grid;gap:10px"></div>
-<button class="btn secondary" style="margin-top:14px;width:100%" onclick="addDefaultKpisForSelectedExpert()">📋 افزودن شاخص‌های پیش‌فرض</button>
-<button class="btn success" style="margin-top:14px;width:100%" onclick="addKpiTarget()">➕ افزودن KPI جدید</button>
+<div style="margin-top:16px;padding:14px;border:1px solid var(--bd);border-radius:12px;background:rgba(15,23,42,.4)">
+<div style="font-weight:700;margin-bottom:12px">➕ افزودن شاخص جدید</div>
+<div style="display:grid;grid-template-columns:minmax(140px,2fr) minmax(110px,1fr) repeat(2,minmax(90px,1fr));gap:8px;align-items:center">
+<input id="newKpiName" class="form-input" type="text" placeholder="عنوان شاخص">
+<select id="newKpiIcon" class="form-input" aria-label="انتخاب آیکون شاخص">
+<option value="🎯">🎯 هدف</option><option value="📞">📞 تماس</option><option value="🔄">🔄 فالوآپ</option><option value="📋">📋 اطلاعات</option><option value="🖥️">🖥️ پنل</option><option value="🎓">🎓 آموزش</option><option value="📦">📦 بارکد/بسته</option><option value="🤝">🤝 جلسه</option><option value="📝">📝 گزارش</option><option value="💰">💰 فروش</option><option value="🚀">🚀 پیشرفت</option><option value="⭐">⭐ سایر</option>
+</select>
+<input id="newKpiDaily" class="form-input" type="number" min="0" step="1" value="1" aria-label="هدف روزانه" placeholder="هدف روزانه">
+<input id="newKpiMonthly" class="form-input" type="number" min="0" step="1" value="22" aria-label="هدف ماهیانه" placeholder="هدف ماهیانه">
+</div>
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px;font-size:11px;color:var(--txt2)"><span>هدف روزانه</span><span>هدف ماهیانه</span></div>
+<button class="btn success" style="margin-top:12px;width:100%" onclick="addKpiTarget()">افزودن شاخص</button>
+</div>
+<button class="btn secondary" style="margin-top:12px;width:100%" onclick="addDefaultKpisForSelectedExpert()">📋 افزودن شاخص‌های پیش‌فرض</button>
 </div>
 </div>
 </div>
@@ -522,10 +534,50 @@ async function deleteCloudExpertById(userId){const {data:profile,error}=await sb
 function addExpert(){const inp=document.getElementById('newExpertName');const name=inp.value.trim();if(!name){showNotification('❌ نام را وارد کنید','error');return;}const team=getTeam();if(team.length>=10){showNotification('❌ حداکثر ۱۰ کارشناس','error');return;}team.push({name:name});setTeam(team);inp.value='';renderExpertAdmin();showNotification('✅ کارشناس افزوده شد');}
 function editExpert(i){const team=getTeam();const nn=prompt('نام جدید:',team[i].name);if(nn&&nn.trim()){team[i].name=nn.trim();setTeam(team);renderExpertAdmin();showNotification('✅ ویرایش شد');}}
 function deleteExpert(i){if(confirm('حذف کارشناس؟')){const team=getTeam();team.splice(i,1);setTeam(team);renderExpertAdmin();showNotification('✅ حذف شد');}}
-async function renderKpiAdmin(){const ownerSelect=document.getElementById('kpiOwnerSelect');const listEl=document.getElementById('kpiTargetList');if(!ownerSelect||!listEl)return;try{const {data:users,error}=await sb.from('profiles').select('id,display_name,username').eq('role','sales').order('display_name');if(error)throw error;const previous=ownerSelect.value;ownerSelect.innerHTML='<option value="">انتخاب کارشناس برای تنظیم KPI</option>'+(users||[]).map(u=>'<option value="'+escapeLeadHtml(u.id)+'">'+escapeLeadHtml(u.display_name)+' — '+escapeLeadHtml(u.username)+'</option>').join('');if(previous&&(users||[]).some(u=>u.id===previous))ownerSelect.value=previous;if(!ownerSelect.value){listEl.innerHTML='<div style="color:var(--txt2)">ابتدا کارشناس را انتخاب کنید.</div>';return;}selectedKpiOwnerId=ownerSelect.value;const {data:list,error:targetError}=await sb.from('crm_kpi_definitions').select('id,key,name,icon,target').eq('owner_auth_id',selectedKpiOwnerId).order('created_at');if(targetError)throw targetError;if(!list?.length){listEl.innerHTML='<div style="color:var(--txt2)">برای این کارشناس KPI تعریف نشده است. می‌توانید شاخص‌های پیش‌فرض را اضافه کنید یا KPI جدید بسازید.</div>';return;}listEl.innerHTML=(list||[]).map(f=>'<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;background:rgba(15,23,42,.4);border:1px solid var(--bd);border-radius:11px;padding:12px"><input type="text" value="'+escapeLeadHtml(f.name)+'" class="form-input" style="flex:1;min-width:110px" placeholder="عنوان KPI" onchange="updateCloudKpi(\''+f.id+'\',\'name\',this.value)"><input type="text" value="'+escapeLeadHtml(f.icon)+'" class="form-input" style="width:58px" placeholder="آیکون" onchange="updateCloudKpi(\''+f.id+'\',\'icon\',this.value)"><input type="number" min="0" value="'+Math.max(0,Number(f.target)||0)+'" class="form-input" style="width:90px" onchange="updateCloudKpi(\''+f.id+'\',\'target\',this.value)"><button class="btn danger" style="padding:6px 10px;font-size:11px" onclick="deleteCloudKpi(\''+f.id+'\')">حذف</button></div>').join('')||'<div style="color:var(--txt2)">برای این کارشناس هنوز KPI تعریف نشده است.</div>';}catch(err){console.error('Cloud KPI admin failed',err);listEl.innerHTML='<div style="color:#fca5a5">دریافت KPI ناموفق بود.</div>';}}
-async function addDefaultKpisForSelectedExpert(){const ownerId=document.getElementById('kpiOwnerSelect')?.value;if(!ownerId){showNotification('ابتدا کارشناس را انتخاب کنید','error');return;}const {data:existing,error:readError}=await sb.from('crm_kpi_definitions').select('key').eq('owner_auth_id',ownerId);if(readError){showNotification('بررسی KPIهای فعلی ناموفق بود','error');return;}const keys=new Set((existing||[]).map(x=>x.key));const defaults=DEFAULT_KPI.filter(k=>!keys.has(k.key)).map(k=>({owner_auth_id:ownerId,key:k.key,name:k.name,icon:k.icon,target:k.target}));if(!defaults.length){showNotification('همه شاخص‌های پیش‌فرض از قبل وجود دارند');return;}const {error}=await sb.from('crm_kpi_definitions').insert(defaults);if(error){console.error('Default KPI insert failed',error);showNotification('افزودن شاخص‌های پیش‌فرض ناموفق بود','error');return;}await renderKpiAdmin();showNotification(defaults.length+' شاخص پیش‌فرض اضافه شد');}
-async function addKpiTarget(){const ownerId=document.getElementById('kpiOwnerSelect')?.value;if(!ownerId){showNotification('ابتدا کارشناس را انتخاب کنید','error');return;}const name=prompt('عنوان KPI جدید:','شاخص جدید');if(name===null||!name.trim())return;const targetRaw=prompt('هدف عددی:','1');if(targetRaw===null)return;const target=Number(targetRaw);if(!Number.isInteger(target)||target<0){showNotification('هدف باید عدد صحیح و غیرمنفی باشد','error');return;}const icon=prompt('آیکون KPI:','🎯');if(icon===null)return;const key='kpi_'+Date.now().toString(36);const {error}=await sb.from('crm_kpi_definitions').insert({owner_auth_id:ownerId,key,name:name.trim(),icon:icon.trim()||'🎯',target});if(error){console.error('KPI create failed',error);showNotification('ساخت KPI ناموفق بود','error');return;}await renderKpiAdmin();showNotification('KPI اختصاصی ساخته شد');}
-async function updateCloudKpi(id,field,value){const patch={};if(field==='target'){const n=Number(value);if(!Number.isInteger(n)||n<0){showNotification('هدف باید عدد صحیح و غیرمنفی باشد','error');await renderKpiAdmin();return;}patch.target=n;}else if(field==='name'){if(!String(value).trim()){showNotification('عنوان KPI خالی نمی‌تواند باشد','error');await renderKpiAdmin();return;}patch.name=String(value).trim();}else if(field==='icon')patch.icon=String(value).trim()||'🎯';const {error}=await sb.from('crm_kpi_definitions').update(patch).eq('id',id);if(error){console.error('KPI update failed',error);showNotification('ویرایش KPI ناموفق بود','error');return;}await renderKpiAdmin();}
+const KPI_ICON_OPTIONS=[['🎯','هدف'],['📞','تماس'],['🔄','فالوآپ'],['📋','اطلاعات'],['🖥️','پنل'],['🎓','آموزش'],['📦','بارکد/بسته'],['🤝','جلسه'],['📝','گزارش'],['💰','فروش'],['🚀','پیشرفت'],['⭐','سایر']];
+function kpiIconOptions(selected){return KPI_ICON_OPTIONS.map(([icon,label])=>'<option value="'+icon+'" '+(icon===(selected||'🎯')?'selected':'')+'>'+icon+' '+label+'</option>').join('');}
+async function renderKpiAdmin(){
+ const ownerSelect=document.getElementById('kpiOwnerSelect'),listEl=document.getElementById('kpiTargetList');if(!ownerSelect||!listEl)return;
+ try{
+  const {data:users,error}=await sb.from('profiles').select('id,display_name,username').eq('role','sales').order('display_name');if(error)throw error;
+  const previous=ownerSelect.value;ownerSelect.innerHTML='<option value="">انتخاب کارشناس برای تنظیم KPI</option>'+(users||[]).map(u=>'<option value="'+escapeLeadHtml(u.id)+'">'+escapeLeadHtml(u.display_name)+' — '+escapeLeadHtml(u.username)+'</option>').join('');
+  if(previous&&(users||[]).some(u=>u.id===previous))ownerSelect.value=previous;
+  const addBtn=document.querySelector('#settings [onclick="addKpiTarget()"]');if(addBtn)addBtn.disabled=!ownerSelect.value;
+  if(!ownerSelect.value){selectedKpiOwnerId='';listEl.innerHTML='<div style="color:var(--txt2)">ابتدا کارشناس را انتخاب کنید.</div>';return;}
+  selectedKpiOwnerId=ownerSelect.value;
+  const {data:list,error:targetError}=await sb.from('crm_kpi_definitions').select('id,key,name,icon,target,target_daily,target_monthly').eq('owner_auth_id',selectedKpiOwnerId).order('created_at');if(targetError)throw targetError;
+  if(!list?.length){listEl.innerHTML='<div style="color:var(--txt2)">برای این کارشناس هنوز شاخصی تعریف نشده است. از فرم افزودن شاخص در پایین استفاده کنید یا شاخص‌های پیش‌فرض را اضافه کنید.</div>';return;}
+  listEl.innerHTML='<div style="display:grid;grid-template-columns:minmax(130px,2fr) minmax(110px,1fr) repeat(2,minmax(90px,1fr)) auto;gap:8px;padding:0 8px;color:var(--txt2);font-size:11px"><span>عنوان شاخص</span><span>آیکون</span><span>هدف روزانه</span><span>هدف ماهیانه</span><span>عملیات</span></div>'+(list||[]).map(f=>{
+   const daily=Math.max(0,Number(f.target_daily??f.target)||0),monthly=Math.max(0,Number(f.target_monthly??((f.target||0)*22))||0);
+   return '<div style="display:grid;grid-template-columns:minmax(130px,2fr) minmax(110px,1fr) repeat(2,minmax(90px,1fr)) auto;gap:8px;align-items:center;background:rgba(15,23,42,.4);border:1px solid var(--bd);border-radius:11px;padding:10px"><input type="text" value="'+escapeLeadHtml(f.name)+'" class="form-input" placeholder="عنوان شاخص" aria-label="عنوان شاخص" onchange="updateCloudKpi(\''+f.id+'\',\'name\',this.value)"><select class="form-input" aria-label="آیکون شاخص" onchange="updateCloudKpi(\''+f.id+'\',\'icon\',this.value)">'+kpiIconOptions(f.icon)+'</select><input type="number" min="0" step="1" value="'+daily+'" class="form-input" aria-label="هدف روزانه" title="هدف روزانه" onchange="updateCloudKpi(\''+f.id+'\',\'target_daily\',this.value)"><input type="number" min="0" step="1" value="'+monthly+'" class="form-input" aria-label="هدف ماهیانه" title="هدف ماهیانه" onchange="updateCloudKpi(\''+f.id+'\',\'target_monthly\',this.value)"><button class="btn danger" style="padding:7px 10px;font-size:11px" onclick="deleteCloudKpi(\''+f.id+'\')">حذف</button></div>';
+  }).join('');
+ }catch(err){console.error('Cloud KPI admin failed',err);listEl.innerHTML='<div style="color:#fca5a5">دریافت KPI ناموفق بود.</div>';}
+}
+async function addDefaultKpisForSelectedExpert(){
+ const ownerId=document.getElementById('kpiOwnerSelect')?.value;if(!ownerId){showNotification('ابتدا کارشناس را انتخاب کنید','error');return;}
+ const {data:existing,error:readError}=await sb.from('crm_kpi_definitions').select('key').eq('owner_auth_id',ownerId);if(readError){showNotification('بررسی KPIهای فعلی ناموفق بود','error');return;}
+ const keys=new Set((existing||[]).map(x=>x.key));
+ const defaults=DEFAULT_KPI.filter(k=>!keys.has(k.key)).map(k=>({owner_auth_id:ownerId,key:k.key,name:k.name,icon:k.icon,target:k.target,target_daily:k.target,target_monthly:k.target*22}));
+ if(!defaults.length){showNotification('همه شاخص‌های پیش‌فرض از قبل وجود دارند');return;}
+ const {error}=await sb.from('crm_kpi_definitions').insert(defaults);if(error){console.error('Default KPI insert failed',error);showNotification('افزودن شاخص‌های پیش‌فرض ناموفق بود','error');return;}
+ await renderKpiAdmin();showNotification(defaults.length+' شاخص پیش‌فرض اضافه شد');
+}
+async function addKpiTarget(){
+ const ownerId=document.getElementById('kpiOwnerSelect')?.value;if(!ownerId){showNotification('ابتدا کارشناس را انتخاب کنید','error');return;}
+ const name=document.getElementById('newKpiName')?.value.trim()||'';
+ const icon=document.getElementById('newKpiIcon')?.value||'🎯';
+ const dailyRaw=document.getElementById('newKpiDaily')?.value,monthlyRaw=document.getElementById('newKpiMonthly')?.value;
+ if(!name){showNotification('عنوان شاخص را وارد کنید','error');document.getElementById('newKpiName')?.focus();return;}
+ const daily=Number(dailyRaw),monthly=Number(monthlyRaw);
+ if(!Number.isInteger(daily)||daily<0||!Number.isInteger(monthly)||monthly<0){showNotification('اهداف روزانه و ماهیانه باید عدد صحیح و غیرمنفی باشند','error');return;}
+ const key='kpi_'+Date.now().toString(36);
+ const {error}=await sb.from('crm_kpi_definitions').insert({owner_auth_id:ownerId,key,name,icon,target:daily,target_daily:daily,target_monthly:monthly});
+ if(error){console.error('KPI create failed',error);showNotification('ساخت شاخص ناموفق بود','error');return;}
+ document.getElementById('newKpiName').value='';
+ document.getElementById('newKpiDaily').value='1';document.getElementById('newKpiMonthly').value='22';document.getElementById('newKpiIcon').value='🎯';
+ await renderKpiAdmin();showNotification('شاخص جدید اضافه شد');
+}
+async function updateCloudKpi(id,field,value){const patch={};if(field==='target'||field==='target_daily'||field==='target_monthly'){const n=Number(value);if(!Number.isInteger(n)||n<0){showNotification('هدف باید عدد صحیح و غیرمنفی باشد','error');await renderKpiAdmin();return;}if(field==='target'){patch.target=n;patch.target_daily=n;}else if(field==='target_daily'){patch.target_daily=n;patch.target=n;}else patch.target_monthly=n;}else if(field==='name'){if(!String(value).trim()){showNotification('عنوان شاخص خالی نمی‌تواند باشد','error');await renderKpiAdmin();return;}patch.name=String(value).trim();}else if(field==='icon')patch.icon=String(value).trim()||'🎯';const {error}=await sb.from('crm_kpi_definitions').update(patch).eq('id',id);if(error){console.error('KPI update failed',error);showNotification('ویرایش شاخص ناموفق بود','error');await renderKpiAdmin();return;}showNotification('شاخص به‌روزرسانی شد');}
 async function deleteCloudKpi(id){if(!confirm('این KPI از تنظیمات این کارشناس حذف شود؟ داده‌های گزارش روزانه حذف نمی‌شوند.'))return;const {error}=await sb.from('crm_kpi_definitions').delete().eq('id',id);if(error){console.error('KPI delete failed',error);showNotification('حذف KPI ناموفق بود','error');return;}await renderKpiAdmin();showNotification('KPI حذف شد');}
 function updateKpiTarget(i,field,val){const list=getKpiTargets();if(field==='target')list[i].target=parseInt(val)||0;else list[i][field]=val;setKpiTargets(list);}
 function addLocalKpiTargetLegacy(){const list=getKpiTargets();list.push({key:'kpi'+Date.now(),icon:'⭐',name:'شاخص جدید',target:1});setKpiTargets(list);renderKpiAdmin();showNotification('✅ KPI افزوده شد');}
