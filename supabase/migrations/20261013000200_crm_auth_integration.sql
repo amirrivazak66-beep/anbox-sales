@@ -27,6 +27,9 @@ revoke all on public.profiles from anon, authenticated;
 grant select on public.profiles to authenticated;
 
 alter table public.leads add column if not exists owner_auth_id uuid references auth.users(id);
+alter table public.leads add column if not exists followup_date text;
+alter table public.leads add column if not exists followup_note text;
+alter table public.leads add column if not exists notes text;
 alter table public.leads add column if not exists updated_at timestamptz not null default now();
 create index if not exists leads_owner_auth_id_idx on public.leads(owner_auth_id);
 
