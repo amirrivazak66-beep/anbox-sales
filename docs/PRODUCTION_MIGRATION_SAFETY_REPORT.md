@@ -7,11 +7,11 @@ Production commit observed: `d411e77748e596bdd880cec10bf564ddf5c28871`
 
 ## Scope and safety boundary
 
-- This report is for review only. It does not apply SQL, deploy Edge Functions, merge the pull request, or modify GitHub Pages production.
+- This report documents the staged rollout. The additive SQL migration has now been applied to the existing Supabase project, and two Edge Functions have been deployed. The GitHub pull request remains unmerged and GitHub Pages production code remains unchanged.
 - The current feature branch is the rollback point for code review; production `main` remains unchanged.
-- Supabase production project was inspected read-only. No database writes were performed.
+- Initial inspection was read-only. After review, the additive migration was applied; post-migration verification confirmed the new schema is present.
 - The inspected Supabase tables reported zero rows in `public.leads` and `auth.users`. Browser localStorage is separate and was not inspected; it may contain real CRM records. Do not infer local data is empty.
-- No Supabase Edge Functions were deployed at inspection time.
+- Edge Functions `username-login` (JWT verification disabled because it is the public sign-in bridge) and `admin-users` (JWT verification enabled) are deployed and ACTIVE.
 - The Supabase organization is on the Free plan; no paid database branch or other paid resource was created.
 
 ## Production schema observations
@@ -39,10 +39,16 @@ The existing `public.users` table has a legacy plaintext `password` column. The 
 5. Rollback for application code: redeploy the previous GitHub Pages commit. Do not drop new tables/columns automatically; additive schema can remain while investigating.
 6. If data import is wrong, stop writes and reconcile using the backups and import log. Never bulk-delete cloud rows as an automatic rollback.
 
+## Actions completed after review
+
+- Applied the additive migration `onbox_crm_auth_integration_20261013` to the existing Supabase project.
+- Verified `public.profiles` and new lead columns/policies exist; current counts remain 0 for `auth.users`, `public.profiles`, and `public.leads`.
+- Deployed `username-login` and `admin-users` Edge Functions; statuses returned ACTIVE.
+- Latest observed GitHub Actions static validation and CRM smoke checks completed successfully.
+
 ## Explicit non-actions
 
-- No production SQL migration applied.
-- No Edge Function deployed.
+- No GitHub PR merged and no GitHub Pages production code deployed.
 - No Auth account created.
 - No production branch merged or deployed.
 - No localStorage data read, copied, or deleted.
