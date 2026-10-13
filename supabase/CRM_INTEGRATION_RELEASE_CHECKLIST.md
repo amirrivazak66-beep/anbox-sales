@@ -14,12 +14,12 @@
 2. Bootstrap the first manager safely. There are currently no Auth users; the manager must be created through a trusted Supabase dashboard/server-side process and have a matching `profiles` row. Do not place service-role credentials in browser code or commit them.
 3. Deploy `username-login` with JWT verification disabled (it authenticates via Supabase Auth password grant) and `admin-users` with JWT verification enabled.
 4. Configure the standard Supabase Edge Function secrets; never expose `SUPABASE_SERVICE_ROLE_KEY` to the browser.
-5. Add the controlled localStorage-to-cloud migration/import flow and reconcile lead ownership for each staff browser before retiring local data.
+5. Use the new “Transfer my local leads to Supabase” control on each staff browser after signing in with the matching username. It deduplicates against cloud leads and preserves localStorage. Repeat on each browser; do not delete local data until row counts and samples are verified.
 6. Test manager, two sales accounts, wrong password, first-login password change, lead CRUD across devices, direct REST RLS access, Excel/CSV import and export, and JSON backup/restore.
 7. Confirm the non-lead data areas (team settings, checklist, KPI reports) are still browser-local; their Supabase tables need separate persistence/policies before claiming full multi-device CRM sync.
 
 ## Current deployment status
 - GitHub branch only; main/live site has not been changed.
 - No Supabase SQL migration has been applied.
-- No Edge Function has been deployed by this change.
+- No Edge Function has been deployed by this change. The code is present in GitHub only.
 - Existing database rows were reported as empty during inspection, but localStorage on staff browsers may contain important records.
