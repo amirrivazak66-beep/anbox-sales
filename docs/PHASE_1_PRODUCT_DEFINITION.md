@@ -152,13 +152,13 @@ The existing dashboard has login, profiles/roles, lead CRUD, pipeline, team, KPI
 Before further product features:
 1. Verify database backup and restoration capability.
 2. Test auth and role boundaries.
-3. Fix/verify checklist persistence.
+3. Verify checklist toggle/save/reload behavior in a dedicated test browser; the Save handler now persists to the existing per-user key.
 4. Test lead ownership and CRUD permissions.
 5. Validate KPI math, report access and Excel round-trip.
 6. Inspect public login abuse controls and legacy user-table dependencies.
 7. Verify the actual GitHub Pages deployment.
 
-The automated static smoke test has passed once on the QA branch. It is not an end-to-end test.
+The automated static smoke test and the two existing static CRM/Supabase workflows passed on the checklist-fix branch. They are not end-to-end tests.
 
 ## 12. Definition of done for each MVP feature
 
@@ -178,7 +178,7 @@ The automated static smoke test has passed once on the QA branch. It is not an e
 1. Complete safe static checks and inspect CI failures.
 2. Verify a database restore point without changing production data.
 3. Test current app in a dedicated test browser/account.
-4. Correct checklist persistence in a separate code branch.
+4. Verify the checklist save/reload behavior in a dedicated test browser.
 5. Review the public login bridge for rate limiting and abuse protection.
 6. Review public.users dependencies and the is_crm_manager() grants; prepare, but do not yet apply, a least-privilege plan.
 7. Decide the first one or two integrations only after access feasibility and customer value are established.
