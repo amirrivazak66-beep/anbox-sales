@@ -1,9 +1,12 @@
 # Supabase Auth Migration Plan — OnBox CRM
 
-## Status
-Planning/staging only. This branch does not change `main`, and the SQL migration in this branch has NOT been applied to Supabase.
+## Status — historical plan, revalidated 2026-10-14
 
-## Confirmed current state (checked 2026-10-13)
+The SQL file in the original planning PR was not applied under its own draft version. However, the live Supabase project now contains a related Auth integration migration under version `20261013184306`, six Auth users/profiles, lead ownership data, and active `username-login` / `admin-users` Edge Functions. Do not use the older statements below that imply the live project is still empty as current truth.
+
+The exact live migration history and current read-only schema snapshot are documented in [LIVE_SUPABASE_RECONCILIATION_2026-10-14.md](LIVE_SUPABASE_RECONCILIATION_2026-10-14.md). The repository filenames and live migration versions are not fully reconciled, and full live E2E/backup-restore validation remains incomplete. This plan is still not authorization to apply migrations or change production.
+
+## Historical baseline snapshot (checked 2026-10-13; superseded by live audit dated 2026-10-14)
 - Main CRM UI is `index.html` and currently stores leads and session/team settings in browser `localStorage`.
 - Login credentials are hard-coded in client-side JavaScript. They must be treated as exposed and rotated.
 - Supabase project `anbox-sales` is healthy and contains public tables: `config`, `daily_reports`, `kpi_targets`, `leaderboard`, `leads`, `reports`, `users`.
