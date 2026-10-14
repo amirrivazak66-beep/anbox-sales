@@ -15,7 +15,7 @@ This roadmap follows the supplied Master Blueprint Phase 0 and the owner's clari
 1. Validate authentication and role boundaries.
 2. Verify lead ownership, manager assignment and CRUD policies.
 3. Test KPI math and date boundaries.
-4. Verify/fix checklist persistence after confirming intended behavior.
+4. Verify checklist toggle/save/reload behavior in a dedicated test browser (the Save handler was updated in PR #11).
 5. Test reports, pipeline, Excel import/export and JSON backup/restore.
 6. Resolve security findings through isolated changes with rollback plans.
 
