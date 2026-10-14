@@ -9,7 +9,7 @@ const root = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const files = ["index.html", "dashboard.html"];
 const required = {
   "index.html": ["دستیار مدیر فروش", "dashboard.html", "id=\"features\"", "id=\"contact\""],
-  "dashboard.html": ["id=\"loginPage\"", "id=\"dashboardPage\"", "handleLogin()", "loadLeads()", "renderTeam()", "renderKpi()", "loadReports()", "exportCrmBackup()", "importCrmBackup(event)"]
+  "dashboard.html": ["id=\"loginPage\"", "id=\"dashboardPage\"", "handleLogin()", "loadLeads()", "renderTeam()", "renderKpi()", "loadReports()", "exportCrmBackup()", "importCrmBackup(event)", "function saveChecklist()"]
 };
 const errors = [];
 const temp = mkdtempSync(join(tmpdir(), "anbox-smoke-"));
@@ -58,6 +58,8 @@ try {
 
   // Keep these protections explicit: smoke checks must never mutate production data or browser storage.
   const dashboard = readFileSync(join(root, "dashboard.html"), "utf8");
+  const saveFunction = dashboard.match(/function saveChecklist\(\)\{([\s\S]*?)\}\s*async function openLeadModal/);
+  if (!saveFunction || !/localStorage\.setItem\(['"]checklist_['"]\+user/.test(saveFunction[1])) errors.push("dashboard.html: saveChecklist() does not persist checklist state");
   if (/localStorage\.clear\s*\(/.test(dashboard)) errors.push("dashboard.html: localStorage.clear() is prohibited");
   if (/DROP\s+(TABLE|SCHEMA|DATABASE)|TRUNCATE\s+TABLE/i.test(dashboard)) errors.push("dashboard.html: destructive SQL marker found");
 
