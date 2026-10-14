@@ -121,7 +121,6 @@ try {
   console.log("PASS dashboard, leads, team, pipeline, reports and settings navigation");
 
   await app.locator(".nav-item").filter({ hasText: "تیم" }).click();
-  await app.locator("#checklist-tab").waitFor({ state: "visible" });
   await app.locator(".tab").filter({ hasText: "چک‌لیست" }).click();
   await app.locator("#ck_0").check();
   await app.locator('button[onclick="saveChecklist()"]').click();
