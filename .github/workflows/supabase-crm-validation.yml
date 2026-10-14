@@ -50,6 +50,6 @@ jobs:
       - name: Check integration guards
         run: |
           ! grep -q "pass123\|sales2025\|admin2025" index.html
-          grep -q "owner_auth_id" supabase/migrations/20261013000200_crm_auth_integration.sql
-          grep -q "leads_select_owner_or_manager" supabase/migrations/20261013000200_crm_auth_integration.sql
+          grep -q "owner_auth_id" supabase/migrations/20261013184306_onbox_crm_auth_integration_20261013.sql
+          grep -q "leads_select_owner_or_manager" supabase/migrations/20261013184306_onbox_crm_auth_integration_20261013.sql
           grep -q "must_change_password" supabase/functions/admin-users/index.ts

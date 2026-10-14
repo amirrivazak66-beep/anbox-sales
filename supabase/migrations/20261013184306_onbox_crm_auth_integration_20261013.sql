@@ -1,4 +1,3 @@
--- OnBox CRM Supabase integration. Additive only; run in a development database first.
 begin;
 
 create table if not exists public.profiles (
@@ -33,7 +32,6 @@ alter table public.leads add column if not exists notes text;
 alter table public.leads add column if not exists updated_at timestamptz not null default now();
 create index if not exists leads_owner_auth_id_idx on public.leads(owner_auth_id);
 
--- Do not auto-assign legacy rows. Explicitly reconcile/import after user provisioning.
 drop policy if exists leads_select_owner_or_manager on public.leads;
 create policy leads_select_owner_or_manager on public.leads
 for select to authenticated using (owner_auth_id = (select auth.uid()) or (select public.is_crm_manager()));
@@ -55,7 +53,5 @@ drop policy if exists leads_delete_owner_or_manager on public.leads;
 create policy leads_delete_owner_or_manager on public.leads
 for delete to authenticated using (owner_auth_id = (select auth.uid()) or (select public.is_crm_manager()));
 
--- Keep legacy public.users.password untouched for rollback/audit, but do not grant browser access to it.
 revoke all on public.users from anon, authenticated;
--- The app uses Supabase Auth + profiles. Existing report/config tables remain locked until their policies are designed.
 commit;

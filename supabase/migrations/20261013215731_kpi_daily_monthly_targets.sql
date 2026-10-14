@@ -1,5 +1,3 @@
--- Stable schema checkpoint for per-expert KPI targets.
--- Safe to re-run: existing columns and values are preserved.
 alter table public.crm_kpi_definitions
   add column if not exists target_daily integer,
   add column if not exists target_monthly integer;
