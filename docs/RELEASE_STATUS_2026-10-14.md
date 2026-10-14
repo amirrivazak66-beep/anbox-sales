@@ -72,3 +72,11 @@ No production database rows, schema, Auth settings, RLS policies, grants, or Edg
 
 ## Brand caveat
 «مدیرنگر» is a provisional working identity. Exact-name web search returned no results in the limited search performed, but trademark, company-name, social-handle and domain availability have not been cleared.
+
+
+## PR #25 and schema inventory — 2026-10-14
+
+- [PR #25](https://github.com/amirrivazak66-beep/anbox-sales/pull/25) merged as `bdfe35bf0aa32e50d9df6fd8eb668f1c83d267dd`. The tracked `admin-users` source now matches deployed v3, including manager-only `update_user` and `delete_user` actions and the guard preventing deletion when a salesperson still owns leads. This was a source-only reconciliation; no function deployment occurred.
+- PR checks passed, including browser smoke with mocked Supabase. Mainline static, CRM and browser smoke checks passed after merge. Pages deployment was still in progress at last check and must be verified separately.
+- A read-only schema inventory is in [SCHEMA_INVENTORY_2026-10-14.md](SCHEMA_INVENTORY_2026-10-14.md). It records structure/policies only, not row data; it is not a restorable backup or clean-install baseline.
+- No backup/restore tool is available through the connected Supabase actions. A real encrypted logical backup and separate restore rehearsal remain unverified. Do not change production RLS, grants, Auth settings, schema or functions until that recovery gate is met.

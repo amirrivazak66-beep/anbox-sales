@@ -146,3 +146,13 @@ A task is complete only when the intended outcome is clear, changes are committe
 - New read-only drift check found deployed `admin-users` v3 differs from `supabase/functions/admin-users/index.ts` in GitHub: deployed code contains manager-only `update_user` and `delete_user` actions not present in the tracked file. The deployed `username-login` v1 source exactly matches GitHub; `verify_jwt=false` is expected for this username/password bridge and requires abuse/rate-limit review. `admin-users` has `verify_jwt=true`.
 - A read-only ACL check reconfirmed `public.is_crm_manager()` is SECURITY DEFINER and has EXECUTE grants for `anon` and `authenticated`; the Security Advisor also reports leaked-password protection disabled and two RLS-enabled tables without policies. No production setting or grant was changed.
 - Next action: reconcile the deployed `admin-users` source into GitHub in a PR (without redeploying it), add regression guards, then review the PR checks. Keep production changes blocked until an authorized backup and separate restore rehearsal are confirmed.
+
+
+## Latest continuation update — 2026-10-14, after PR #25
+
+- PR #25 merged successfully: [reconcile deployed admin-users source drift](https://github.com/amirrivazak66-beep/anbox-sales/pull/25); merge/main SHA `bdfe35bf0aa32e50d9df6fd8eb668f1c83d267dd`.
+- The tracked `supabase/functions/admin-users/index.ts` now matches the source retrieved from deployed `admin-users` v3. This was source reconciliation only; no Edge Function deployment was performed.
+- All PR #25 checks passed: static dashboard smoke, CRM smoke, Supabase static validation, and browser smoke using mocked data. After merge, main's static dashboard, CRM and browser smoke checks passed; GitHub Pages deployment was still running at the latest status check. Recheck before claiming deployment completed.
+- The schema-only read-only inventory is documented at [SCHEMA_INVENTORY_2026-10-14.md](SCHEMA_INVENTORY_2026-10-14.md). It is an inventory, not an executable baseline or complete backup.
+- Inventory confirms legacy `public.users` has a `password` text column and no RLS policy. No values were read. Table grants observed earlier did not include anon/authenticated access, but legacy authentication/data lifecycle must be verified before any change or removal.
+- Next: verify Pages deployment; keep production untouched while a trusted operator creates an encrypted logical backup and proves restore in a separate environment. Then continue authorization test design and narrow security remediation proposal. Supabase connector exposes no database dump/backup or restore-rehearsal operation; do not claim recovery is verified.
