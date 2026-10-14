@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>داشبورد فروش | آن‌باکس</title>
+<title>مدیرنگر | هوش مدیریتی کسب‌وکار</title>
 <script>
 (function loadXlsxFallback(){
   const sources=[
@@ -34,7 +34,7 @@ body{font-family:Tahoma,'Segoe UI',sans-serif;background:linear-gradient(135deg,
 @keyframes pop{from{opacity:0;transform:scale(.96)}to{opacity:1;transform:scale(1)}}
 .login-container{display:flex;align-items:center;justify-content:center;min-height:100vh;padding:20px}
 .login-box{background:var(--card);backdrop-filter:blur(22px);-webkit-backdrop-filter:blur(22px);padding:44px;border-radius:22px;border:1px solid var(--bd);box-shadow:0 24px 60px rgba(0,0,0,.5),inset 0 1px 0 rgba(255,255,255,.06);width:100%;max-width:410px;animation:pop .5s ease}
-.login-logo{text-align:center;font-size:54px;margin-bottom:14px;filter:drop-shadow(0 6px 18px rgba(59,130,246,.5))}
+.login-logo{text-align:center;margin-bottom:14px;filter:drop-shadow(0 6px 18px rgba(59,130,246,.35))}.brand-mark{display:block;width:58px;height:58px;margin:0 auto}.brand-mark-small{display:block;width:32px;height:32px;flex-shrink:0}.login-subtitle{text-align:center;color:var(--txt2);font-size:12px;line-height:1.8;margin-top:-20px;margin-bottom:28px}
 .login-title{text-align:center;font-size:27px;font-weight:800;letter-spacing:-.5px;background:linear-gradient(135deg,#fff,#93c5fd);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:30px}
 .form-group{margin-bottom:18px}
 .form-label{display:block;font-size:13px;font-weight:600;margin-bottom:8px;color:var(--txt2)}
@@ -142,8 +142,9 @@ h2{color:#fff!important}
 <body>
 <div id="loginPage" class="login-container">
 <div class="login-box">
-<div class="login-logo">📦</div>
-<div class="login-title">آن‌باکس</div>
+<div class="login-logo"><svg class="brand-mark" viewBox="0 0 64 64" role="img" aria-label="نشان مدیرنگر"><rect x="3" y="3" width="58" height="58" rx="17" fill="#2563EB"/><path d="M15 45V34M26 45V27M37 45V20M48 45V29" stroke="#FFFFFF" stroke-width="5" stroke-linecap="round"/><path d="M14 22L25 28L37 16L48 21" fill="none" stroke="#34D399" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/><circle cx="48" cy="21" r="3.5" fill="#34D399"/></svg></div>
+<div class="login-title">مدیرنگر</div>
+<div class="login-subtitle">دستیار هوشمند مدیر کسب‌وکار</div>
 <div class="login-error" id="loginError"></div>
 <div class="form-group">
 <label class="form-label">نام کاربری</label>
@@ -160,7 +161,7 @@ h2{color:#fff!important}
 <div class="overlay" id="overlay" onclick="toggleSidebar()"></div>
 <div id="dashboardPage" class="dashboard-container" style="display:none">
 <div class="sidebar" id="sidebar">
-<div class="logo"><div class="logo-text">📦 آن‌باکس</div></div>
+<div class="logo"><svg class="brand-mark-small" viewBox="0 0 64 64" role="img" aria-label="نشان مدیرنگر"><rect x="3" y="3" width="58" height="58" rx="17" fill="#2563EB"/><path d="M15 45V34M26 45V27M37 45V20M48 45V29" stroke="#FFFFFF" stroke-width="5" stroke-linecap="round"/><path d="M14 22L25 28L37 16L48 21" fill="none" stroke="#34D399" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/><circle cx="48" cy="21" r="3.5" fill="#34D399"/></svg><div class="logo-text">مدیرنگر</div></div>
 <div class="user-info">
 <div class="user-name" id="sidebarUsername">مجتبی</div>
 <div style="font-size:11px;opacity:.8">فعال</div>
@@ -177,7 +178,7 @@ h2{color:#fff!important}
 </div>
 <div class="main">
 <div class="header">
-<div class="header-title">داشبورد | آن‌باکس</div>
+<div class="header-title">مدیرنگر <span style="color:var(--txt2);font-weight:500;font-size:13px">| داشبورد فروش</span></div>
 <div>👤 <span id="headerUsername">مجتبی</span></div>
 </div>
 <div class="content">

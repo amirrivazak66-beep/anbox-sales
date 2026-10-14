@@ -8,8 +8,8 @@ import { fileURLToPath } from "node:url";
 const root = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const files = ["index.html", "dashboard.html"];
 const required = {
-  "index.html": ["دستیار مدیر فروش", "dashboard.html", "id=\"features\"", "id=\"contact\""],
-  "dashboard.html": ["id=\"loginPage\"", "id=\"dashboardPage\"", "handleLogin()", "loadLeads()", "renderTeam()", "renderKpi()", "loadReports()", "exportCrmBackup()", "importCrmBackup(event)", "function saveChecklist()"]
+  "index.html": ["مدیرنگر", "dashboard.html", "id=\"features\"", "id=\"contact\""],
+  "dashboard.html": ["<title>مدیرنگر", "aria-label=\"نشان مدیرنگر\"", "id=\"loginPage\"", "id=\"dashboardPage\"", "handleLogin()", "loadLeads()", "renderTeam()", "renderKpi()", "loadReports()", "exportCrmBackup()", "importCrmBackup(event)", "function saveChecklist()"]
 };
 const errors = [];
 const temp = mkdtempSync(join(tmpdir(), "anbox-smoke-"));
