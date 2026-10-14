@@ -151,6 +151,58 @@ try {
   assert.equal(await app.locator("#ck_0").isChecked(), true);
   console.log("PASS checklist save and reload persistence using mock/local test storage");
 
+  // JSON backup contract: export and restore only synthetic browser-local data.
+  await app.locator(".nav-item").filter({ hasText: "تنظیمات" }).click();
+  await app.locator("#settings-user-tab").waitFor({ state: "attached", timeout: 5000 });
+  await app.locator("#settingsTabs .tab").filter({ hasText: "اطلاعات کاربری" }).click();
+  await app.locator("#settings-user-tab.active").waitFor({ state: "visible", timeout: 5000 });
+  await app.evaluate(() => {
+    localStorage.setItem("shared_team", JSON.stringify([{ name: "Backup Team" }]));
+    localStorage.setItem("shared_kpi_targets", JSON.stringify([{ key: "backup-kpi", name: "Backup KPI", target: 7 }]));
+    localStorage.setItem("leads_test.manager", JSON.stringify([{ company_name: "Synthetic Backup Lead" }]));
+    localStorage.setItem("kpi_backup-test", JSON.stringify({ target: 4 }));
+  });
+  const downloadPromise = app.waitForEvent("download");
+  await app.locator('button[onclick="exportCrmBackup()"]').click();
+  const backupDownload = await downloadPromise;
+  const backupContent = readFileSync(await backupDownload.path(), "utf8");
+  const backup = JSON.parse(backupContent);
+  assert.equal(backup.format, "anbox-crm-backup");
+  assert.equal(backup.version, 1);
+  assert.equal(backup.keys.shared_team[0].name, "Backup Team");
+  assert.equal(backup.keys.shared_kpi_targets[0].target, 7);
+  assert.equal(backup.keys["leads_test.manager"][0].company_name, "Synthetic Backup Lead");
+  assert.equal(backup.keys["checklist_test.manager"][0], true);
+  assert.equal(backup.keys["kpi_backup-test"].target, 4);
+
+  await app.evaluate(() => {
+    localStorage.setItem("shared_team", "[]");
+    localStorage.removeItem("shared_kpi_targets");
+    localStorage.removeItem("leads_test.manager");
+    localStorage.removeItem("checklist_test.manager");
+    localStorage.removeItem("kpi_backup-test");
+  });
+  app.once("dialog", dialog => dialog.accept());
+  await app.locator("#crmBackupInput").setInputFiles({
+    name: "synthetic-crm-backup.json",
+    mimeType: "application/json",
+    buffer: Buffer.from(backupContent, "utf8")
+  });
+  await app.locator("#notification.show").filter({ hasText: "بازیابی انجام شد" }).waitFor({ state: "visible", timeout: 5000 });
+  const restored = await app.evaluate(() => ({
+    team: JSON.parse(localStorage.getItem("shared_team") || "null"),
+    targets: JSON.parse(localStorage.getItem("shared_kpi_targets") || "null"),
+    leads: JSON.parse(localStorage.getItem("leads_test.manager") || "null"),
+    checklist: JSON.parse(localStorage.getItem("checklist_test.manager") || "null"),
+    kpi: JSON.parse(localStorage.getItem("kpi_backup-test") || "null")
+  }));
+  assert.equal(restored.team[0].name, "Backup Team");
+  assert.equal(restored.targets[0].target, 7);
+  assert.equal(restored.leads[0].company_name, "Synthetic Backup Lead");
+  assert.equal(restored.checklist[0], true);
+  assert.equal(restored.kpi.target, 4);
+  console.log("PASS JSON backup export/import round-trip and version-1 key compatibility");
+
   await browser.close();
   browser = null;
   console.log("BROWSER SMOKE CHECKS PASSED");
