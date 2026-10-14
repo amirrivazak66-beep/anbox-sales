@@ -121,6 +121,24 @@ try {
   }
   console.log("PASS dashboard, leads, team, pipeline, reports and settings navigation");
 
+  // Regression coverage for the settings panel: content must remain rendered, not merely have a visible wrapper.
+  await app.locator("#settings-user-tab").waitFor({ state: "visible", timeout: 5000 });
+  assert.equal(await app.locator("#settings-user-tab").isVisible(), true);
+  assert.equal(await app.locator("#settingsUsername").isVisible(), true);
+  assert.equal(await app.locator("#crmBackupInput").count(), 1);
+  const settingsHeight = await app.locator("#settings").evaluate(el => el.getBoundingClientRect().height);
+  assert.ok(settingsHeight > 300, `Settings content unexpectedly collapsed (height=${settingsHeight})`);
+
+  const adminTab = app.locator("#adminTabBtn");
+  assert.equal(await adminTab.isVisible(), true, "Manager should see the admin settings tab");
+  await adminTab.click();
+  await app.locator("#settings-admin-tab.active").waitFor({ state: "visible", timeout: 5000 });
+  assert.equal(await app.locator("#newExpertUsername").isVisible(), true);
+  assert.equal(await app.locator("#kpiOwnerSelect").count(), 1);
+  await app.locator("#settingsTabs .tab").filter({ hasText: "اطلاعات کاربری" }).click();
+  assert.equal(await app.locator("#settings-user-tab").isVisible(), true);
+  console.log("PASS settings content visibility, manager controls and tab switching");
+
   await app.locator(".nav-item").filter({ hasText: "تیم" }).click();
   await app.locator(".tab").filter({ hasText: "چک‌لیست" }).click();
   await app.locator("#ck_0").check();
