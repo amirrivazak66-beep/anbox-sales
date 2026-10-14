@@ -105,6 +105,21 @@ These PR details are historical. Fetch the current PR list before acting.
 
 If an external account action is required, continue all independent work and document the precise blocker, safe steps, permission needed, and resume point. Never claim the blocked action is complete.
 
+## Latest live Supabase reconciliation — 2026-10-14
+
+A read-only inspection of the connected Free-plan project `uaydruhkevdmvpyefdjm` found the live state has advanced beyond earlier notes:
+- 6 Auth users and 6 profiles (1 manager, 5 sales).
+- 8 leads; all 8 have non-null `owner_auth_id`.
+- Legacy `public.users` has 7 rows; `public.leaderboard` has 0.
+- Active Edge Functions: `username-login` v1 (verify_jwt=false) and `admin-users` v3 (verify_jwt=true).
+- Live migration history contains versions `20261013184306`, `20261013215731`, and `20261014093029`; their exact tracked files do not all match current repository filenames. The third migration has no matching file in main, and a draft SQL file remains inside the migrations directory.
+- Security Advisor flags `public.is_crm_manager()` executable by anon/authenticated and leaked-password protection disabled. RLS is enabled; `public.users` and `public.leaderboard` have no policies.
+- Dashboard login and lead CRUD are cloud-backed, while team settings/KPI target state/checklist still include localStorage.
+
+Full evidence and safe next steps: [LIVE_SUPABASE_RECONCILIATION_2026-10-14.md](LIVE_SUPABASE_RECONCILIATION_2026-10-14.md).
+
+**Current blocker:** no verified real backup + separate restore rehearsal, and migration history is not yet reconciled. Do not run production migrations or change Auth/RLS/grants until these gates are met. These facts supersede conflicting older zero-user/no-live-migration notes.
+
 ## Handoff at context/chat limit
 
 Before the conversation ends:
