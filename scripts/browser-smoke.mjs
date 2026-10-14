@@ -153,7 +153,9 @@ try {
 
   // JSON backup contract: export and restore only synthetic browser-local data.
   await app.locator(".nav-item").filter({ hasText: "تنظیمات" }).click();
-  await app.locator("#settings-user-tab").waitFor({ state: "visible", timeout: 5000 });
+  await app.locator("#settings-user-tab").waitFor({ state: "attached", timeout: 5000 });
+  await app.locator("#settingsTabs .tab").filter({ hasText: "اطلاعات کاربری" }).click();
+  await app.locator("#settings-user-tab.active").waitFor({ state: "visible", timeout: 5000 });
   await app.evaluate(() => {
     localStorage.setItem("shared_team", JSON.stringify([{ name: "Backup Team" }]));
     localStorage.setItem("shared_kpi_targets", JSON.stringify([{ key: "backup-kpi", name: "Backup KPI", target: 7 }]));
