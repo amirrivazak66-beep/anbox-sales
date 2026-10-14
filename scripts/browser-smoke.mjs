@@ -79,7 +79,8 @@ try {
   const landing = await browser.newPage();
   await landing.goto(base + "/", { waitUntil: "domcontentloaded" });
   assert.match(await landing.title(), /مدیرنگر/);
-  assert.equal(await landing.getByText("مدیرنگر", { exact: true }).first().isVisible(), true);
+  assert.equal(await landing.locator(".brand").first().isVisible(), true);
+  assert.match(await landing.locator(".brand").first().innerText(), /مدیرنگر/);
   await landing.locator("#nextSlide").click();
   assert.equal(await landing.locator(".slide.active").innerText().then(t => t.includes("قیف فروش")), true);
   await landing.setViewportSize({ width: 390, height: 844 });
