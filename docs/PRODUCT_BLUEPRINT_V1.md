@@ -164,10 +164,10 @@ A static audit identified a checklist persistence concern, security-review items
 
 ## 17. Brand status
 
-- The original deck uses psmedia as a working name.
-- The owner wants a different public brand name.
-- A previous conversation recommended «فروش‌نگر» as a possible name, but it is too sales-specific for the full platform and has not been approved as final.
-- Do not replace public branding, login branding or identifiers until a brand broad enough for the AI Business Manager vision is screened for name collisions, domain availability and trademark risk.
+- The original deck uses psmedia as a working name; the owner requested a different public brand.
+- «مدیرنگر» is now implemented as a **provisional working identity** in the landing page and dashboard login/header. It is broader than «فروش‌نگر» and fits the AI Business Manager direction.
+- Limited web search returned no exact-name results, but trademark, company-name, social-handle and domain availability are **not cleared**. Do not claim legal availability or exclusivity.
+- See BRAND_GUIDELINES_V1.md for the logo concept, visual tokens, technical migration boundaries and name-clearance checklist.
 - Keep existing technical identifiers and Supabase auth identifiers unchanged unless a separate migration plan proves it necessary.
 
 ## 18. Implementation interpretation and constraints
