@@ -54,20 +54,21 @@ A final static review of the current main files also found:
 2. Prepare a least-privilege security migration plan without applying it to production yet.
 3. Only then continue to the next Phase 1 feature implementation.
 
-## Latest live Supabase reconciliation — read-only, 2026-10-14
+## Latest live Supabase reconciliation — read-only, 2026-10-14 (refreshed after PR #24)
 
-The connected Supabase Free-plan project was inspected read-only after the earlier release snapshot. This new evidence supersedes the earlier statements that the live Auth setup was still empty/not applied:
+The connected Supabase Free-plan project was inspected read-only. This section supersedes earlier migration-drift statements in this document:
 - `auth.users`: 6; `public.profiles`: 6 (1 manager, 5 sales).
-- `public.leads`: 8, with all 8 assigned a non-null `owner_auth_id`.
-- `public.users`: 7 legacy rows; `public.leaderboard`: 0 rows.
-- Active Edge Functions: `username-login` v1 and `admin-users` v3.
-- Live migration history has three versions, including `restore_manager_read_access_reports_config` which is not represented by a matching file in main. The applied Auth/KPI migration version strings also differ from tracked filenames; a draft migration file remains under `supabase/migrations`. Migration reproducibility is therefore a blocker.
-- Current source shows lead CRUD/login integrated with Supabase; team settings, KPI target state, and checklist still use localStorage.
-- Current Security Advisor flags `public.is_crm_manager()` EXECUTE for anon/authenticated and disabled leaked-password protection; RLS-enabled `public.users` and `public.leaderboard` have no policies. Do not change these blindly.
+- `public.leads`: 8, and all 8 have a non-null `owner_auth_id`.
+- Legacy `public.users`: 7 rows; `public.leaderboard`: 0 rows.
+- Live migration ledger contains `20261013184306`, `20261013215731`, and `20261014093029`. PR #24 aligns the exact SQL statements and filenames in GitHub. A complete clean-install baseline is still missing.
+- Main SHA: `651a5e2783e2fdcec3dddc795f6c18ce00f72075`. Mainline CRM smoke, static dashboard smoke, browser smoke (mock data only), and Pages deployment workflows all completed successfully for this SHA.
+- Deployed Edge Function `username-login` v1 exactly matches GitHub source; `verify_jwt=false`. Deployed `admin-users` v3 uses `verify_jwt=true`, but its source contains manager-only `update_user` and `delete_user` actions absent from the tracked GitHub file. This source drift is being reconciled in a separate code-only PR; do not redeploy as part of source reconciliation.
+- Security Advisor still flags `public.is_crm_manager()` as SECURITY DEFINER executable by `anon` and `authenticated`, leaked-password protection disabled, and RLS-enabled `public.users` and `public.leaderboard` without policies. These require dependency review and controlled role tests before remediation.
+- Dashboard login and lead CRUD are cloud-backed; team settings, KPI target state and checklist still include localStorage.
 
-Evidence, exact counts, and next steps: [LIVE_SUPABASE_RECONCILIATION_2026-10-14.md](LIVE_SUPABASE_RECONCILIATION_2026-10-14.md).
+Evidence and migration details: [LIVE_SUPABASE_RECONCILIATION_2026-10-14.md](LIVE_SUPABASE_RECONCILIATION_2026-10-14.md), [MIGRATION_HISTORY_RECONCILIATION.md](MIGRATION_HISTORY_RECONCILIATION.md).
 
-No database or function changes were made during this read-only audit. A real backup and a successful separate restore rehearsal remain unverified. Do not run `supabase db push/reset` or alter production schema/Auth/RLS/grants until the migration ledger and baseline schema are reconciled.
+No production database rows, schema, Auth settings, RLS policies, grants, or Edge Functions were changed during this audit. A real backup and successful separate restore rehearsal remain unverified. Do not run `supabase db push/reset` or change production Auth/RLS/grants until the recovery gate is met.
 
 ## Brand caveat
 «مدیرنگر» is a provisional working identity. Exact-name web search returned no results in the limited search performed, but trademark, company-name, social-handle and domain availability have not been cleared.

@@ -46,6 +46,33 @@ Deno.serve(async(req:Request)=>{
    if(profileError){await admin.auth.admin.deleteUser(created.user.id);return reply(500,{error:"profile_creation_failed"});}
    return reply(200,{username,display_name:displayName,role,temporary_password:temporaryPassword,must_change_password:true});
  }
+ if(action==="update_user"){
+   const userId=typeof body.user_id==="string"?body.user_id:"";
+   const username=typeof body.username==="string"?body.username.trim().toLowerCase():"";
+   const displayName=typeof body.display_name==="string"?body.display_name.trim():"";
+   if(!userId||!validUsername(username)||!displayName)return reply(400,{error:"invalid_user_data"});
+   const {data:target}=await admin.from("profiles").select("id,username,role").eq("id",userId).maybeSingle();
+   if(!target||target.role!=="sales")return reply(404,{error:"user_not_found"});
+   const {data:duplicate}=await admin.from("profiles").select("id").eq("username",username).neq("id",userId).maybeSingle();
+   if(duplicate)return reply(409,{error:"username_exists"});
+   const {error:authUpdateError}=await admin.auth.admin.updateUserById(userId,{email:`${username}@auth.anbox.invalid`,email_confirm:true,user_metadata:{username}});
+   if(authUpdateError)return reply(409,{error:"username_update_failed"});
+   const {error:profileUpdateError}=await admin.from("profiles").update({username,display_name:displayName}).eq("id",userId);
+   if(profileUpdateError){await admin.auth.admin.updateUserById(userId,{email:`${target.username}@auth.anbox.invalid`,email_confirm:true,user_metadata:{username:target.username}});return reply(500,{error:"profile_update_failed"});}
+   return reply(200,{ok:true,username,display_name:displayName});
+ }
+ if(action==="delete_user"){
+   const userId=typeof body.user_id==="string"?body.user_id:"";
+   if(!userId||userId===authData.user.id)return reply(400,{error:"invalid_user"});
+   const {data:target}=await admin.from("profiles").select("id,role").eq("id",userId).maybeSingle();
+   if(!target||target.role!=="sales")return reply(404,{error:"user_not_found"});
+   const {count:leadCount,error:leadCountError}=await admin.from("leads").select("id",{count:"exact",head:true}).eq("owner_auth_id",userId);
+   if(leadCountError)return reply(500,{error:"lead_safety_check_failed"});
+   if((leadCount||0)>0)return reply(409,{error:"user_has_leads"});
+   const {error:deleteError}=await admin.auth.admin.deleteUser(userId);
+   if(deleteError)return reply(500,{error:"user_delete_failed"});
+   return reply(200,{ok:true});
+ }
  if(action==="reset_password"){
    const userId=typeof body.user_id==="string"?body.user_id:"";
    if(!userId)return reply(400,{error:"invalid_user"});
