@@ -26,6 +26,8 @@ window.supabase = {
   createClient: () => {
     const manager = { id: "test-manager", username: "test.manager", display_name: "Test Manager", role: "manager", must_change_password: false };
     const salesperson = { id: "test-sales", username: "test.sales", display_name: "Test Sales", role: "sales", must_change_password: false };
+    let cloudChecklistRow = null;
+    try { cloudChecklistRow = JSON.parse(localStorage.getItem("__mock_cloud_checklist") || "null"); } catch {}
     return {
       auth: {
         getSession: async () => ({ data: { session: localStorage.getItem("__mock_auth") ? { user: { id: manager.id } } : null }, error: null }),
@@ -52,7 +54,8 @@ window.supabase = {
           update: () => builder,
           delete: () => builder,
           single: async () => ({ data: manager, error: null }),
-          maybeSingle: async () => ({ data: null, error: null }),
+          maybeSingle: async () => ({ data: table === "crm_checklists" ? cloudChecklistRow : null, error: null }),
+          upsert: (row) => { if (table === "crm_checklists") { cloudChecklistRow = row; localStorage.setItem("__mock_cloud_checklist", JSON.stringify(row)); } return builder; },
           then: (resolve, reject) => {
             let data = [];
             if (table === "profiles") {
@@ -144,6 +147,8 @@ try {
   await app.locator("#ck_0").check();
   await app.locator('button[onclick="saveChecklist()"]').click();
   assert.equal(await app.locator("#ck_0").isChecked(), true);
+  await app.waitForFunction(() => JSON.parse(localStorage.getItem("__mock_cloud_checklist") || "null")?.items?.[0] === true);
+  console.log("PASS checklist cloud upsert using mocked Supabase");
   await app.reload({ waitUntil: "domcontentloaded" });
   await app.locator("#dashboardPage").waitFor({ state: "visible", timeout: 10000 });
   await app.locator(".nav-item").filter({ hasText: "تیم" }).click();
