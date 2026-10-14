@@ -1,7 +1,7 @@
 name: CRM smoke checks
 on:
   push:
-    branches: ["feature/lead-management-followups"]
+    branches: ["main", "qa/dashboard-smoke-tests"]
   pull_request:
     branches: ["main"]
 jobs:
@@ -11,12 +11,12 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
-          node-version: "20"
+          node-version: "22"
       - name: Check inline JavaScript syntax
         run: |
           node <<'NODE'
           const fs = require('fs');
-          const html = fs.readFileSync('index.html', 'utf8');
+          const html = fs.readFileSync('dashboard.html', 'utf8');
           const scripts = [...html.matchAll(/<script(?:\s[^>]*)?>([\s\S]*?)<\/script>/gi)].map(m => m[1]).filter(s => s.trim());
           if (!scripts.length) throw new Error('No inline scripts found');
           scripts.forEach((script, i) => {
@@ -30,7 +30,7 @@ jobs:
         run: |
           node <<'NODE'
           const fs = require('fs');
-          const html = fs.readFileSync('index.html', 'utf8');
+          const html = fs.readFileSync('dashboard.html', 'utf8');
           const required = [
             'function downloadExcelTemplate()',
             'function downloadLeadsExcel()',
