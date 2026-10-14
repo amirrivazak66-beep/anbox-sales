@@ -154,7 +154,21 @@ try {
   await app.locator(".nav-item").filter({ hasText: "تیم" }).click();
   await app.locator(".tab").filter({ hasText: "چک‌لیست" }).click();
   assert.equal(await app.locator("#ck_0").isChecked(), true);
-  console.log("PASS checklist save and reload persistence using mock/local test storage");
+
+  // Simulate an older local checklist that differs from cloud; it must survive until explicit save.
+  await app.evaluate(() => localStorage.setItem("checklist_test.manager", JSON.stringify(new Array(10).fill(false))));
+  await app.reload({ waitUntil: "domcontentloaded" });
+  await app.locator("#dashboardPage").waitFor({ state: "visible", timeout: 10000 });
+  await app.locator(".nav-item").filter({ hasText: "تیم" }).click();
+  await app.locator(".tab").filter({ hasText: "چک‌لیست" }).click();
+  assert.equal(await app.locator("#ck_0").isChecked(), true, "Cloud state should be displayed when it differs from local state");
+  assert.equal(await app.evaluate(() => JSON.parse(localStorage.getItem("checklist_test.manager"))[0]), false, "Local conflict must not be overwritten during load");
+  await app.locator("#ck_1").check();
+  assert.equal(await app.evaluate(() => JSON.parse(localStorage.getItem("checklist_test.manager"))[0]), false, "Local conflict must remain until explicit save");
+  await app.locator('button[onclick="saveChecklist()"]').click();
+  await app.waitForFunction(() => JSON.parse(localStorage.getItem("__mock_cloud_checklist") || "null")?.items?.[1] === true);
+  assert.equal(await app.evaluate(() => JSON.parse(localStorage.getItem("checklist_test.manager"))[0]), true, "Explicit save should reconcile local and cloud state");
+  console.log("PASS checklist save, reload and local/cloud conflict preservation using mock data");
 
   // JSON backup contract: export and restore only synthetic browser-local data.
   await app.locator(".nav-item").filter({ hasText: "تنظیمات" }).click();
