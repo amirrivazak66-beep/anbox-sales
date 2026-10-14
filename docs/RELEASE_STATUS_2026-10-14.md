@@ -3,8 +3,7 @@
 ## Current mainline snapshot
 - Public homepage: index.html, title «مدیرنگر | هوش مدیریتی کسب‌وکار».
 - Preserved application: dashboard.html, same title and new inline SVG mark.
-- Latest mainline SHA at time of this status note: 6668de02e141486fc6d95119658f3b442c5565a5.
-- Supabase project remains unchanged by the code/branding work.
+- Supabase project remains unchanged by the code/branding work and remains ACTIVE_HEALTHY.
 
 ## Completed and merged
 - PR #9 — Product Blueprint, Phase 1 product definition, technical audit and roadmap.
@@ -16,7 +15,15 @@
 - PR #15 — Playwright browser smoke tests with mock Supabase and isolated local storage.
 - PR #16 — Provisional brand guidelines and legal-clearance checklist.
 
-## Automated verification
+## Verification status
+
+### Confirmed by user in the live environment
+- The public site and dashboard were confirmed working in the real environment.
+- Manager and salesperson roles were both tested by the user.
+- Excel upload, Excel export, and lead management were tested for both manager and salesperson and reported working.
+- These user-confirmed live checks supersede the earlier “not yet verified” entries below.
+
+### Automated verification
 Latest relevant browser-test branch run passed:
 - Browser smoke checks (mock data only).
 - Static dashboard smoke checks.
@@ -32,25 +39,20 @@ A final static review of the current main files also found:
 - The login/sidebar/dashboard title no longer uses the old AnBox wordmark.
 - The existing database field key anbox_fit, legacy Excel header alias, backup format identifier and localStorage key structure remain preserved.
 
-## Not yet verified — do not infer completion
-- Actual GitHub Pages response/deployment was not verified through the available tools. Confirm the live URL in a browser after Pages finishes publishing.
-- No full Supabase database backup/restore point was verified.
-- Real production login and role boundaries were not exercised by the mock browser test.
-- Excel/CSV data round-trip has not been run against a real file.
-- No database rows, RLS policies, Auth settings or Edge Functions were changed.
+## Remaining verification — do not infer completion
+- A full Supabase database backup/restore point has not been verified. The project dashboard or an authorized backup process must confirm backup availability and recovery steps before production security/schema changes.
+- No database rows, RLS policies, Auth settings or Edge Functions were changed during the code/branding work.
 
 ## Security follow-up — production changes held
 - public.users has RLS enabled and no policies; read-only inspection found grants only for postgres and service_role and no references in public SQL routines/views/triggers. Do not delete it until all external dependencies and password-storage history are verified.
 - public.is_crm_manager() is SECURITY DEFINER and explicitly grants EXECUTE to anon and authenticated; PUBLIC is not granted EXECUTE. Review all callers before any privilege change.
-- Supabase Advisor reports leaked-password protection disabled and RLS initialization-plan performance warnings. Address these only after restore capability, test accounts and rollback plan are available.
+- Supabase Advisor reports leaked-password protection disabled and RLS initialization-plan performance warnings. Address these only after restore capability and a rollback plan are available.
 - Five indexes are reported unused; do not remove them based only on low observed usage.
 
 ## Next execution sequence
-1. Confirm the live homepage and dashboard URLs in a real browser.
-2. Verify database backup/restore capability through the Supabase project dashboard or an authorized backup process.
-3. Run real-user role and Excel round-trip tests in a safe environment.
-4. Prepare a least-privilege security migration plan without applying it to production yet.
-5. Only then continue to the next Phase 1 feature implementation.
+1. Verify database backup/restore capability through the Supabase project dashboard or an authorized backup process.
+2. Prepare a least-privilege security migration plan without applying it to production yet.
+3. Only then continue to the next Phase 1 feature implementation.
 
 ## Brand caveat
 «مدیرنگر» is a provisional working identity. Exact-name web search returned no results in the limited search performed, but trademark, company-name, social-handle and domain availability have not been cleared.
