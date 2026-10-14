@@ -80,3 +80,13 @@ No production database rows, schema, Auth settings, RLS policies, grants, or Edg
 - PR checks passed, including browser smoke with mocked Supabase. Mainline static, CRM and browser smoke checks passed after merge. Pages deployment was still in progress at last check and must be verified separately.
 - A read-only schema inventory is in [SCHEMA_INVENTORY_2026-10-14.md](SCHEMA_INVENTORY_2026-10-14.md). It records structure/policies only, not row data; it is not a restorable backup or clean-install baseline.
 - No backup/restore tool is available through the connected Supabase actions. A real encrypted logical backup and separate restore rehearsal remain unverified. Do not change production RLS, grants, Auth settings, schema or functions until that recovery gate is met.
+
+
+## PR #26/#27 and latest continuation — 2026-10-14
+
+- PR #26 merged the schema inventory and continuity-document updates.
+- PR #27 merged `docs/SECURITY_REMEDIATION_DRAFT_2026-10-14.md`, a proposal and test matrix only.
+- Candidate SQL to revoke `anon` EXECUTE on `public.is_crm_manager()` has not been run. No production DB/Auth/RLS/grants/data/functions were changed by these PRs.
+- Main SHA at continuation start: `aeec0db470eb39274712cce64d1cde2c22704187`. The connected Actions-run lookup returned no mainline workflow runs for this SHA, and the combined commit-status API returned no status records; current mainline browser smoke and Pages deployment are therefore **not confirmed here**. PR checks are not proof of mainline deployment.
+- The backup/recovery runbook has been reviewed, but no real encrypted backup or successful restore rehearsal has been verified. The recovery gate remains blocking for production security changes.
+- Next: confirm deployment/check status; complete a separate restore rehearsal; test anon/sales/manager role boundaries in isolation; only then decide on the narrow grant change. Keep application persistence work backward-compatible and reversible.
