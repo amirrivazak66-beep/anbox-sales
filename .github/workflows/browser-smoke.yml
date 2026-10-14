@@ -1,0 +1,30 @@
+name: Browser smoke checks (mock data only)
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches:
+      - main
+      - qa/browser-smoke-tests
+
+permissions:
+  contents: read
+
+jobs:
+  browser-smoke:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Install temporary Playwright test dependency
+        run: npm install --no-save playwright
+      - name: Install Chromium
+        run: npx playwright install --with-deps chromium
+      - name: Run browser smoke checks
+        run: node scripts/browser-smoke.mjs
