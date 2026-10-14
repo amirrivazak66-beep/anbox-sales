@@ -6,13 +6,12 @@ create table if not exists public.crm_checklists (
   schema_version smallint not null default 1 check (schema_version = 1),
   updated_at timestamptz not null default now(),
   constraint crm_checklists_items_shape check (
-    jsonb_typeof(items) = 'array'
-    and jsonb_array_length(items) = 10
+    case when jsonb_typeof(items) = 'array' then jsonb_array_length(items) = 10 else false end
   )
 );
 
 alter table public.crm_checklists enable row level security;
-revoke all on public.crm_checklists from anon, authenticated;
+revoke all on public.crm_checklists from public, anon, authenticated;
 grant select, insert, update, delete on public.crm_checklists to authenticated;
 
 drop policy if exists crm_checklists_select_own on public.crm_checklists;
