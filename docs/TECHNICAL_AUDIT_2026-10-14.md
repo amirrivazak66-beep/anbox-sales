@@ -111,3 +111,14 @@ Review migration SQL and compare it to live schema before further schema changes
 7. Align the public homepage to the platform-wide positioning after brand approval.
 
 No production changes were made by this audit.
+
+## 9. Edge Function source review
+
+The active Edge Function source was inspected read-only after the initial audit draft:
+
+- `username-login` is active, has `verify_jwt=false`, accepts POST, validates the username format and password length, then calls Supabase Auth password-token endpoint using server-side `SUPABASE_URL` and `SUPABASE_ANON_KEY`. It returns a generic invalid-credentials response. No service-role key is used in this function. The visible source does not implement an explicit rate limit; verify whether infrastructure-level throttling/abuse protection exists before broad public exposure.
+- `admin-users` is active, has `verify_jwt=true`, validates the bearer session with `auth.getUser()`, looks up the caller's profile and requires the manager role for administrative actions. It uses `SUPABASE_SERVICE_ROLE_KEY` server-side for administrative Auth operations. The service-role key was not found in the inspected frontend snippet; keep it server-side only.
+- The login flow uses Supabase Auth and `profiles`, not a direct read of `public.users` in the inspected path. This strengthens the hypothesis that `public.users` may be a legacy table, but dependencies outside the inspected path must be checked before any cleanup.
+- The Edge Function comments refer to the historical OnBox CRM; this is a maintenance/branding inconsistency, not by itself a security flaw.
+
+Before changing Edge Functions: review invocation logs and current callers, check abuse controls for the public login bridge, test account creation/reset/change-password flows with manager and salesperson roles, and preserve the existing Auth accounts.
