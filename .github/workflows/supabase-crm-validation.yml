@@ -53,3 +53,7 @@ jobs:
           grep -q "owner_auth_id" supabase/migrations/20261013184306_onbox_crm_auth_integration_20261013.sql
           grep -q "leads_select_owner_or_manager" supabase/migrations/20261013184306_onbox_crm_auth_integration_20261013.sql
           grep -q "must_change_password" supabase/functions/admin-users/index.ts
+          grep -Fq 'if(action==="update_user")' supabase/functions/admin-users/index.ts
+          grep -Fq 'if(action==="delete_user")' supabase/functions/admin-users/index.ts
+          grep -Fq 'target.role!=="sales"' supabase/functions/admin-users/index.ts
+          grep -Fq 'user_has_leads' supabase/functions/admin-users/index.ts
