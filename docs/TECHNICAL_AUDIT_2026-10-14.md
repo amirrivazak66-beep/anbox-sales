@@ -32,7 +32,7 @@ Observed files:
 Static code is not proof of end-to-end behavior. Test login/logout, role boundaries, lead CRUD and ownership, Excel round-trip, backup/restore, KPI calculation, reports, checklist persistence, navigation and responsive layout.
 
 ## Static-code issue to verify
-`saveChecklist()` currently only displays a success notification; the visible function body does not persist checklist values. Checklist rendering reads from localStorage under `checklist_` plus the current username. Verify intended behavior and fix in an isolated branch after backup.
+`updateChecklist()` already persists each checkbox toggle immediately to the existing per-user localStorage key. The original `saveChecklist()` button only displayed a success message, which was misleading. PR #11 changed the button handler to write the current checkbox state explicitly and added a regression smoke assertion. Browser-level save/reload verification is still required.
 
 ## Supabase snapshot
 Project status: `ACTIVE_HEALTHY`; PostgreSQL 17.6.1.127. No Supabase development branches were listed.
@@ -122,3 +122,14 @@ The active Edge Function source was inspected read-only after the initial audit 
 - The Edge Function comments refer to the historical OnBox CRM; this is a maintenance/branding inconsistency, not by itself a security flaw.
 
 Before changing Edge Functions: review invocation logs and current callers, check abuse controls for the public login bridge, test account creation/reset/change-password flows with manager and salesperson roles, and preserve the existing Auth accounts.
+
+
+## 10. Follow-up checks completed after the initial audit
+
+- Read-only dependency scan found no references to `public.users` in public SQL routines, views or triggers. This does not prove that no external client or uninspected process uses it, so the table remains untouched.
+- Table grants for `public.users` were returned only for `postgres` and `service_role`; no direct table grants to `anon` or `authenticated` were found. RLS remains enabled and no policies are defined for the table. Do not remove the table without a migration/dependency review.
+- The function ACL for `public.is_crm_manager()` explicitly grants EXECUTE to `anon` and `authenticated`; the `PUBLIC` role is not granted EXECUTE. The function returns a manager-role boolean and uses an empty search_path. The anonymous grant appears unnecessary for the authenticated UI but should only be revoked after verifying all callers and a restore path.
+- The three GitHub Actions checks passed on the checklist-fix branch: Static dashboard smoke checks, CRM Supabase static validation and CRM smoke checks. This is static CI validation, not browser E2E testing.
+- PR #10 merged as `e55ef29`: added static smoke checks and corrected the legacy CRM workflow to inspect `dashboard.html` rather than the new public landing page `index.html`.
+- PR #11 merged as `4974ac9`: made the checklist Save button persist the current per-user checklist state. No Supabase data or schema was changed.
+- The audit still has no verified database restore point and no live browser test. Those remain release blockers for production database/security changes.
