@@ -156,3 +156,14 @@ A task is complete only when the intended outcome is clear, changes are committe
 - The schema-only read-only inventory is documented at [SCHEMA_INVENTORY_2026-10-14.md](SCHEMA_INVENTORY_2026-10-14.md). It is an inventory, not an executable baseline or complete backup.
 - Inventory confirms legacy `public.users` has a `password` text column and no RLS policy. No values were read. Table grants observed earlier did not include anon/authenticated access, but legacy authentication/data lifecycle must be verified before any change or removal.
 - Next: verify Pages deployment; keep production untouched while a trusted operator creates an encrypted logical backup and proves restore in a separate environment. Then continue authorization test design and narrow security remediation proposal. Supabase connector exposes no database dump/backup or restore-rehearsal operation; do not claim recovery is verified.
+
+
+## Latest continuation update — 2026-10-14, after PRs #26 and #27
+
+- PR #26 merged the read-only schema inventory and updated continuity/release documentation.
+- PR #27 merged the security-remediation draft and manager/sales/anon role test matrix. Current main at the start of this continuation was `aeec0db470eb39274712cce64d1cde2c22704187`.
+- PR #27 is planning/documentation only. Candidate SQL to revoke anonymous EXECUTE on `public.is_crm_manager()` was **not applied**. No production database, Auth, RLS, grants, data, or Edge Functions were changed.
+- The connected GitHub Actions helper does not expose mainline workflow runs for this commit through its commit-run endpoint, and the combined commit-status endpoint returned no status records. Therefore the current-main browser smoke and Pages deployment state could not be confirmed in this pass. Do not infer success from the PR checks.
+- The live Pages URL and GitHub Actions pages were not accessible through the web reader in this pass; verify using GitHub Actions/Deployments or the actual site in a browser before declaring release completion.
+- Backup runbook reviewed. It provides a local CLI logical-dump workflow for roles/schema/data, encrypted off-repository storage, and a separate restore rehearsal. The documented procedure still needs an authorized operator to execute it. No backup or restore artifact has been verified.
+- Next sequence: (1) confirm latest main and deployment/check status; (2) complete and verify encrypted backup + separate restore rehearsal outside chat/repository; (3) run role-based regression tests in the isolated restore; (4) only then consider the narrowly scoped anon grant change; (5) continue Phase 1 persistence work for team settings/KPI targets/checklist with backward-compatible localStorage migration and rollback.
