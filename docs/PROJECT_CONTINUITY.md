@@ -112,13 +112,13 @@ A read-only inspection of the connected Free-plan project `uaydruhkevdmvpyefdjm`
 - 8 leads; all 8 have non-null `owner_auth_id`.
 - Legacy `public.users` has 7 rows; `public.leaderboard` has 0.
 - Active Edge Functions: `username-login` v1 (verify_jwt=false) and `admin-users` v3 (verify_jwt=true).
-- Live migration history contains versions `20261013184306`, `20261013215731`, and `20261014093029`; their exact tracked files do not all match current repository filenames. The third migration has no matching file in main, and a draft SQL file remains inside the migrations directory.
+- Live migration history contains versions `20261013184306`, `20261013215731`, and `20261014093029`. PR #24 aligned the tracked migration filenames and exact SQL with those three live versions. This does not create a complete clean-install baseline.
 - Security Advisor flags `public.is_crm_manager()` executable by anon/authenticated and leaked-password protection disabled. RLS is enabled; `public.users` and `public.leaderboard` have no policies.
 - Dashboard login and lead CRUD are cloud-backed, while team settings/KPI target state/checklist still include localStorage.
 
 Full evidence and safe next steps: [LIVE_SUPABASE_RECONCILIATION_2026-10-14.md](LIVE_SUPABASE_RECONCILIATION_2026-10-14.md).
 
-**Current blocker:** no verified real backup + separate restore rehearsal, and migration history is not yet reconciled. Do not run production migrations or change Auth/RLS/grants until these gates are met. These facts supersede conflicting older zero-user/no-live-migration notes.
+**Current blocker:** no verified real backup + separate restore rehearsal, and no complete clean-install baseline. Migration ledger filenames/statements are now reconciled by PR #24. Do not run production migrations or change Auth/RLS/grants until the recovery gate is met. These facts supersede conflicting older zero-user/no-live-migration notes.
 
 ## Handoff at context/chat limit
 
@@ -135,3 +135,14 @@ Before the conversation ends:
 A task is complete only when the intended outcome is clear, changes are committed on the expected branch, applicable checks pass, role/data risks and compatibility are reviewed, PR/merge/deployment state is recorded accurately, remaining live validation is named, and the next action is recorded.
 
 **Canonical rule:** when chat memory and repository evidence conflict, inspect the live repository and choose the safer, better-supported state. Never silently discard a decision or present an assumption as a fact.
+
+
+## Latest continuation update — 2026-10-14, after PR #24
+
+- Current main SHA verified: `651a5e2783e2fdcec3dddc795f6c18ce00f72075`.
+- PR #24 merged: [migration ledger reconciliation](https://github.com/amirrivazak66-beep/anbox-sales/pull/24).
+- Mainline GitHub Actions for this SHA all completed successfully: CRM smoke, static dashboard smoke, browser smoke (mock data only), and GitHub Pages build/deployment. This is not live account-level E2E.
+- Live migration ledger has three versions, each now tracked under the matching filename. Clean-install baseline remains incomplete.
+- New read-only drift check found deployed `admin-users` v3 differs from `supabase/functions/admin-users/index.ts` in GitHub: deployed code contains manager-only `update_user` and `delete_user` actions not present in the tracked file. The deployed `username-login` v1 source exactly matches GitHub; `verify_jwt=false` is expected for this username/password bridge and requires abuse/rate-limit review. `admin-users` has `verify_jwt=true`.
+- A read-only ACL check reconfirmed `public.is_crm_manager()` is SECURITY DEFINER and has EXECUTE grants for `anon` and `authenticated`; the Security Advisor also reports leaked-password protection disabled and two RLS-enabled tables without policies. No production setting or grant was changed.
+- Next action: reconcile the deployed `admin-users` source into GitHub in a PR (without redeploying it), add regression guards, then review the PR checks. Keep production changes blocked until an authorized backup and separate restore rehearsal are confirmed.
