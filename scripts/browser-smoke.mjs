@@ -60,6 +60,15 @@ window.supabase = {
             let data = [];
             if (table === "profiles") {
               data = filters.role === "sales" ? [salesperson] : [manager, salesperson];
+            } else if (table === "leads") {
+              const today = new Date().toISOString();
+              data = [
+                { id: 1, owner_auth_id: salesperson.id, company_name: "Synthetic Overdue Co", sales_stage: "2", lead_status: "در حال پیگیری", followup_date: "2000-01-01", created_at: today },
+                { id: 2, owner_auth_id: salesperson.id, company_name: "Synthetic No-Date Co", sales_stage: "3", lead_status: "در حال مذاکره", followup_date: null, created_at: today },
+                { id: 3, owner_auth_id: salesperson.id, company_name: "Synthetic Contract Co", sales_stage: "6", lead_status: "در حال عقد قرارداد", followup_date: null, created_at: "2025-01-01T00:00:00.000Z" }
+              ];
+            } else if (table === "crm_kpi_definitions") {
+              data = filters.owner_auth_id === salesperson.id ? [{ owner_auth_id: salesperson.id, key: "received", target_daily: 3, target_monthly: 10 }] : [];
             }
             return Promise.resolve({ data, error: null }).then(resolve, reject);
           }
@@ -114,6 +123,7 @@ try {
     ["تیم", "team"],
     ["Pipeline", "pipeline"],
     ["گزارش‌ها", "reports"],
+    ["تحلیل عملکرد", "performance"],
     ["تنظیمات", "settings"]
   ];
   for (const [label, id] of navCases) {
@@ -122,6 +132,10 @@ try {
     const size = await app.locator("#" + id).evaluate(el => el.getBoundingClientRect().height);
     assert.ok(size > 0, `Page ${id} has no rendered height`);
   }
+  assert.match(await app.locator("#performanceTeamRows").innerText(), /Test Sales/);
+  assert.match(await app.locator("#performanceAlertRows").innerText(), /Synthetic Overdue Co/);
+  assert.match(await app.locator("#performanceAlertRows").innerText(), /Synthetic No-Date Co/);
+  console.log("PASS manager-only performance page, target data and synthetic follow-up alerts");
   console.log("PASS dashboard, leads, team, pipeline, reports and settings navigation");
 
   // Regression coverage for the settings panel: content must remain rendered, not merely have a visible wrapper.
