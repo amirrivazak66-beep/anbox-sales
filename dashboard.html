@@ -541,7 +541,8 @@ function buildManagerPerformance(profiles,targets,leadRows,now=new Date()){
   const matchingTargets=targets.filter(row=>String(row.owner_auth_id)===String(profile.id)&&String(row.key||'').toLowerCase()==='received');
   const target=matchingTargets.length===1?matchingTargets[0]:null;
   const dailyTarget=target?Number(target.target_daily??target.target??0):null;
-  const monthlyTarget=target?Number(target.target_monthly??((Number(target.target)||0)*22)):null;
+  const monthlyTargetValue=target?.target_monthly??(target?.target!==null&&target?.target!==undefined?Number(target.target)*24:null);
+  const monthlyTarget=monthlyTargetValue===null?null:Number(monthlyTargetValue);
   const targetConfigured=Boolean(target&&((dailyTarget||0)>0||(monthlyTarget||0)>0));
   const monthActual=owned.filter(lead=>inRange(lead.created_at,monthStart,monthEnd)).length;
   const todayActual=owned.filter(lead=>inRange(lead.created_at,dayStart,dayEnd)).length;
@@ -549,7 +550,7 @@ function buildManagerPerformance(profiles,targets,leadRows,now=new Date()){
   const overdue=active.filter(lead=>isDateKey(lead.followup_date)&&String(lead.followup_date)<todayKey).length;
   const invalidFollowup=active.filter(lead=>lead.followup_date&&!isDateKey(lead.followup_date)).length;
   const missingFollowup=active.filter(lead=>!lead.followup_date).length;
-  return {id:String(profile.id),name:String(profile.display_name||profile.username||'نامشخص'),todayActual,monthActual,targetConfigured,dailyTarget,monthlyTarget,monthlyGap:targetConfigured?monthActual-monthlyTarget:null,activeLeads:active.length,contracts:owned.filter(lead=>Number(lead.sales_stage)===6).length,overdue,missingFollowup,invalidFollowup};
+  return {id:String(profile.id),name:String(profile.display_name||profile.username||'نامشخص'),todayActual,monthActual,targetConfigured,dailyTarget,monthlyTarget,monthlyGap:monthlyTarget!==null?monthActual-monthlyTarget:null,activeLeads:active.length,contracts:owned.filter(lead=>Number(lead.sales_stage)===6).length,overdue,missingFollowup,invalidFollowup};
  });
  const alerts=leadRows.filter(lead=>!isClosed(lead)&&(!lead.followup_date||!isDateKey(lead.followup_date)||String(lead.followup_date)<todayKey)).map(lead=>{const date=String(lead.followup_date||''),valid=isDateKey(date);return {id:String(lead.id??''),company:String(lead.company_name||'بدون نام'),owner:profileById.get(String(lead.owner_auth_id||''))?.display_name||profileById.get(String(lead.owner_auth_id||''))?.username||'کارشناس نامشخص',followupDate:date,alert:!date?'تاریخ پیگیری ثبت نشده':!valid?'فرمت تاریخ پیگیری نامعتبر':'سررسید گذشته',stage:Number(lead.sales_stage)||0};});
  return {todayKey,team,alerts,undated:leadRows.filter(lead=>!lead.created_at||Number.isNaN(new Date(lead.created_at).getTime())).length};

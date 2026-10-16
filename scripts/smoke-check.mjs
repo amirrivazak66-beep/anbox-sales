@@ -117,6 +117,20 @@ try {
       if (first.todayActual !== 1 || first.monthActual !== 2 || first.monthlyGap !== -1) errors.push("dashboard.html: lead target completion or monthly deviation is incorrect");
       if (first.activeLeads !== 2 || first.contracts !== 1 || first.overdue !== 1 || first.missingFollowup !== 1) errors.push("dashboard.html: expert performance and follow-up counts are incorrect");
       if (report.team[1].targetConfigured || report.alerts.length !== 3 || report.undated !== 1 || report.alerts[2].alert !== "فرمت تاریخ پیگیری نامعتبر") errors.push("dashboard.html: missing targets, closed leads or invalid dates are misreported");
+      const fallbackReport = buildPerformance(
+        [{ id: "expert-1", display_name: "Expert One" }],
+        [{ owner_auth_id: "expert-1", key: "received", target: 2 }],
+        [],
+        now
+      );
+      if (fallbackReport.team[0].monthlyTarget !== 48 || fallbackReport.team[0].monthlyGap !== -48) errors.push("dashboard.html: monthly KPI target should fall back to the general target multiplied by 24");
+      const undefinedReport = buildPerformance(
+        [{ id: "expert-1", display_name: "Expert One" }],
+        [{ owner_auth_id: "expert-1", key: "received", target_daily: 2 }],
+        [],
+        now
+      );
+      if (undefinedReport.team[0].monthlyTarget !== null || undefinedReport.team[0].monthlyGap !== null) errors.push("dashboard.html: monthly KPI target should remain undefined when neither monthly nor general target is defined");
     } catch (error) {
       errors.push("dashboard.html: manager performance regression test failed: " + error.message);
     }
