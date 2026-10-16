@@ -16,6 +16,17 @@
 - تست مرورگر `node scripts/browser-smoke.mjs` اجرا نشد، چون Playwright در محیط موجود نیست؛ بسته‌ای نصب نشد.
 - هیچ اتصال، SQL، Migration یا تغییری در Supabase انجام نشد.
 
+## به‌روزرسانی بعدی — فاز محصولی (2026-10-16)
+- شاخهٔ جداگانهٔ محصولی: `codex/manager-performance-alerts` بر مبنای `main` با commit محلی `872923b`؛ این شاخه شامل تغییرات مستندات نیست.
+- فایل‌های تغییرکرده در شاخهٔ محصولی: `dashboard.html`، `scripts/smoke-check.mjs` و `scripts/browser-smoke.mjs`.
+- CSV بدون XLSX فقط header می‌داد؛ اصلاح شد تا ردیف‌های لید با quoting، BOM واقعی و CRLF صادر شوند. regression test ابتدا شکست را نشان داد و پس از اصلاح موفق شد.
+- صفحهٔ مدیرانهٔ تحلیل عملکرد اضافه شد؛ تحقق هدف فقط برای KPI ثبت لید محاسبه می‌شود. عملکرد مالکیت‌دار، مرحلهٔ عقد قرارداد و فالوآپ عقب‌افتاده/خالی/نامعتبر بر پایهٔ فیلدهای موجود نشان داده می‌شود. KPIهای بدون رویداد مستقیم، هدف‌های تعریف‌نشده و دادهٔ تاریخ نامعتبر به‌عنوان عملکرد واقعی/صفر نمایش داده نمی‌شوند.
+- تست‌های موفق: `node scripts/smoke-check.mjs`، بررسی syntax و نشانگرهای workflow CRM/Excel و `git diff --check`. `scripts/browser-smoke.mjs` syntax-check شد اما اجرا نشد؛ Playwright موجود نیست.
+- احراز هویت Git برای push در GCM در دسترس نبود؛ تلاش غیرتعاملی با نبود رمز شکست خورد و GitHub CLI نصب نیست. هیچ شاخه‌ای push و هیچ PR جدیدی منتشر نشده است. شاخهٔ مستندات و شاخهٔ محصولی هر دو محلی و مستقل‌اند.
+- هیچ SQL، Migration، اتصال یا تغییر Supabase انجام نشد.
+
+### گام دقیق بعدی
+مالک باید احراز هویت GitHub را در Git Credential Manager تکمیل کند. سپس شاخهٔ مستندات `codex/project-continuity-pack` را push و PR مستقل آن را به `main` باز کن؛ پس از آن شاخهٔ محصولی `codex/manager-performance-alerts` را push و PR مستقل محصولی را به `main` باز کن. هیچ‌کدام را merge یا deploy نکن.
 ## شروع نشست بعدی
 1. `AGENTS.md`، `docs/PROJECT_SOURCE_OF_TRUTH.md`، `docs/DECISIONS.md` و این فایل را بخوان.
 2. branch، `git status`، commitهای اخیر، diff و PRهای باز را دوباره از وضعیت واقعی بررسی کن.
