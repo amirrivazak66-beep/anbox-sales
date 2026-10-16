@@ -36,3 +36,13 @@
 - Do not claim a test passed unless it was actually run and its output inspected.
 - Distinguish static checks from browser tests and from live-production verification.
 - If a required check cannot run, state why and give the smallest next step.
+
+## Product source of truth and cross-session continuity
+- Before each task, read `docs/PROJECT_SOURCE_OF_TRUTH.md`, `docs/DECISIONS.md`, and `docs/SESSION_HANDOFF.md`, then consult the relevant existing product/technical docs.
+- Preserve the owner's currently chosen public product name. Never rename the public product to `psmedia`; that is historical source material only.
+- The existing dashboard/CRM (leads, experts/team, KPIs, pipeline, reports, Excel/CSV and existing data) is Module 1 of one integrated product, not a disposable prototype.
+- The four agreed modules are: (1) Performance Management & Intelligence, (2) Marketing & Advertising Intelligence, (3) AI Business Advisor, (4) Agents & Operations Execution.
+- At task start, inspect actual git status, branch, commits, PRs, relevant files and tests. Do not assume old handoff notes are still current.
+- At session end, update `docs/SESSION_HANDOFF.md` with branch/commit/PR, changed files, tests actually run and results, unrun checks and reasons, blockers and exact next step.
+- Record explicit owner decisions in `docs/DECISIONS.md`. If name/decisions conflict or cannot be established, do not guess or rename; report the discrepancy.
+- Continue to follow all existing production safety, branching, security, testing and deployment rules. Never merge or deploy without explicit owner approval.

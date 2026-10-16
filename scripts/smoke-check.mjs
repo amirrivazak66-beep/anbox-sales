@@ -4,6 +4,7 @@ import { tmpdir } from "node:os";
 import { join, resolve, dirname } from "node:path";
 import { spawnSync } from "node:child_process";
 import { fileURLToPath } from "node:url";
+import { runInNewContext } from "node:vm";
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const files = ["index.html", "dashboard.html"];
@@ -58,6 +59,24 @@ try {
 
   // Keep these protections explicit: smoke checks must never mutate production data or browser storage.
   const dashboard = readFileSync(join(root, "dashboard.html"), "utf8");
+  const csvParserMatch = dashboard.match(/function parseCsvRows\(text\)\{[^\r\n]*\}/);
+  if (!csvParserMatch) {
+    errors.push("dashboard.html: parseCsvRows() is missing");
+  } else {
+    try {
+      const parseCsvRows = runInNewContext("(" + csvParserMatch[0] + ")");
+      const expectedRows = [{ company: "Acme", note: "Call, after lunch" }];
+      for (const [label, lineEnding] of [["LF", "\n"], ["CRLF", "\r\n"]]) {
+        const sample = ["company,note", "\"Acme\",\"Call, after lunch\"", ""].join(lineEnding);
+        const actualRows = JSON.parse(JSON.stringify(parseCsvRows("\uFEFF" + sample)));
+        if (JSON.stringify(actualRows) !== JSON.stringify(expectedRows)) {
+          errors.push("dashboard.html: parseCsvRows() failed " + label + " CSV with BOM or quoted comma");
+        }
+      }
+    } catch (error) {
+      errors.push("dashboard.html: parseCsvRows() could not be tested: " + error.message);
+    }
+  }
   const saveFunction = dashboard.match(/function saveChecklist\(\)\{([\s\S]*?)\}\s*async function openLeadModal/);
   if (!dashboard.includes("'تناسب با آن باکس':'anbox_fit'")) errors.push("dashboard.html: legacy Excel import header alias was removed");
   if (!saveFunction || !/localStorage\.setItem\(['"]checklist_['"]\+user/.test(saveFunction[1])) errors.push("dashboard.html: saveChecklist() does not persist checklist state");
