@@ -6,36 +6,23 @@
 توسعهٔ یک محصول واحد با چهار ماژول تعریف‌شده در `PROJECT_SOURCE_OF_TRUTH.md`. داشبورد و قابلیت‌های CRM/فروش فعلی ماژول اول محصول‌اند و نباید صرفاً به‌دلیل تغییر معماری حذف شوند.
 
 ## وضعیت پایان نشست 2026-10-16
-- Branch جاری: `codex/project-continuity-pack`؛ مبنا `8a9e2eb`؛ commit محلی محتوای کار `2906f56` (`docs: add project continuity source of truth`).
-- PRهای GitHub: تنها PR باز بررسی‌شده #8 مربوط به پیش‌نمایش صفحهٔ فرود در شاخه‌ای دیگر است. PR این شاخه ایجاد/منتشر نشده؛ برای بازبینی محلی آماده است و push آن به تأیید مالک نیاز دارد.
-- فایل‌های تغییرکرده در commit کار: `AGENTS.md`، `docs/PROJECT_SOURCE_OF_TRUTH.md`، `docs/DECISIONS.md`، `docs/SESSION_HANDOFF.md`، `dashboard.html` و `scripts/smoke-check.mjs`.
-- تغییر CSV قبلی حفظ شد: `dashboard.html` اکنون BOM و پایان‌خط LF/CRLF را می‌پذیرد؛ `scripts/smoke-check.mjs` برای BOM، پایان‌خط‌ها و فیلد دارای comma آزمون دارد.
-- اسناد بسته اضافه و addendum به قواعد فعلی `AGENTS.md` ادغام شد؛ هیچ سند قبلی حذف یا بازنویسی نشد.
-- کد فعلی صفحهٔ اصلی و داشبورد نام «مدیرنگر» را نشان می‌دهد. اسناد قدیمی آن را موقت می‌خوانند، پس انتخاب نهایی برند از اسناد قطعی نیست. نام تغییر نکرد؛ تأیید مالک برای تثبیت نام لازم است.
-- تست موفق: `node scripts/smoke-check.mjs`؛ بررسی syntax و نشانگرهای CRM/Excel مطابق workflow؛ `git diff --check`.
-- تست مرورگر `node scripts/browser-smoke.mjs` اجرا نشد، چون Playwright در محیط موجود نیست؛ بسته‌ای نصب نشد.
-- هیچ اتصال، SQL، Migration یا تغییری در Supabase انجام نشد.
-
-## به‌روزرسانی بعدی — فاز محصولی (2026-10-16)
-- شاخهٔ جداگانهٔ محصولی: `codex/manager-performance-alerts` بر مبنای `main` با commit محلی `872923b`؛ این شاخه شامل تغییرات مستندات نیست.
-- فایل‌های تغییرکرده در شاخهٔ محصولی: `dashboard.html`، `scripts/smoke-check.mjs` و `scripts/browser-smoke.mjs`.
-- CSV بدون XLSX فقط header می‌داد؛ اصلاح شد تا ردیف‌های لید با quoting، BOM واقعی و CRLF صادر شوند. regression test ابتدا شکست را نشان داد و پس از اصلاح موفق شد.
-- صفحهٔ مدیرانهٔ تحلیل عملکرد اضافه شد؛ تحقق هدف فقط برای KPI ثبت لید محاسبه می‌شود. عملکرد مالکیت‌دار، مرحلهٔ عقد قرارداد و فالوآپ عقب‌افتاده/خالی/نامعتبر بر پایهٔ فیلدهای موجود نشان داده می‌شود. KPIهای بدون رویداد مستقیم، هدف‌های تعریف‌نشده و دادهٔ تاریخ نامعتبر به‌عنوان عملکرد واقعی/صفر نمایش داده نمی‌شوند.
-- تست‌های موفق: `node scripts/smoke-check.mjs`، بررسی syntax و نشانگرهای workflow CRM/Excel و `git diff --check`. `scripts/browser-smoke.mjs` syntax-check شد اما اجرا نشد؛ Playwright موجود نیست.
-- احراز هویت Git برای push در GCM در دسترس نبود؛ تلاش غیرتعاملی با نبود رمز شکست خورد و GitHub CLI نصب نیست. هیچ شاخه‌ای push و هیچ PR جدیدی منتشر نشده است. شاخهٔ مستندات و شاخهٔ محصولی هر دو محلی و مستقل‌اند.
-- هیچ SQL، Migration، اتصال یا تغییر Supabase انجام نشد.
-
-### گام دقیق بعدی
-مالک باید احراز هویت GitHub را در Git Credential Manager تکمیل کند. سپس شاخهٔ مستندات `codex/project-continuity-pack` را push و PR مستقل آن را به `main` باز کن؛ پس از آن شاخهٔ محصولی `codex/manager-performance-alerts` را push و PR مستقل محصولی را به `main` باز کن. هیچ‌کدام را merge یا deploy نکن.
-## شروع نشست بعدی
-1. `AGENTS.md`، `docs/PROJECT_SOURCE_OF_TRUTH.md`، `docs/DECISIONS.md` و این فایل را بخوان.
-2. branch، `git status`، commitهای اخیر، diff و PRهای باز را دوباره از وضعیت واقعی بررسی کن.
-3. فایل‌ها و تست‌های مرتبط را فقط به‌اندازهٔ نیاز بررسی کن؛ از گزارش تاریخی به‌عنوان وضعیت قطعی استفاده نکن.
-4. روی branch مستقل بمان و تغییرات قبلی محلی را حفظ کن.
-5. هیچ تغییر production در Supabase، migration، RLS یا دادهٔ واقعی انجام نده.
+- `main` و `origin/main` بدون تغییر در `8a9e2eb` هستند.
+- PR مستندات: [#32](https://github.com/amirrivazak66-beep/anbox-sales/pull/32)، شاخهٔ `codex/project-continuity-pack`، HEAD=`c105a03`، مقصد `main`؛ باز و merge نشده. شامل اسناد تداوم و تغییر CSV واردشده از تاریخچهٔ قبلی است.
+- PR محصول: [#33](https://github.com/amirrivazak66-beep/anbox-sales/pull/33)، شاخهٔ `codex/manager-performance-alerts`، HEAD=`872923b`، مبنا `main`؛ باز و merge نشده.
+- فایل‌های PR محصول: `dashboard.html`، `scripts/smoke-check.mjs`، `scripts/browser-smoke.mjs`.
+- CSV بدون XLSX پیش از اصلاح فقط header صادر می‌کرد؛ اکنون ردیف‌های لید، quoting، BOM واقعی UTF-8 و CRLF دارد. مسیر XLSX و واردکردن CSV حفظ شده‌اند.
+- صفحهٔ مدیرانهٔ تحلیل عملکرد اضافه شده است. تحقق هدف فقط برای KPI ثبت لید (با تاریخ معتبر) محاسبه می‌شود؛ شاخص‌های مالکیت کارشناس، مرحلهٔ قرارداد و لیدهای فاقد/عقب‌افتاده/دارای تاریخ نامعتبر فالوآپ بر داده‌های موجود تکیه دارند. هدف تعریف‌نشده، KPI مبهم و تاریخ نامعتبر به‌عنوان عملکرد واقعی یا صفر گزارش نمی‌شود.
+- تست‌ها: `node scripts/smoke-check.mjs` موفق؛ `node --check scripts/browser-smoke.mjs` موفق؛ `git diff --check origin/main...HEAD` موفق. مرورگر اجرا نشد چون Playwright در محیط موجود نیست.
+- هیچ اتصال، SQL، Migration یا تغییری در Supabase انجام نشد. PRها merge یا deploy نشده‌اند.
 
 ## گام دقیق بعدی
-پس از تأیید مالک برای انتشار، شاخهٔ آمادهٔ بازبینی را push و PR را باز کن؛ تا آن زمان PRای برای این تغییرات منتشر نشده است. در نشست توسعهٔ بعدی، ابتدا وضعیت branch و PR را دوباره بررسی کن و سپس دربارهٔ گام CSV بعدی تصمیم بگیر.
+بازبینی PR محصول #33 با دادهٔ توسعهٔ تأییدشده و ارزیابی معنای KPIها/تاریخ‌های فالوآپ، بدون خواندن دیتابیس تولیدی. بعد از بازخورد، اصلاحات لازم را روی شاخهٔ محصولی و با تست انجام بده. تا زمان تأیید مالک، merge یا deploy نکن.
+
+## شروع نشست بعدی
+1. `AGENTS.md`، `docs/PROJECT_SOURCE_OF_TRUTH.md`، `docs/DECISIONS.md` و این فایل را بخوان.
+2. branch، `git status`، commitهای اخیر، diff و PRها را از وضعیت واقعی بررسی کن.
+3. روی شاخهٔ محصولی مستقل بمان؛ تغییرات قبلی را حفظ کن.
+4. هیچ تغییر production در Supabase، migration، RLS یا دادهٔ واقعی انجام نده.
 
 ## قالب پایان نشست
 - انجام‌شده:
