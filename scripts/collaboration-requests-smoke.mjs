@@ -34,4 +34,14 @@ assert.ok(source.includes("data-history"), "each request must expose its interac
 assert.ok(source.includes("cr-followup-list"), "phase 2 must show due follow-up tasks");
 assert.ok(source.includes("cr-export-daily"), "phase 2 must export a daily activity report");
 assert.ok(source.includes("p_due_at:due.toISOString()"), "follow-up due dates must be persisted as timestamps");
+assert.ok(source.includes('id="cr-followup-from"'), "phase 2 must filter activity by start date");
+assert.ok(source.includes('id="cr-followup-to"'), "phase 2 must filter activity by end date");
+assert.ok(source.includes('id="cr-followup-status"'), "phase 2 must filter follow-ups by operational status");
+assert.ok(source.includes('id="cr-followup-expert"'), "managers must be able to filter follow-ups by assigned expert");
+assert.ok(source.includes('id="cr-expert-report"'), "managers must see a comparative expert performance report");
+assert.ok(source.includes("o.calls++"), "expert report must count calls");
+assert.ok(source.includes("o.notes++"), "expert report must count notes");
+assert.ok(source.includes("o.overdue++"), "expert report must count overdue tasks");
+assert.ok(source.includes("cr-followup-from','cr-followup-to','cr-followup-status"), "follow-up filters must refresh the operational report");
+assert.ok(source.includes("managernegar-daily-followups.xlsx"), "daily activity report must export an Excel workbook");
 console.log("PASS collaboration request type classification, parser defaults and safe insert-only import");
