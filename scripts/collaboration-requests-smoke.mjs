@@ -23,4 +23,8 @@ assert.ok(source.includes("requestTypeOptions"), "classification options must be
 assert.ok(source.includes("cr-type"), "request type filter must be present");
 assert.ok(source.includes(".insert(payload)"), "Excel imports must insert new records");
 assert.ok(!source.includes(".upsert(payload"), "Excel re-import must not silently overwrite manual updates");
+assert.ok(source.includes("data-refer-hr"), "employment requests must expose an HR referral action");
+assert.ok(source.includes("if(!isManager){message('فقط مدیر"), "only managers may trigger HR referral");
+assert.ok(source.includes("request_status:'ارجاع به منابع انسانی'"), "HR referral must persist in the request status");
+assert.ok(source.includes("request_status==='ارجاع به منابع انسانی'"), "referred requests must not be referred twice");
 console.log("PASS collaboration request type classification, parser defaults and safe insert-only import");
