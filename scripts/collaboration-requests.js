@@ -5,6 +5,7 @@ const schema=[
  ['external_id','شناسه',['شناسه','کد','کد درخواست','شماره','ردیف']],
  ['request_type','نوع درخواست',[]],
  ['request_status','وضعیت درخواست',[]],
+ ['request_status','وضعیت درخواست',[]],
  ['phone','تلفن',['تلفن','شماره تماس','موبایل','شماره موبایل']],
  ['company','شرکت',['شرکت','نام شرکت','نام مجموعه','نام مشتری']],
  ['province','استان',['استان','استان محل فعالیت']],
@@ -25,6 +26,7 @@ const editable=schema.filter(x=>!['external_id','expert_name','registered_at_tex
 const requestTypeLabels={unclassified:'تعیین‌نشده',commercial:'تجاری',employment:'استخدامی'};
 const requestTypeOptions=['unclassified','commercial','employment'];
 const requestStatusLabels=['جدید','در حال بررسی','نیازمند اطلاعات','در حال پیگیری','در انتظار پاسخ','جلسه/مذاکره','ارجاع به منابع انسانی','تکمیل‌شده','ردشده','بسته‌شده'];
+const requestStatusLabels=['جدید','در حال بررسی','نیازمند اطلاعات','در حال پیگیری','در انتظار پاسخ','جلسه/مذاکره','ارجاع به منابع انسانی','تکمیل‌شده','ردشده','بسته‌شده'];
 const norm=v=>String(v??'').trim().replace(/[۰-۹]/g,c=>String('۰۱۲۳۴۵۶۷۸۹'.indexOf(c))).replace(/[٠-٩]/g,c=>String('٠١٢٣٤٥٦٧٨٩'.indexOf(c)));
 const esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const pct=(a,b)=>b?Math.min(100,Math.round(a*100/b)):0;
@@ -37,7 +39,7 @@ function parseRows(rows){
  const o={};schema.forEach(([key],j)=>{o[key]=mapped[key]>=0?norm(row[mapped[key]]):''});
  if(!o.external_id)throw Error('شناسه در ردیف '+(i+2)+' خالی است');
  o.call_count=Number(o.call_count||0);if(!Number.isInteger(o.call_count)||o.call_count<0)throw Error('تعداد تماس در ردیف '+(i+2)+' نامعتبر است');
- o.request_type='unclassified';
+ o.request_type='unclassified';o.request_status='جدید';
  o.request_status='جدید';
  return o;
  });
@@ -69,7 +71,7 @@ function mount(host,{supabase,userId,isManager=false,XLSX=global.XLSX}={}){
  const el=id=>host.querySelector('#'+id),message=t=>{el('cr-message').textContent=t};
  const distinct=k=>[...new Set(records.map(r=>r[k]).filter(Boolean))].sort((a,b)=>a.localeCompare(b,'fa'));
  function fill(id,values,label){const select=el(id),v=select.value;select.innerHTML='<option value="">'+label+'</option>'+values.map(x=>'<option>'+esc(x)+'</option>').join('');select.value=v}
- function filtered(){const q=norm(el('cr-search').value).toLowerCase();return records.filter(r=>(view==='all'||r.request_type===view||(view==='unclassified'&&(!r.request_type||r.request_type==='unclassified')))&&(!q||[r.company,r.phone,r.external_id].some(v=>norm(v).toLowerCase().includes(q)))&&(!el('cr-province').value||r.province===el('cr-province').value)&&(!el('cr-result').value||r.call_result===el('cr-result').value)&&(!el('cr-stage').value||r.sales_stage===el('cr-stage').value)&&(!el('cr-priority').value||r.priority===el('cr-priority').value)&&(!el('cr-expert').value||r.expert_name===el('cr-expert').value)&&(!el('cr-category').value||r.sales_category===el('cr-category').value)&&(!el('cr-type').value||r.request_type===el('cr-type').value))}
+ function filtered(){const q=norm(el('cr-search').value).toLowerCase();return records.filter(r=>(view==='all'||r.request_type===view||(view==='unclassified'&&(!r.request_type||r.request_type==='unclassified')))&&(!q||[r.company,r.phone,r.external_id].some(v=>norm(v).toLowerCase().includes(q)))&&(!el('cr-province').value||r.province===el('cr-province').value)&&(!el('cr-result').value||r.call_result===el('cr-result').value)&&(!el('cr-stage').value||r.request_status===el('cr-stage').value)&&(!el('cr-priority').value||r.priority===el('cr-priority').value)&&(!el('cr-expert').value||r.expert_name===el('cr-expert').value)&&(!el('cr-category').value||r.sales_category===el('cr-category').value)&&(!el('cr-type').value||r.request_type===el('cr-type').value))}
  function gauge(title,value,color){return '<div><div style="text-align:center">'+title+'</div><div class="cr-gauge" style="--v:'+value+';--g:'+color+'"><b>'+value+'٪</b></div><div class="cr-muted" style="text-align:center">۰٪ — ۱۰۰٪</div></div>'}
  function render(){
  const rows=filtered(),commercialRows=rows.filter(r=>r.request_type==='commercial'),total=commercialRows.length,followed=commercialRows.filter(r=>Number(r.call_count)>0).length,completed=commercialRows.filter(r=>r.company&&r.phone&&r.province&&r.sales_stage&&r.call_result).length,need=commercialRows.filter(r=>!r.next_followup_text||r.next_followup_text==='ندارد'||!r.call_result).length,actioned=commercialRows.filter(r=>r.next_action&&r.next_action!=='بدون اقدام').length;
@@ -78,7 +80,7 @@ function mount(host,{supabase,userId,isManager=false,XLSX=global.XLSX}={}){
  el('cr-table').innerHTML='<table><thead><tr><th>شرکت/متقاضی</th><th>نوع درخواست</th><th>استان</th><th>تلفن</th><th>وضعیت درخواست</th><th>پیگیری بعدی</th><th>مالک</th><th>عملیات</th></tr></thead><tbody>'+rows.map(r=>'<tr><td>'+esc(r.company)+'</td><td><span class="cr-pill">'+esc(requestTypeLabels[r.request_type||'unclassified'])+'</span></td><td>'+esc(r.province)+'</td><td>'+esc(r.phone)+'</td><td><span class="cr-pill">'+esc(r.request_status||r.sales_stage)+'</span></td><td>'+esc(r.next_followup_text)+'</td><td>'+esc(ownerName(r.owner_auth_id))+'</td><td><button class="cr-btn alt" data-edit="'+esc(r.id)+'">ویرایش</button></td></tr>').join('')+'</tbody></table>';
  host.querySelectorAll('[data-edit]').forEach(b=>b.onclick=()=>edit(records.find(r=>String(r.id)===b.dataset.edit)));
  }
- async function load(){if(isManager){const p=await supabase.from('profiles').select('id,display_name,username,role').eq('role','sales').order('display_name');if(p.error)throw p.error;expertProfiles=p.data||[]}let q=supabase.from('collaboration_requests').select('*').order('created_at',{ascending:false}).limit(2000);if(!isManager)q=q.eq('owner_auth_id',userId);const {data,error}=await q;if(error)throw error;records=data||[];fill('cr-province',distinct('province'),'همه استان‌ها');fill('cr-result',distinct('call_result'),'همه نتایج تماس');fill('cr-stage',distinct('sales_stage'),'همه مراحل');fill('cr-priority',distinct('priority'),'همه اولویت‌ها');fill('cr-expert',distinct('expert_name'),'همه کارشناسان');fill('cr-category',distinct('sales_category'),'همه دسته‌ها');const ownerSelect=el('cr-import-owner');ownerSelect.innerHTML=(isManager?'<option value="">انتخاب مالک فایل</option>':'')+(isManager?expertProfiles.map(p=>'<option value="'+esc(p.id)+'">'+esc(p.display_name||p.username)+'</option>').join(''):'<option value="'+esc(userId)+'">درخواست‌های من</option>')+(isManager?'<option value="'+esc(userId)+'">مدیر</option>':'');if(!isManager)ownerSelect.value=userId;el('cr-export-employment').hidden=!isManager;render();message('اطلاعات به‌روز شد: '+records.length.toLocaleString('fa-IR')+' درخواست');}
+ async function load(){if(isManager){const p=await supabase.from('profiles').select('id,display_name,username,role').eq('role','sales').order('display_name');if(p.error)throw p.error;expertProfiles=p.data||[]}let q=supabase.from('collaboration_requests').select('*').order('created_at',{ascending:false}).limit(2000);if(!isManager)q=q.eq('owner_auth_id',userId);const {data,error}=await q;if(error)throw error;records=data||[];fill('cr-province',distinct('province'),'همه استان‌ها');fill('cr-result',distinct('call_result'),'همه نتایج تماس');fill('cr-stage',distinct('request_status'),'همه وضعیت‌ها');fill('cr-priority',distinct('priority'),'همه اولویت‌ها');fill('cr-expert',distinct('expert_name'),'همه کارشناسان');fill('cr-category',distinct('sales_category'),'همه دسته‌ها');const ownerSelect=el('cr-import-owner');ownerSelect.innerHTML=(isManager?'<option value="">انتخاب مالک فایل</option>':'')+(isManager?expertProfiles.map(p=>'<option value="'+esc(p.id)+'">'+esc(p.display_name||p.username)+'</option>').join(''):'<option value="'+esc(userId)+'">درخواست‌های من</option>')+(isManager?'<option value="'+esc(userId)+'">مدیر</option>':'');if(!isManager)ownerSelect.value=userId;el('cr-export-employment').hidden=!isManager;render();message('اطلاعات به‌روز شد: '+records.length.toLocaleString('fa-IR')+' درخواست');}
  function edit(r){
   if(!r)return;
   const dialog=document.createElement('dialog');dialog.className='cr-edit';
