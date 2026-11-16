@@ -243,9 +243,12 @@ body{background:radial-gradient(ellipse at 20% 5%,rgba(0,85,160,.11),transparent
 /* Fine details from supplied reference */
 .ref-brand{display:flex;align-items:center;justify-content:flex-start;gap:12px;padding:0 4px 22px!important;margin-bottom:22px!important;border-bottom:1px solid rgba(89,143,196,.16)}
 .ref-brand-copy{display:flex;flex-direction:column;gap:4px}.ref-brand .logo-text{font-size:25px}.ref-brand small{font-size:10px;color:#b1c2d7}.ref-brand .brand-mark-small{width:52px;height:52px;flex:0 0 52px}
-.ref-sidebar-user{position:sticky;top:calc(100vh - 100px);margin-top:28px!important;display:flex;align-items:center;gap:10px;padding:11px!important;background:linear-gradient(145deg,#10253d,#0a1b30)!important;border-radius:17px!important}
-.ref-sidebar-user .user-name{font-size:13px;margin:0}.ref-sidebar-user .ref-role{font-size:10px;color:#9db2ca;margin-top:3px}.ref-avatar{width:42px;height:42px;border-radius:50%;display:grid;place-items:center;background:#163a60;color:#fff;font-size:23px}
-.ref-sidebar-user .logout-btn{width:auto;margin:0 0 0 auto;padding:7px 10px;font-size:10px}
+/* Keep the account/action card anchored fully inside the sidebar viewport. */
+.sidebar{box-sizing:border-box;height:100vh;height:100dvh;padding-bottom:112px}
+.ref-sidebar-user{position:absolute;right:16px;left:16px;bottom:16px;top:auto;width:auto;box-sizing:border-box;margin:0!important;display:flex;flex-direction:row;align-items:center;justify-content:space-between;gap:9px;padding:11px!important;background:linear-gradient(145deg,#10253d,#0a1b30)!important;border:1px solid rgba(89,143,196,.16);border-radius:17px!important;z-index:5;min-height:76px}
+.ref-sidebar-user>div:not(.ref-avatar){min-width:0;flex:1;text-align:right}
+.ref-sidebar-user .user-name{font-size:13px;margin:0;line-height:1.5;overflow-wrap:anywhere}.ref-sidebar-user .ref-role{font-size:10px;color:#9db2ca;margin-top:3px}.ref-avatar{width:42px;height:42px;flex:0 0 42px;border-radius:50%;display:grid;place-items:center;background:#163a60;color:#fff;font-size:23px}
+.ref-sidebar-user .logout-btn{flex:0 0 auto;width:auto;max-width:62px;white-space:nowrap;margin:0;padding:7px 9px;font-size:10px;line-height:1.4}
 .ref-search{display:flex;align-items:center;gap:7px}.ref-search input{width:100%;min-width:0;border:0;outline:0;background:transparent;color:#edf6ff;font:12px Tahoma}.ref-search input::placeholder{color:#a7b8ce}.ref-search button{border:0;background:transparent;color:#bcd0e7;font-size:22px;cursor:pointer;line-height:1}
 .ref-date select{background:transparent;color:#eaf3ff;border:0;outline:0;font:600 12px Tahoma;cursor:pointer}.ref-date option{background:#10223a;color:#fff}
 .ref-bell{border:0;cursor:pointer;font-size:18px}
