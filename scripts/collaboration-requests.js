@@ -1,76 +1,81 @@
-/* Collaboration requests: preview only. Requires reviewed Supabase schema and RLS before use. */
+/* Collaboration requests CRM module. */
 (function(global){
 'use strict';
-const headers=['شناسه','تلفن','شرکت','استان','ارسال ماهانه','دسته فروش','تاریخ ثبت','کارشناس','نتیجه تماس','مرحله فروش','اولویت','تعداد تماس','تاریخ آخرین تماس','پیگیری بعدی','اقدام بعدی','توضیحات'];
-const fields=['external_id','phone','company','province','monthly_shipments','sales_category','registered_at_text','expert_name','call_result','sales_stage','priority','call_count','last_contact_text','next_followup_text','next_action','notes'];
-const editable=['phone','company','province','monthly_shipments','sales_category','call_result','sales_stage','priority','call_count','last_contact_text','next_followup_text','next_action','notes'];
-const escapeHTML=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const schema=[
+ ['external_id','شناسه',['شناسه','کد','کد درخواست','شماره','ردیف']],
+ ['phone','تلفن',['تلفن','شماره تماس','موبایل','شماره موبایل']],
+ ['company','شرکت',['شرکت','نام شرکت','نام مجموعه','نام مشتری']],
+ ['province','استان',['استان','استان محل فعالیت']],
+ ['monthly_shipments','ارسال ماهانه',['ارسال ماهانه','تعداد ارسال ماهانه','حجم ارسال ماهانه']],
+ ['sales_category','دسته فروش',['دسته فروش','نوع فروش','گروه فروش']],
+ ['registered_at_text','تاریخ ثبت',['تاریخ ثبت','تاریخ درخواست','تاریخ']],
+ ['expert_name','کارشناس',['کارشناس','نام کارشناس','کارشناس فروش']],
+ ['call_result','نتیجه تماس',['نتیجه تماس','وضعیت تماس','نتیجه پیگیری']],
+ ['sales_stage','مرحله فروش',['مرحله فروش','مرحله','وضعیت فروش']],
+ ['priority','اولویت',['اولویت','درجه اهمیت']],
+ ['call_count','تعداد تماس',['تعداد تماس','دفعات تماس','تعداد پیگیری']],
+ ['last_contact_text','تاریخ آخرین تماس',['تاریخ آخرین تماس','آخرین تماس']],
+ ['next_followup_text','پیگیری بعدی',['پیگیری بعدی','تاریخ پیگیری بعدی','تاریخ پیگیری']],
+ ['next_action','اقدام بعدی',['اقدام بعدی','اقدام لازم','اقدام']],
+ ['notes','توضیحات',['توضیحات','شرح','یادداشت']]
+];
+const editable=schema.filter(x=>!['external_id','expert_name','registered_at_text'].includes(x[0])).map(x=>x[0]);
 const norm=v=>String(v??'').trim().replace(/[۰-۹]/g,c=>String('۰۱۲۳۴۵۶۷۸۹'.indexOf(c))).replace(/[٠-٩]/g,c=>String('٠١٢٣٤٥٦٧٨٩'.indexOf(c)));
+const esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const pct=(a,b)=>b?Math.min(100,Math.round(a*100/b)):0;
 function parseRows(rows){
- if(!Array.isArray(rows)||rows.length<2)throw Error('شیت CRM خالی است');
- const cols=rows[0].map(norm);if(headers.some(h=>!cols.includes(h)))throw Error('ستون‌های مورد انتظار در شیت CRM یافت نشد');
- const result=rows.slice(1).filter(row=>row.some(v=>String(v??'').trim())).map((row,i)=>{
- const record={};headers.forEach((h,j)=>record[fields[j]]=norm(row[cols.indexOf(h)]));
- if(!record.external_id)throw Error('شناسه ردیف '+(i+2)+' خالی است');
- record.call_count=Number(record.call_count||0);
- if(!Number.isInteger(record.call_count)||record.call_count<0)throw Error('تعداد تماس نامعتبر است');
- return record;
- });const seen=new Set();for(const r of result){if(seen.has(r.external_id))throw Error('شناسه تکراری در اکسل: '+r.external_id);seen.add(r.external_id)}return result;
+ if(!Array.isArray(rows)||rows.length<2)throw Error('فایل باید حداقل یک ردیف عنوان و یک ردیف داده داشته باشد');
+ const heads=rows[0].map(norm),mapped={};
+ schema.forEach(([key,,aliases])=>{mapped[key]=heads.findIndex(h=>aliases.some(a=>norm(a).toLowerCase()===h.toLowerCase()))});
+ if(mapped.external_id<0)throw Error('ستون شناسه درخواست پیدا نشد. لطفاً فایل نمونه اکسل را با قالب مورد انتظار تطبیق دهید.');
+ const output=rows.slice(1).filter(row=>row.some(v=>String(v??'').trim())).map((row,i)=>{
+ const o={};schema.forEach(([key],j)=>{o[key]=mapped[key]>=0?norm(row[mapped[key]]):''});
+ if(!o.external_id)throw Error('شناسه در ردیف '+(i+2)+' خالی است');
+ o.call_count=Number(o.call_count||0);if(!Number.isInteger(o.call_count)||o.call_count<0)throw Error('تعداد تماس در ردیف '+(i+2)+' نامعتبر است');
+ return o;
+ });
+ const seen=new Set();for(const o of output){if(seen.has(o.external_id))throw Error('شناسه تکراری در فایل: '+o.external_id);seen.add(o.external_id)}
+ return output;
 }
 function mount(host,{supabase,userId,isManager=false,XLSX=global.XLSX}={}){
  if(!host||!supabase||!userId)throw Error('هویت کاربر و اتصال دیتابیس الزامی است');
- host.dir='rtl';host.innerHTML='<section class="card"><h2>🤝 درخواست همکاری</h2><p>بارگذاری فایل CRM، ویرایش اطلاعات و گزارش کارشناسان</p><label>فایل اکسل <input type="file" id="cr-file" accept=".xlsx,.xls"></label> <button id="cr-reload">به‌روزرسانی</button><p id="cr-message" role="status"></p></section><section class="card" id="cr-summary"></section><section class="card"><input id="cr-search" placeholder="جستجوی شرکت، تلفن یا شناسه"><div id="cr-table" style="overflow:auto"></div></section>';
- let records=[];const message=(t)=>host.querySelector('#cr-message').textContent=t;
- async function load(){
- let query=supabase.from('collaboration_requests').select('*').order('created_at',{ascending:false}).limit(1000);
- if(!isManager)query=query.eq('owner_auth_id',userId);
- const {data,error}=await query;if(error)throw error;records=data||[];render();
- }
+ host.dir='rtl';host.innerHTML=`
+ <style>
+ .cr-wrap{color:var(--txt,#e2e8f0);direction:rtl}.cr-head{display:flex;justify-content:space-between;gap:12px;align-items:center;flex-wrap:wrap;margin-bottom:18px}.cr-actions{display:flex;gap:8px;flex-wrap:wrap}.cr-btn{border:1px solid var(--bd, #334155);border-radius:10px;padding:10px 14px;background:#2563eb;color:white;cursor:pointer;font:inherit}.cr-btn.alt{background:transparent;color:inherit}.cr-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin-bottom:16px}.cr-kpi,.cr-panel{background:var(--card,rgba(15,23,42,.65));border:1px solid var(--bd,rgba(59,130,246,.18));border-radius:14px;padding:16px;margin-bottom:14px}.cr-kpi small,.cr-muted{color:var(--txt2,#94a3b8)}.cr-kpi strong{display:block;font-size:25px;margin-top:7px}.cr-gauges{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}.cr-gauge{width:132px;height:132px;margin:12px auto;border-radius:50%;display:grid;place-items:center;background:conic-gradient(var(--g) calc(var(--v)*1%),rgba(148,163,184,.18) 0);position:relative}.cr-gauge:before{content:'';position:absolute;inset:12px;border-radius:50%;background:#111c31}.cr-gauge b{z-index:1;font-size:23px}.cr-filters{display:grid;grid-template-columns:repeat(5,minmax(120px,1fr));gap:9px}.cr-filters input,.cr-filters select,.cr-edit input{width:100%;padding:10px;border-radius:9px;border:1px solid var(--bd);background:rgba(15,23,42,.75);color:inherit;font:inherit}.cr-table{overflow:auto}.cr-table table{width:100%;min-width:760px;border-collapse:collapse}.cr-table th,.cr-table td{text-align:right;padding:11px;border-bottom:1px solid var(--bd);font-size:13px}.cr-pill{padding:4px 8px;border-radius:18px;background:rgba(59,130,246,.18)}.cr-edit{max-width:680px;width:95%;max-height:85vh;overflow:auto;background:#101b30;color:#fff;border:1px solid var(--bd);border-radius:14px;padding:18px;margin:auto}.cr-edit label{display:block;margin:10px 0}.cr-edit button{margin-top:10px}.cr-status{margin:8px 0;min-height:22px;color:#93c5fd}@media(max-width:850px){.cr-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.cr-gauges{grid-template-columns:1fr}.cr-filters{grid-template-columns:repeat(2,minmax(0,1fr))}}
+ </style>
+ <div class="cr-wrap">
+ <div class="cr-head"><div><h2>🤝 درخواست همکاری</h2><p class="cr-muted">مدیریت درخواست‌های همکاری کارشناسان</p></div>
+ <div class="cr-actions"><label class="cr-btn" for="cr-file">⬆ آپلود اکسل درخواست همکاری</label><input hidden type="file" id="cr-file" accept=".xlsx,.xls"><button class="cr-btn alt" id="cr-reload">به‌روزرسانی</button></div></div>
+ <p class="cr-status" id="cr-message" role="status" aria-live="polite"></p>
+ <div class="cr-grid" id="cr-kpis"></div>
+ <div class="cr-panel"><h3>گزارش عملکرد</h3><div class="cr-gauges" id="cr-gauges"></div></div>
+ <div class="cr-panel"><div class="cr-filters">
+ <input id="cr-search" placeholder="جستجو در شرکت، تلفن و شناسه">
+ <select id="cr-province"><option value="">همه استان‌ها</option></select>
+ <select id="cr-result"><option value="">همه نتایج تماس</option></select>
+ <select id="cr-stage"><option value="">همه مراحل</option></select>
+ <select id="cr-priority"><option value="">همه اولویت‌ها</option></select>
+ </div></div>
+ <div class="cr-panel cr-table" id="cr-table"></div></div>`;
+ let records=[];
+ const el=id=>host.querySelector('#'+id),message=t=>{el('cr-message').textContent=t};
+ const distinct=k=>[...new Set(records.map(r=>r[k]).filter(Boolean))].sort((a,b)=>a.localeCompare(b,'fa'));
+ function fill(id,values,label){const select=el(id),v=select.value;select.innerHTML='<option value="">'+label+'</option>'+values.map(x=>'<option>'+esc(x)+'</option>').join('');select.value=v}
+ function filtered(){const q=norm(el('cr-search').value).toLowerCase();return records.filter(r=>(!q||[r.company,r.phone,r.external_id].some(v=>norm(v).toLowerCase().includes(q)))&&(!el('cr-province').value||r.province===el('cr-province').value)&&(!el('cr-result').value||r.call_result===el('cr-result').value)&&(!el('cr-stage').value||r.sales_stage===el('cr-stage').value)&&(!el('cr-priority').value||r.priority===el('cr-priority').value))}
+ function gauge(title,value,color){return '<div><div style="text-align:center">'+title+'</div><div class="cr-gauge" style="--v:'+value+';--g:'+color+'"><b>'+value+'٪</b></div><div class="cr-muted" style="text-align:center">۰٪ — ۱۰۰٪</div></div>'}
  function render(){
- const q=norm(host.querySelector('#cr-search').value).toLowerCase();
- const rows=records.filter(r=>[r.company,r.phone,r.external_id].some(v=>norm(v).toLowerCase().includes(q)));
- const pct=n=>rows.length?Math.round(n*100/rows.length):0;
- const contacted=rows.filter(r=>Number(r.call_count)>0).length;
- const complete=rows.filter(r=>r.company&&r.phone&&r.province&&r.sales_stage&&r.call_result).length;
- const followup=rows.filter(r=>r.next_followup_text).length;
- host.querySelector('#cr-summary').textContent='تعداد: '+rows.length+' | نرخ تماس: '+pct(contacted)+'٪ | تکمیل اطلاعات: '+pct(complete)+'٪ | دارای پیگیری: '+pct(followup)+'٪ (بر اساس رکوردهای فیلترشده)';
- host.querySelector('#cr-table').innerHTML='<table style="width:100%;min-width:800px"><thead><tr><th>شناسه</th><th>شرکت</th><th>تلفن</th><th>استان</th><th>مرحله</th><th>پیگیری</th><th>عملیات</th></tr></thead><tbody>'+rows.map(r=>'<tr><td>'+escapeHTML(r.external_id)+'</td><td>'+escapeHTML(r.company)+'</td><td>'+escapeHTML(r.phone)+'</td><td>'+escapeHTML(r.province)+'</td><td>'+escapeHTML(r.sales_stage)+'</td><td>'+escapeHTML(r.next_followup_text)+'</td><td><button class="cr-edit" data-id="'+escapeHTML(r.id)+'">ویرایش</button></td></tr>').join('')+'</tbody></table>';
- host.querySelectorAll('.cr-edit').forEach(button=>button.onclick=async()=>{
- const r=records.find(x=>String(x.id)===button.dataset.id);if(!r)return;
- const dialog=document.createElement('dialog');dialog.style.cssText='max-width:650px;width:95%;border:1px solid #ddd;border-radius:12px';
- dialog.innerHTML='<form method="dialog"><h3>ویرایش درخواست</h3>'+editable.map(k=>'<label style="display:block;margin:8px 0">'+escapeHTML(headers[fields.indexOf(k)])+' <input style="width:100%" name="'+k+'" value="'+escapeHTML(r[k])+'"></label>').join('')+'<button value="save">ذخیره</button> <button value="cancel">انصراف</button></form>';
- host.append(dialog);dialog.showModal();
- dialog.querySelector('form').onsubmit=async ev=>{
- if(ev.submitter?.value!=='save')return;ev.preventDefault();
- const data=Object.fromEntries(new FormData(ev.currentTarget));data.call_count=Number(data.call_count);
- if(!Number.isInteger(data.call_count)||data.call_count<0){global.alert('تعداد تماس نامعتبر است');return}
- let update=supabase.from('collaboration_requests').update(data).eq('id',r.id);
- if(!isManager)update=update.eq('owner_auth_id',userId);
- const {error}=await update;if(error){global.alert(error.message);return}dialog.close();dialog.remove();await load();
- };dialog.onclose=()=>dialog.remove();
- });
+ const rows=filtered(),total=rows.length,followed=rows.filter(r=>Number(r.call_count)>0).length,completed=rows.filter(r=>r.company&&r.phone&&r.province&&r.sales_stage&&r.call_result).length,need=rows.filter(r=>!r.next_followup_text||!r.call_result).length;
+ el('cr-kpis').innerHTML=[['کل درخواست‌ها',total],['پیگیری‌شده',followed],['در انتظار پیگیری',rows.filter(r=>r.next_followup_text).length],['نیازمند اقدام',need]].map(([a,b])=>'<div class="cr-kpi"><small>'+a+'</small><strong>'+b.toLocaleString('fa-IR')+'</strong></div>').join('');
+ el('cr-gauges').innerHTML=gauge('نرخ پیگیری',pct(followed,total),'#3b82f6')+gauge('تکمیل اطلاعات',pct(completed,total),'#22c55e')+gauge('پیشرفت هدف',pct(followed,total),'#a78bfa');
+ el('cr-table').innerHTML='<table><thead><tr><th>شرکت</th><th>استان</th><th>تلفن</th><th>مرحله فروش</th><th>پیگیری بعدی</th><th>عملیات</th></tr></thead><tbody>'+rows.map(r=>'<tr><td>'+esc(r.company)+'</td><td>'+esc(r.province)+'</td><td>'+esc(r.phone)+'</td><td><span class="cr-pill">'+esc(r.sales_stage)+'</span></td><td>'+esc(r.next_followup_text)+'</td><td><button class="cr-btn alt" data-edit="'+esc(r.id)+'">ویرایش</button></td></tr>').join('')+'</tbody></table>';
+ host.querySelectorAll('[data-edit]').forEach(b=>b.onclick=()=>edit(records.find(r=>String(r.id)===b.dataset.edit)));
  }
- host.querySelector('#cr-search').oninput=render;
- host.querySelector('#cr-reload').onclick=()=>load().catch(e=>message('خطا: '+e.message));
- host.querySelector('#cr-file').onchange=async e=>{
- const file=e.target.files?.[0];if(!file)return;
- try{
- if(!XLSX?.read)throw Error('کتابخانه اکسل هنوز بارگذاری نشده');
- if(file.size>5*1024*1024)throw Error('حجم فایل بیشتر از ۵ مگابایت است');
- const wb=XLSX.read(await file.arrayBuffer(),{type:'array',cellDates:false});
- if(!wb.Sheets.CRM)throw Error('شیت CRM یافت نشد');
- const parsed=parseRows(XLSX.utils.sheet_to_json(wb.Sheets.CRM,{header:1,defval:'',raw:false}));
- if(!parsed.length)throw Error('فایل رکوردی ندارد');
- if(!global.confirm(parsed.length+' درخواست وارد یا به‌روزرسانی شوند؟'))return;
- for(let i=0;i<parsed.length;i+=100){
- const payload=parsed.slice(i,i+100).map(r=>({...r,owner_auth_id:userId}));
- const {error}=await supabase.from('collaboration_requests').upsert(payload,{onConflict:'owner_auth_id,external_id'});
- if(error)throw Error('خطا در دسته '+(Math.floor(i/100)+1)+': '+error.message);
- }
- await load();message(parsed.length+' درخواست ثبت یا به‌روزرسانی شد');
- }catch(err){message('خطا: '+err.message)}finally{e.target.value=''}
- };
- load().catch(e=>message('دیتابیس این بخش هنوز آماده نیست: '+e.message));
+ async function load(){let q=supabase.from('collaboration_requests').select('*').order('created_at',{ascending:false}).limit(2000);if(!isManager)q=q.eq('owner_auth_id',userId);const {data,error}=await q;if(error)throw error;records=data||[];fill('cr-province',distinct('province'),'همه استان‌ها');fill('cr-result',distinct('call_result'),'همه نتایج تماس');fill('cr-stage',distinct('sales_stage'),'همه مراحل');fill('cr-priority',distinct('priority'),'همه اولویت‌ها');render();message('اطلاعات به‌روز شد: '+records.length.toLocaleString('fa-IR')+' درخواست');}
+ function edit(r){if(!r)return;const dialog=document.createElement('dialog');dialog.className='cr-edit';dialog.innerHTML='<form method="dialog"><h3>ویرایش درخواست همکاری</h3>'+editable.map(k=>{const f=schema.find(x=>x[0]===k);return '<label>'+esc(f[1])+'<input name="'+k+'" value="'+esc(r[k])+'"></label>'}).join('')+'<button class="cr-btn" value="save">ذخیره تغییرات</button> <button class="cr-btn alt" value="cancel">انصراف</button></form>';host.append(dialog);dialog.showModal();dialog.querySelector('form').onsubmit=async e=>{if(e.submitter?.value!=='save')return;e.preventDefault();const d=Object.fromEntries(new FormData(e.currentTarget));d.call_count=Number(d.call_count);if(!Number.isInteger(d.call_count)||d.call_count<0){message('تعداد تماس نامعتبر است');return}let q=supabase.from('collaboration_requests').update(d).eq('id',r.id);if(!isManager)q=q.eq('owner_auth_id',userId);const {error}=await q;if(error){message('خطا در ذخیره: '+error.message);return}dialog.close();await load()};dialog.onclose=()=>dialog.remove()}
+ el('cr-file').onchange=async e=>{const file=e.target.files?.[0];if(!file)return;try{if(!XLSX?.read)throw Error('کتابخانه اکسل بارگذاری نشده است');if(file.size>10*1024*1024)throw Error('حداکثر حجم فایل ۱۰ مگابایت است');const wb=XLSX.read(await file.arrayBuffer(),{type:'array',cellDates:false});const sheet=wb.Sheets.CRM||wb.Sheets[wb.SheetNames[0]];if(!sheet)throw Error('شیت قابل خواندن نیست');const rows=XLSX.utils.sheet_to_json(sheet,{header:1,defval:'',raw:false});const parsed=parseRows(rows);if(!parsed.length)throw Error('هیچ ردیف داده‌ای پیدا نشد');if(!global.confirm(parsed.length+' درخواست به نام کاربر واردشده ثبت/به‌روزرسانی شود؟'))return;for(let i=0;i<parsed.length;i+=100){const payload=parsed.slice(i,i+100).map(r=>({...r,owner_auth_id:userId}));const {error}=await supabase.from('collaboration_requests').upsert(payload,{onConflict:'owner_auth_id,external_id'});if(error)throw error}await load();message(parsed.length.toLocaleString('fa-IR')+' درخواست ثبت یا به‌روزرسانی شد')}catch(err){message('خطا: '+(err.message||String(err)))}finally{e.target.value=''}};
+ ['cr-search','cr-province','cr-result','cr-stage','cr-priority'].forEach(id=>el(id).addEventListener(id==='cr-search'?'input':'change',render));
+ el('cr-reload').onclick=()=>load().catch(e=>message('خطا در دریافت اطلاعات: '+e.message));
+ load().catch(e=>message('خطا در اتصال دیتابیس درخواست همکاری: '+e.message));
 }
-global.OnboxCollaborationRequests={mount,parseRows,headers};
+global.OnboxCollaborationRequests={mount,parseRows,schema};
 })(window);
