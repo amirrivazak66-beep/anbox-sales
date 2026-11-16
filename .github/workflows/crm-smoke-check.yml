@@ -26,6 +26,8 @@ jobs:
           });
           console.log(`Syntax OK: ${scripts.length} inline scripts`);
           NODE
+      - name: Check collaboration request classification and import safety
+        run: node scripts/collaboration-requests-smoke.mjs
       - name: Check CRM and Excel feature markers
         run: |
           node <<'NODE'
