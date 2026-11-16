@@ -77,6 +77,18 @@ function mount(host,{supabase,userId,isManager=false,XLSX=global.XLSX}={}){
  el('cr-gauges').innerHTML=gauge('نرخ پیگیری',pct(followed,total),'#3b82f6')+gauge('تکمیل اطلاعات',pct(completed,total),'#22c55e')+gauge('نرخ اقدام ثبت‌شده',pct(actioned,total),'#a78bfa');
  el('cr-table').innerHTML='<table><thead><tr><th>شرکت/متقاضی</th><th>نوع درخواست</th><th>استان</th><th>تلفن</th><th>وضعیت درخواست</th><th>پیگیری بعدی</th><th>مالک</th><th>عملیات</th></tr></thead><tbody>'+rows.map(r=>'<tr><td>'+esc(r.company)+'</td><td><span class="cr-pill">'+esc(requestTypeLabels[r.request_type||'unclassified'])+'</span></td><td>'+esc(r.province)+'</td><td>'+esc(r.phone)+'</td><td><span class="cr-pill">'+esc(r.request_status||r.sales_stage)+'</span></td><td>'+esc(r.next_followup_text)+'</td><td>'+esc(ownerName(r.owner_auth_id))+'</td><td><button class="cr-btn alt" data-edit="'+esc(r.id)+'">ویرایش</button>'+(isManager&&r.request_type==='employment'?(r.request_status==='ارجاع به منابع انسانی'?'<span class="cr-pill">ارجاع شده</span>':' <button class="cr-btn" data-refer-hr="'+esc(r.id)+'">ارجاع به منابع انسانی</button>'):'')+'</td></tr>').join('')+'</tbody></table>';
  host.querySelectorAll('[data-edit]').forEach(b=>b.onclick=()=>edit(records.find(r=>String(r.id)===b.dataset.edit)));
+ host.querySelectorAll('[data-refer-hr]').forEach(b=>b.onclick=async()=>{
+  if(!isManager){message('فقط مدیر می‌تواند درخواست را به منابع انسانی ارجاع دهد');return}
+  const r=records.find(x=>String(x.id)===b.dataset.referHr);
+  if(!r||r.request_type!=='employment'){message('فقط درخواست استخدامی قابل ارجاع است');return}
+  if(r.request_status==='ارجاع به منابع انسانی'){message('این درخواست قبلاً ارجاع شده است');return}
+  if(!global.confirm('درخواست «'+(r.company||r.phone||r.external_id)+'» به منابع انسانی ارجاع شود؟'))return;
+  b.disabled=true;
+  const {data,error}=await supabase.from('collaboration_requests').update({request_status:'ارجاع به منابع انسانی'}).eq('id',r.id).select('id,request_status').maybeSingle();
+  if(error){b.disabled=false;message('ارجاع انجام نشد: '+error.message);return}
+  if(!data){b.disabled=false;message('درخواست به‌روزرسانی نشد؛ دسترسی مدیر یا مالکیت رکورد را بررسی کنید');return}
+  await load();message('درخواست با موفقیت در مدیرنگر به منابع انسانی ارجاع شد؛ تاریخ و عامل تغییر در تاریخچه ثبت شد');
+ });
  }
  async function load(){if(isManager){const p=await supabase.from('profiles').select('id,display_name,username,role').eq('role','sales').order('display_name');if(p.error)throw p.error;expertProfiles=p.data||[]}let q=supabase.from('collaboration_requests').select('*').order('created_at',{ascending:false}).limit(2000);if(!isManager)q=q.eq('owner_auth_id',userId);const {data,error}=await q;if(error)throw error;records=data||[];fill('cr-province',distinct('province'),'همه استان‌ها');fill('cr-result',distinct('call_result'),'همه نتایج تماس');fill('cr-stage',distinct('request_status'),'همه وضعیت‌ها');fill('cr-priority',distinct('priority'),'همه اولویت‌ها');fill('cr-expert',distinct('expert_name'),'همه کارشناسان');fill('cr-category',distinct('sales_category'),'همه دسته‌ها');const ownerSelect=el('cr-import-owner');ownerSelect.innerHTML=(isManager?'<option value="">انتخاب مالک فایل</option>':'')+(isManager?expertProfiles.map(p=>'<option value="'+esc(p.id)+'">'+esc(p.display_name||p.username)+'</option>').join(''):'<option value="'+esc(userId)+'">درخواست‌های من</option>')+(isManager?'<option value="'+esc(userId)+'">مدیر</option>':'');if(!isManager)ownerSelect.value=userId;el('cr-export-employment').hidden=!isManager;render();message('اطلاعات به‌روز شد: '+records.length.toLocaleString('fa-IR')+' درخواست');}
  function edit(r){
