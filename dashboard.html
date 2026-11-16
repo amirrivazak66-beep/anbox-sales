@@ -137,6 +137,62 @@ h2{color:#fff!important}
 .toolbar{gap:8px}
 .search-box{width:100%}
 }
+
+/* Managernegar modern executive dashboard */
+:root{--bg:#071426;--card:rgba(12,29,52,.88);--txt:#e8f1ff;--txt2:#93a9c5;--bd:rgba(80,145,210,.17);--cyan:#19c7e8;--mint:#10c7a2;--violet:#9271f5}
+body{background:radial-gradient(ellipse at 12% 8%,rgba(20,103,180,.17),transparent 35%),radial-gradient(ellipse at 80% 70%,rgba(16,199,162,.08),transparent 32%),#071426}
+.sidebar{background:rgba(7,20,38,.96);border-left:1px solid rgba(77,144,204,.18);box-shadow:-16px 0 50px rgba(0,0,0,.16)}
+.logo{padding:4px 5px 18px;border-bottom:1px solid var(--bd)}
+.logo-text{font-size:20px;letter-spacing:-.4px}
+.user-info{background:linear-gradient(135deg,rgba(22,103,176,.2),rgba(10,35,58,.4));border-radius:16px}
+.nav-menu{margin-top:20px;gap:8px}.nav-item{padding:13px 15px;border-radius:13px}
+.nav-item.active{background:linear-gradient(105deg,#0757a9,#087fc5);box-shadow:0 9px 24px rgba(0,115,210,.22)}
+.main{background:transparent}.header{background:rgba(7,20,38,.88);border-bottom-color:rgba(80,145,210,.14);padding:15px 30px}
+.header-title{font-size:17px}.content{padding:28px 30px 42px;max-width:1740px}
+#dashboard{display:block}
+.dash-topline{display:flex;align-items:center;justify-content:space-between;gap:18px;margin-bottom:22px;flex-wrap:wrap}
+.dash-eyebrow{font-size:11px;letter-spacing:.5px;color:#4cc7ed;margin-bottom:8px;font-weight:700}
+.dash-welcome{font-size:clamp(23px,2.2vw,32px);font-weight:800;letter-spacing:-.7px;margin:0 0 7px}
+.dash-subtitle{font-size:13px;color:var(--txt2);line-height:1.9}
+.dash-actions{display:flex;gap:10px;flex-wrap:wrap}
+.dash-action{border:1px solid rgba(66,160,231,.35);border-radius:12px;padding:11px 17px;background:rgba(14,69,118,.32);color:#eaf6ff;font:600 12px Tahoma;cursor:pointer;transition:.2s}
+.dash-action.primary{background:linear-gradient(120deg,#0864ca,#078bd3);border-color:transparent;box-shadow:0 8px 20px rgba(0,110,210,.2)}
+.dash-action:hover{transform:translateY(-2px);filter:brightness(1.12)}
+.dash-kpis{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:15px;margin-bottom:18px}
+.dash-kpi{position:relative;overflow:hidden;border:1px solid var(--bd);border-radius:18px;padding:19px 20px;background:linear-gradient(145deg,rgba(15,39,68,.96),rgba(9,27,48,.92));min-height:130px;box-shadow:0 12px 28px rgba(0,0,0,.12)}
+.dash-kpi:after{content:"";position:absolute;width:120px;height:120px;border-radius:50%;left:-40px;bottom:-70px;background:var(--glow);filter:blur(22px);opacity:.2}
+.dash-kpi-head{display:flex;justify-content:space-between;align-items:center;color:#dcecff;font-size:12px;font-weight:700}
+.dash-kpi-icon{width:34px;height:34px;border-radius:11px;display:grid;place-items:center;background:var(--glow);color:var(--accent);font-size:17px}
+.dash-kpi-value{font-size:30px;line-height:1.2;font-weight:800;margin-top:13px;color:#f4f8ff;font-variant-numeric:tabular-nums}
+.dash-kpi-note{font-size:10px;color:var(--txt2);margin-top:5px}
+.dash-kpi.blue{--accent:#36a8ff;--glow:rgba(0,132,255,.18)}.dash-kpi.red{--accent:#ff657d;--glow:rgba(255,60,94,.17)}.dash-kpi.amber{--accent:#ffb547;--glow:rgba(255,170,50,.17)}.dash-kpi.green{--accent:#20d4ae;--glow:rgba(16,199,162,.16)}
+.dash-grid{display:grid;grid-template-columns:minmax(0,1.55fr) minmax(280px,.9fr);gap:17px;margin-bottom:17px}
+.dash-panel{border:1px solid var(--bd);border-radius:18px;padding:20px;background:linear-gradient(145deg,rgba(13,32,56,.94),rgba(8,25,45,.96));box-shadow:0 12px 28px rgba(0,0,0,.12);min-width:0}
+.dash-panel-title{font-size:14px;font-weight:800;color:#eff7ff;margin-bottom:17px;display:flex;align-items:center;gap:9px}
+.dash-panel-title span{color:var(--cyan);font-size:17px}
+.dash-panel-sub{font-size:10px;color:var(--txt2);font-weight:400;margin-right:auto}
+#pipelineGrid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:11px}
+#pipelineGrid .pipeline-box{background:rgba(17,48,78,.58);border:1px solid rgba(79,146,205,.14);border-radius:13px;padding:13px;min-width:0}
+#pipelineGrid .pipeline-stage{font-size:11px;color:#bfd0e5;line-height:1.7;min-height:38px}
+#pipelineGrid .pipeline-count{font-size:24px;font-weight:800;color:#f5f9ff;margin:8px 0}
+#pipelineGrid .pipeline-percent{font-size:10px;color:#8fa9c7;margin-top:6px}
+.progress-bar{height:5px;background:rgba(111,150,190,.18);border-radius:10px;overflow:hidden}.progress-fill{height:100%;border-radius:10px;background:linear-gradient(90deg,#0876d7,#20c7df)}
+.dash-collab-stats{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.dash-collab-tile{border-radius:14px;padding:16px;background:rgba(10,47,68,.65);border:1px solid rgba(16,199,162,.18)}
+.dash-collab-tile.employment{background:rgba(52,37,91,.35);border-color:rgba(146,113,245,.22)}
+.dash-collab-label{font-size:11px;color:#b6c9df}.dash-collab-value{font-size:27px;font-weight:800;margin:10px 0 4px}.dash-collab-tile.commercial .dash-collab-value{color:#28d7bd}.dash-collab-tile.employment .dash-collab-value{color:#aa91ff}
+.dash-collab-hint{font-size:10px;color:var(--txt2);line-height:1.8}
+.dash-bottom{display:grid;grid-template-columns:1fr 1fr;gap:17px}
+.dash-activity{display:flex;flex-direction:column;gap:0}.dash-activity-item{display:flex;align-items:flex-start;gap:12px;padding:12px 0;border-bottom:1px solid rgba(86,139,188,.13)}.dash-activity-item:last-child{border-bottom:0}
+.dash-activity-dot{width:30px;height:30px;flex:0 0 30px;border-radius:10px;display:grid;place-items:center;background:rgba(12,132,198,.18);color:#5bc8f1}
+.dash-activity-title{font-size:11px;font-weight:700;color:#e7f2ff;line-height:1.8}.dash-activity-meta{font-size:10px;color:var(--txt2);margin-top:3px}
+.dash-team-row{display:grid;grid-template-columns:minmax(70px,1fr) 1.5fr 34px;gap:10px;align-items:center;padding:12px 0;border-bottom:1px solid rgba(86,139,188,.13);font-size:11px}.dash-team-row:last-child{border-bottom:0}
+.dash-team-bar{height:7px;border-radius:20px;background:rgba(115,155,192,.16);overflow:hidden}.dash-team-bar i{display:block;height:100%;background:linear-gradient(90deg,#087ed2,#13c8a4);border-radius:20px}
+.dash-empty{font-size:11px;color:var(--txt2);padding:18px 4px;text-align:center}
+@media(max-width:1100px){.dash-kpis{grid-template-columns:repeat(2,minmax(0,1fr))}.dash-grid{grid-template-columns:1fr}}
+@media(max-width:700px){.content{padding:17px 13px 30px}.header{padding:13px 16px}.dash-topline{align-items:flex-start}.dash-actions{width:100%}.dash-action{flex:1}.dash-kpis{gap:9px}.dash-kpi{padding:14px;min-height:116px}.dash-kpi-value{font-size:25px}#pipelineGrid{grid-template-columns:repeat(2,minmax(0,1fr))}.dash-bottom{grid-template-columns:1fr}.dash-panel{padding:15px}}
+@media(prefers-reduced-motion:reduce){.dash-action,.card,.nav-item{transition:none!important;animation:none!important}}
+
 </style>
 </head>
 <body>
@@ -196,32 +252,47 @@ h2{color:#fff!important}
 </form>
 </div>
 <div class="page active" id="dashboard">
-<h2 style="margin-bottom:20px">مدیریت Sales Pipeline</h2>
-<div class="card">
-<div class="card-title">📊 وضعیت Pipeline</div>
-<div class="pipeline-grid" id="pipelineGrid"></div>
-</div>
-<div class="card">
-<div class="card-title">📈 آمار کلی</div>
-<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:15px">
-<div style="text-align:center;padding:20px;background:rgba(37,99,235,.1);border:1px solid var(--bd);border-radius:12px">
-<div style="font-size:24px;font-weight:700;color:#60a5fa" id="stat-total">0</div>
-<div style="font-size:12px;color:var(--txt2);margin-top:5px">کل لیدها</div>
-</div>
-<div style="text-align:center;padding:20px;background:rgba(220,38,38,.1);border:1px solid rgba(220,38,38,.2);border-radius:12px">
-<div style="font-size:24px;font-weight:700;color:#f87171" id="stat-hot">0</div>
-<div style="font-size:12px;color:var(--txt2);margin-top:5px">🔴 لیدهای گرم</div>
-</div>
-<div style="text-align:center;padding:20px;background:rgba(217,119,6,.1);border:1px solid rgba(217,119,6,.2);border-radius:12px">
-<div style="font-size:24px;font-weight:700;color:#fbbf24" id="stat-warm">0</div>
-<div style="font-size:12px;color:var(--txt2);margin-top:5px">🟡 لیدهای معمولی</div>
-</div>
-<div style="text-align:center;padding:20px;background:rgba(22,163,74,.1);border:1px solid rgba(22,163,74,.2);border-radius:12px">
-<div style="font-size:24px;font-weight:700;color:#4ade80" id="stat-qualified">0</div>
-<div style="font-size:12px;color:var(--txt2);margin-top:5px">✅ Qualified</div>
-</div>
-</div>
-</div>
+<section class="dash-topline">
+ <div>
+  <div class="dash-eyebrow">MANAGERNEGAR / EXECUTIVE OVERVIEW</div>
+  <h2 class="dash-welcome">سلام، به مدیرنگر خوش آمدید</h2>
+  <p class="dash-subtitle">مرکز مدیریت درخواست‌های همکاری، پایش فروش و تحلیل عملکرد تیم</p>
+ </div>
+ <div class="dash-actions">
+  <button class="dash-action primary" onclick="switchPage(event,'collaboration')">＋ ثبت و بررسی درخواست</button>
+  <button class="dash-action" onclick="switchPage(event,'reports')">⇩ مشاهده گزارش‌ها</button>
+ </div>
+</section>
+<section class="dash-kpis" aria-label="شاخص‌های کلیدی">
+ <article class="dash-kpi blue"><div class="dash-kpi-head"><span>کل لیدها</span><span class="dash-kpi-icon">♙</span></div><div class="dash-kpi-value" id="stat-total">۰</div><div class="dash-kpi-note">مجموع لیدهای ثبت‌شده در سامانه</div></article>
+ <article class="dash-kpi red"><div class="dash-kpi-head"><span>لیدهای گرم</span><span class="dash-kpi-icon">◉</span></div><div class="dash-kpi-value" id="stat-hot">۰</div><div class="dash-kpi-note">نیازمند پیگیری با اولویت بالاتر</div></article>
+ <article class="dash-kpi amber"><div class="dash-kpi-head"><span>لیدهای معمولی</span><span class="dash-kpi-icon">◌</span></div><div class="dash-kpi-value" id="stat-warm">۰</div><div class="dash-kpi-note">در مسیر پیگیری فروش</div></article>
+ <article class="dash-kpi green"><div class="dash-kpi-head"><span>لیدهای واجد شرایط</span><span class="dash-kpi-icon">✓</span></div><div class="dash-kpi-value" id="stat-qualified">۰</div><div class="dash-kpi-note">رسیده به مراحل پایانی فروش</div></article>
+</section>
+<section class="dash-grid">
+ <article class="dash-panel">
+  <div class="dash-panel-title"><span>▥</span> وضعیت قیف فروش <small class="dash-panel-sub">بر اساس مرحله فعلی هر لید</small></div>
+  <div class="pipeline-grid" id="pipelineGrid"></div>
+ </article>
+ <article class="dash-panel">
+  <div class="dash-panel-title"><span>◎</span> درخواست‌های همکاری <small class="dash-panel-sub">آمار زنده از پایگاه داده</small></div>
+  <div class="dash-collab-stats">
+   <div class="dash-collab-tile commercial"><div class="dash-collab-label">درخواست‌های تجاری</div><div class="dash-collab-value" id="dash-collab-commercial">—</div><div class="dash-collab-hint">فرصت‌های همکاری تجاری</div></div>
+   <div class="dash-collab-tile employment"><div class="dash-collab-label">درخواست‌های استخدامی</div><div class="dash-collab-value" id="dash-collab-employment">—</div><div class="dash-collab-hint">قابل ارجاع به منابع انسانی</div></div>
+  </div>
+  <div class="dash-activity" id="dash-collab-status" style="margin-top:13px"><div class="dash-empty">در حال دریافت آمار درخواست‌ها…</div></div>
+ </article>
+</section>
+<section class="dash-bottom">
+ <article class="dash-panel">
+  <div class="dash-panel-title"><span>☷</span> عملکرد کارشناسان <small class="dash-panel-sub">بر اساس تعداد لیدهای ثبت‌شده</small></div>
+  <div id="dash-team-performance" class="dash-team-list"><div class="dash-empty">در حال آماده‌سازی اطلاعات تیم…</div></div>
+ </article>
+ <article class="dash-panel">
+  <div class="dash-panel-title"><span>◷</span> آخرین فعالیت‌ها <small class="dash-panel-sub">تغییرات اخیر درخواست همکاری</small></div>
+  <div id="dash-recent-activity" class="dash-activity"><div class="dash-empty">در حال دریافت فعالیت‌ها…</div></div>
+ </article>
+</section>
 </div>
 <div class="page" id="leads">
 <h2 style="margin-bottom:20px">مدیریت لیدها</h2>
