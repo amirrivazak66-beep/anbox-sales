@@ -27,4 +27,11 @@ assert.ok(source.includes("data-refer-hr"), "employment requests must expose an 
 assert.ok(source.includes("if(!isManager){message('فقط مدیر"), "only managers may trigger HR referral");
 assert.ok(source.includes("request_status:'ارجاع به منابع انسانی'"), "HR referral must persist in the request status");
 assert.ok(source.includes("request_status==='ارجاع به منابع انسانی'"), "referred requests must not be referred twice");
+assert.ok(source.includes("record_collaboration_followup"), "phase 2 must record interactions through the database RPC");
+assert.ok(source.includes("complete_collaboration_followup"), "phase 2 must support completing due follow-ups");
+assert.ok(source.includes("data-add-followup"), "each request must expose a follow-up action");
+assert.ok(source.includes("data-history"), "each request must expose its interaction history");
+assert.ok(source.includes("cr-followup-list"), "phase 2 must show due follow-up tasks");
+assert.ok(source.includes("cr-export-daily"), "phase 2 must export a daily activity report");
+assert.ok(source.includes("p_due_at:due.toISOString()"), "follow-up due dates must be persisted as timestamps");
 console.log("PASS collaboration request type classification, parser defaults and safe insert-only import");
