@@ -148,7 +148,8 @@ function mount(host,{supabase,userId,isManager=false,XLSX=global.XLSX}={}){
    if(k==='request_type')return '<label>'+esc(f[1])+'<select name="request_type">'+requestTypeOptions.map(v=>'<option value="'+v+'" '+((r.request_type||'unclassified')===v?'selected':'')+'>'+requestTypeLabels[v]+'</option>').join('')+'</select></label>';
    if(k==='request_status')return '<label>'+esc(f[1])+'<select name="request_status">'+requestStatusLabels.map(v=>'<option '+((r.request_status||'جدید')===v?'selected':'')+'>'+v+'</option>').join('')+'</select></label>';
    if(k==='call_count')return '<label>'+esc(f[1])+'<input value="'+esc(r.call_count??0)+'" readonly aria-label="تعداد تماس؛ محاسبه خودکار" title="مقدار تاریخی حفظ می‌شود و تماس‌های جدید از مسیر ثبت پیگیری شمارش می‌شوند"></label>';
-   if(k==='province')return '<label>'+esc(f[1])+'<select name="province"><option value="">انتخاب استان</option>'+provinceOptions.map(v=>'<option value="'+esc(v)+'" '+(r.province===v?'selected':'')+'>'+esc(v)+'</option>').join('')+'</select></label>';\n   if(dropdownFields[k])return '<label>'+esc(f[1])+dropdownMarkup(k,r[k])+'</label>';
+   if(k==='province')return '<label>'+esc(f[1])+'<select name="province"><option value="">انتخاب استان</option>'+provinceOptions.map(v=>'<option value="'+esc(v)+'" '+(r.province===v?'selected':'')+'>'+esc(v)+'</option>').join('')+'</select></label>';
+   if(dropdownFields[k])return '<label>'+esc(f[1])+dropdownMarkup(k,r[k])+'</label>';
    if(k==='last_contact_text'||k==='next_followup_text')return '<label>'+esc(f[1])+'<input type="datetime-local" data-date-field="'+k+'" aria-label="'+esc(f[1])+'"><small>مقدار قبلی: '+esc(r[k]||'ثبت نشده')+' — برای حفظ مقدار قبلی، تاریخ جدید انتخاب نکنید.</small></label>';
    return '<label>'+esc(f[1])+'<input name="'+k+'" value="'+esc(r[k])+'"></label>';
   }).join('');
