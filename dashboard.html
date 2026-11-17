@@ -948,7 +948,8 @@ function importCrmBackup(event){
 }
 function showNotification(msg,type='success'){const el=document.getElementById('notification');el.textContent=msg;el.className='notification '+(type==='error'?'error':'')+' show';setTimeout(()=>el.classList.remove('show'),3000);}
 </script>
-<script>\n/* Fast Persian date/time picker: native ISO values remain the source of truth. */
+<script>
+/* Fast Persian date/time picker: native ISO values remain the source of truth. */
 (function(){
 'use strict';
 const fa=new Intl.DateTimeFormat('en-US-u-ca-persian',{year:'numeric',month:'numeric',day:'numeric',timeZone:'UTC'});
@@ -986,6 +987,6 @@ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',
 window.ManagerNegarJalaliPicker={scan,enhance};
 function start(){scan();new MutationObserver(scan).observe(document.body,{subtree:true,childList:true});}
 })();
-\n</script>
+</script>
 </body>
 </html>
