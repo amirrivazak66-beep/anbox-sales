@@ -33,5 +33,6 @@ document.addEventListener('change',e=>{if(e.target?.id==='jp-clock')clock=e.targ
 function enhance(input){if(input._jalaliButton||input.closest('.jp-popup'))return;const button=document.createElement('button');button.type='button';button.className='jp-trigger';input._jalaliButton=button;input.classList.add('jp-native');input.insertAdjacentElement('afterend',button);button.addEventListener('click',()=>open(input));input.addEventListener('change',()=>updateLabel(input));updateLabel(input);}
 function scan(){document.querySelectorAll('input[type="date"],input[type="datetime-local"]').forEach(enhance);}
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',start);else start();
-window.ManagerNegarJalaliPicker={scan,enhance};\nfunction start(){scan();new MutationObserver(scan).observe(document.body,{subtree:true,childList:true});}
+window.ManagerNegarJalaliPicker={scan,enhance};
+function start(){scan();new MutationObserver(scan).observe(document.body,{subtree:true,childList:true});}
 })();
