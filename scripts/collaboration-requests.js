@@ -22,6 +22,24 @@ const schema=[
  ['notes','توضیحات',['توضیحات','شرح','یادداشت']]
 ];
 const editable=schema.filter(x=>!['external_id','expert_name','registered_at_text'].includes(x[0])).map(x=>x[0]);
+const dropdownFields={
+ call_result:['پاسخ نداد','شماره اشتباه','مشغول بود','تماس برقرار شد','علاقه‌مند','عدم تمایل','درخواست تماس مجدد'],
+ sales_stage:['تماس اولیه','نیازسنجی','معرفی خدمات','ارسال تعرفه','ساخت پنل','مذاکره','ارسال قرارداد','قرارداد منعقد شد','عدم همکاری'],
+ priority:['فوری','بالا','متوسط','پایین'],
+ next_action:['تماس مجدد','ارسال پیامک','ارسال واتساپ','ارسال تعرفه','ارسال پیش‌فاکتور','برگزاری جلسه','ارسال قرارداد','پیگیری قرارداد','بستن پرونده'],
+ sales_category:['فروشگاه اینترنتی','فروش حضوری','تولیدکننده','عمده‌فروش','توزیع‌کننده','سایر'],
+ monthly_shipments:['کمتر از ۱۰۰','۱۰۰ تا ۵۰۰','۵۰۰ تا ۱٬۰۰۰','۱٬۰۰۰ تا ۵٬۰۰۰','بیشتر از ۵٬۰۰۰','نامشخص']
+};
+const provinceOptions=['آذربایجان شرقی','آذربایجان غربی','اردبیل','اصفهان','البرز','ایلام','بوشهر','تهران','چهارمحال و بختیاری','خراسان جنوبی','خراسان رضوی','خراسان شمالی','خوزستان','زنجان','سمنان','سیستان و بلوچستان','فارس','قزوین','قم','کردستان','کرمان','کرمانشاه','کهگیلویه و بویراحمد','گلستان','گیلان','لرستان','مازندران','مرکزی','هرمزگان','همدان','یزد'];
+function dropdownMarkup(key,value){
+ const opts=dropdownFields[key]||provinceOptions,raw=String(value??''),current=raw==='عدم همکاری-'?'عدم همکاری':raw;
+ const known=opts.includes(current),custom=!!current&&!known;
+ return '<select name="'+key+'" data-custom-select="'+key+'">'+
+ '<option value="" '+(!current?'selected':'')+'>انتخاب کنید</option>'+
+ opts.map(v=>'<option value="'+esc(v)+'" '+(v===current?'selected':'')+'>'+esc(v)+'</option>').join('')+
+ '<option value="__custom__" '+(custom?'selected':'')+'>سایر / ورود مقدار دلخواه</option></select>'+
+ '<input data-custom-input="'+key+'" aria-label="مقدار دلخواه '+key+'" value="'+esc(custom?raw:'')+'" placeholder="مقدار دلخواه" '+(custom?'':'hidden disabled')+'>';
+}
 const requestTypeLabels={unclassified:'تعیین‌نشده',commercial:'تجاری',employment:'استخدامی'};
 const requestTypeOptions=['unclassified','commercial','employment'];
 const requestStatusLabels=['جدید','در حال بررسی','نیازمند اطلاعات','در حال پیگیری','در انتظار پاسخ','جلسه/مذاکره','ارجاع به منابع انسانی','تکمیل‌شده','ردشده','بسته‌شده'];
@@ -129,10 +147,23 @@ function mount(host,{supabase,userId,isManager=false,XLSX=global.XLSX}={}){
   const fields=editable.map(k=>{const f=schema.find(x=>x[0]===k);
    if(k==='request_type')return '<label>'+esc(f[1])+'<select name="request_type">'+requestTypeOptions.map(v=>'<option value="'+v+'" '+((r.request_type||'unclassified')===v?'selected':'')+'>'+requestTypeLabels[v]+'</option>').join('')+'</select></label>';
    if(k==='request_status')return '<label>'+esc(f[1])+'<select name="request_status">'+requestStatusLabels.map(v=>'<option '+((r.request_status||'جدید')===v?'selected':'')+'>'+v+'</option>').join('')+'</select></label>';
+   if(k==='call_count')return '<label>'+esc(f[1])+'<input value="'+esc(r.call_count??0)+'" readonly aria-label="تعداد تماس؛ محاسبه خودکار" title="مقدار تاریخی حفظ می‌شود و تماس‌های جدید از مسیر ثبت پیگیری شمارش می‌شوند"></label>';
+   if(k==='province'||dropdownFields[k])return '<label>'+esc(f[1])+dropdownMarkup(k,r[k])+'</label>';
+   if(k==='last_contact_text'||k==='next_followup_text')return '<label>'+esc(f[1])+'<input name="'+k+'" value="'+esc(r[k])+'" placeholder="تاریخ و ساعت شمسی" data-legacy-datetime="'+k+'"></label>';
    return '<label>'+esc(f[1])+'<input name="'+k+'" value="'+esc(r[k])+'"></label>';
   }).join('');
   dialog.innerHTML='<form method="dialog"><h3>ویرایش درخواست همکاری</h3>'+fields+ownerField+'<button class="cr-btn" value="save">ذخیره تغییرات</button> <button class="cr-btn alt" value="cancel">انصراف</button></form><section class="cr-panel" id="cr-history">در حال دریافت تاریخچه…</section>';
   host.append(dialog);dialog.showModal();
+  dialog.querySelectorAll('[data-custom-select]').forEach(select=>{
+   const input=dialog.querySelector('[data-custom-input="'+select.dataset.customSelect+'"]');
+   const toggle=()=>{const custom=select.value==='__custom__';input.hidden=!custom;input.disabled=!custom;if(custom)input.focus();};
+   select.addEventListener('change',toggle);
+  });
+  // Existing Jalali picker can enhance text dates only after schema-backed datetime migration.
+  // City is deliberately not written to the database until its column and authoritative city list are approved.
+  const cityNotice=document.createElement('p');cityNotice.className='cr-muted';
+  cityNotice.textContent='انتخاب شهر پس از تأیید ستون شهر و فهرست وابسته استان/شهر فعال می‌شود؛ اطلاعات فعلی حفظ شده‌اند.';
+  dialog.querySelector('form').append(cityNotice);
   supabase.from('collaboration_request_events').select('created_at,event_type,changed_fields,old_values,new_values').eq('request_id',r.id).order('created_at',{ascending:false}).limit(50).then(({data,error})=>{
    const box=dialog.querySelector('#cr-history');if(!box)return;
    if(error){box.textContent='تاریخچه در دسترس نیست: '+error.message;return}
@@ -140,11 +171,16 @@ function mount(host,{supabase,userId,isManager=false,XLSX=global.XLSX}={}){
   }).catch(()=>{const box=dialog.querySelector('#cr-history');if(box)box.textContent='تاریخچه بارگذاری نشد'});
   dialog.querySelector('form').onsubmit=async e=>{
    if(e.submitter?.value!=='save')return;e.preventDefault();
-   const d=Object.fromEntries(new FormData(e.currentTarget));d.call_count=Number(d.call_count);
+   const d=Object.fromEntries(new FormData(e.currentTarget));
+   dialog.querySelectorAll('[data-custom-select]').forEach(select=>{
+    const key=select.dataset.customSelect;
+    if(select.value==='__custom__')d[key]=dialog.querySelector('[data-custom-input="'+key+'"]').value.trim();
+   });
+   // Preserve historical count: the existing record_collaboration_followup RPC owns increments.
+   delete d.call_count;
    if(!requestTypeOptions.includes(d.request_type)){message('نوع درخواست نامعتبر است');return}
    if(!requestStatusLabels.includes(d.request_status)){message('وضعیت درخواست نامعتبر است');return}
    if(isManager&&d.owner_auth_id){const p=expertProfiles.find(x=>x.id===d.owner_auth_id);d.expert_name=p?(p.display_name||p.username):'مدیر'}else delete d.owner_auth_id;
-   if(!Number.isInteger(d.call_count)||d.call_count<0){message('تعداد تماس نامعتبر است');return}
    let q=supabase.from('collaboration_requests').update(d).eq('id',r.id);if(!isManager)q=q.eq('owner_auth_id',userId);
    const {error}=await q;if(error){message('خطا در ذخیره: '+error.message);return}
    dialog.close();await load();
