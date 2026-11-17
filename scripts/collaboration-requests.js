@@ -30,6 +30,39 @@ const dropdownFields={
  sales_category:['فروشگاه اینترنتی','فروش حضوری','تولیدکننده','عمده‌فروش','توزیع‌کننده','سایر'],
  monthly_shipments:['کمتر از ۱۰۰','۱۰۰ تا ۵۰۰','۵۰۰ تا ۱٬۰۰۰','۱٬۰۰۰ تا ۵٬۰۰۰','بیشتر از ۵٬۰۰۰','نامشخص']
 };
+const cityOptionsByProvince={
+ 'آذربایجان شرقی':['تبریز','مراغه','مرند','اهر'],
+ 'آذربایجان غربی':['ارومیه','خوی','مهاباد','بوکان'],
+ 'اردبیل':['اردبیل','پارس‌آباد','مشگین‌شهر','خلخال'],
+ 'اصفهان':['اصفهان','کاشان','نجف‌آباد','شاهین‌شهر'],
+ 'البرز':['کرج','فردیس','هشتگرد','نظرآباد'],
+ 'ایلام':['ایلام','دهلران','آبدانان','مهران'],
+ 'بوشهر':['بوشهر','برازجان','گناوه','کنگان'],
+ 'تهران':['تهران','ری','اسلامشهر','شهریار','پردیس','پاکدشت'],
+ 'چهارمحال و بختیاری':['شهرکرد','بروجن','فارسان','لردگان'],
+ 'خراسان جنوبی':['بیرجند','قائن','فردوس','طبس'],
+ 'خراسان رضوی':['مشهد','نیشابور','سبزوار','تربت حیدریه'],
+ 'خراسان شمالی':['بجنورد','شیروان','اسفراین','آشخانه'],
+ 'خوزستان':['اهواز','آبادان','خرمشهر','دزفول'],
+ 'زنجان':['زنجان','ابهر','خرمدره','قیدار'],
+ 'سمنان':['سمنان','شاهرود','دامغان','گرمسار'],
+ 'سیستان و بلوچستان':['زاهدان','زابل','چابهار','ایرانشهر'],
+ 'فارس':['شیراز','مرودشت','جهرم','فسا'],
+ 'قزوین':['قزوین','تاکستان','آبیک','الوند'],
+ 'قم':['قم','جعفریه','کهک'],
+ 'کردستان':['سنندج','سقز','بانه','مریوان'],
+ 'کرمان':['کرمان','رفسنجان','سیرجان','جیرفت'],
+ 'کرمانشاه':['کرمانشاه','اسلام‌آباد غرب','جوانرود','پاوه'],
+ 'کهگیلویه و بویراحمد':['یاسوج','دوگنبدان','دهدشت','سی‌سخت'],
+ 'گلستان':['گرگان','گنبد کاووس','علی‌آباد کتول','آق‌قلا'],
+ 'گیلان':['رشت','انزلی','لاهیجان','لنگرود'],
+ 'لرستان':['خرم‌آباد','بروجرد','دورود','الیگودرز'],
+ 'مازندران':['ساری','بابل','آمل','قائم‌شهر'],
+ 'مرکزی':['اراک','ساوه','خمین','محلات'],
+ 'هرمزگان':['بندرعباس','قشم','میناب','بندرلنگه'],
+ 'همدان':['همدان','ملایر','نهاوند','تویسرکان'],
+ 'یزد':['یزد','میبد','اردکان','بافق']
+};
 const provinceOptions=['آذربایجان شرقی','آذربایجان غربی','اردبیل','اصفهان','البرز','ایلام','بوشهر','تهران','چهارمحال و بختیاری','خراسان جنوبی','خراسان رضوی','خراسان شمالی','خوزستان','زنجان','سمنان','سیستان و بلوچستان','فارس','قزوین','قم','کردستان','کرمان','کرمانشاه','کهگیلویه و بویراحمد','گلستان','گیلان','لرستان','مازندران','مرکزی','هرمزگان','همدان','یزد'];
 function dropdownMarkup(key,value){
  const opts=dropdownFields[key]||provinceOptions,raw=String(value??''),current=raw;
@@ -149,7 +182,7 @@ function mount(host,{supabase,userId,isManager=false,XLSX=global.XLSX}={}){
    if(k==='request_status')return '<label>'+esc(f[1])+'<select name="request_status">'+requestStatusLabels.map(v=>'<option '+((r.request_status||'جدید')===v?'selected':'')+'>'+v+'</option>').join('')+'</select></label>';
    if(k==='call_count')return '<label>'+esc(f[1])+'<input value="'+esc(r.call_count??0)+'" readonly aria-label="تعداد تماس؛ محاسبه خودکار" title="مقدار تاریخی حفظ می‌شود و تماس‌های جدید از مسیر ثبت پیگیری شمارش می‌شوند"></label>';
    if(k==='province'||dropdownFields[k])return '<label>'+esc(f[1])+dropdownMarkup(k,r[k])+'</label>';
-   if(k==='last_contact_text'||k==='next_followup_text')return '<label>'+esc(f[1])+'<input name="'+k+'" value="'+esc(r[k])+'" placeholder="تاریخ و ساعت شمسی" data-legacy-datetime="'+k+'"></label>';
+   if(k==='last_contact_text'||k==='next_followup_text')return '<label>'+esc(f[1])+'<input type="datetime-local" data-date-field="'+k+'" aria-label="'+esc(f[1])+'"><small>مقدار قبلی: '+esc(r[k]||'ثبت نشده')+' — برای حفظ مقدار قبلی، تاریخ جدید انتخاب نکنید.</small></label>';
    return '<label>'+esc(f[1])+'<input name="'+k+'" value="'+esc(r[k])+'"></label>';
   }).join('');
   dialog.innerHTML='<form method="dialog"><h3>ویرایش درخواست همکاری</h3>'+fields+ownerField+'<button class="cr-btn" value="save">ذخیره تغییرات</button> <button class="cr-btn alt" value="cancel">انصراف</button></form><section class="cr-panel" id="cr-history">در حال دریافت تاریخچه…</section>';
@@ -159,11 +192,23 @@ function mount(host,{supabase,userId,isManager=false,XLSX=global.XLSX}={}){
    const toggle=()=>{const custom=select.value==='__custom__';input.hidden=!custom;input.disabled=!custom;if(custom)input.focus();};
    select.addEventListener('change',toggle);
   });
-  // Existing Jalali picker can enhance text dates only after schema-backed datetime migration.
-  // City is deliberately not written to the database until its column and authoritative city list are approved.
-  const cityNotice=document.createElement('p');cityNotice.className='cr-muted';
-  cityNotice.textContent='انتخاب شهر پس از تأیید ستون شهر و فهرست وابسته استان/شهر فعال می‌شود؛ اطلاعات فعلی حفظ شده‌اند.';
-  dialog.querySelector('form').append(cityNotice);
+  dialog.querySelectorAll('[data-date-field]').forEach(input=>global.ManagerNegarJalaliPicker?.enhance(input));
+  const provinceSelect=dialog.querySelector('select[name="province"]');
+  const cityLabel=document.createElement('label');cityLabel.textContent='شهر';
+  cityLabel.innerHTML='شهر <select name="city" aria-label="شهر"></select><small>اگر شهر در فهرست نبود، «سایر» را انتخاب کنید.</small>';
+  const citySelect=cityLabel.querySelector('select');
+  const cityCustom=document.createElement('input');cityCustom.placeholder='شهر دلخواه';cityCustom.setAttribute('aria-label','شهر دلخواه');cityCustom.hidden=true;
+  cityLabel.append(cityCustom);provinceSelect.closest('label').insertAdjacentElement('afterend',cityLabel);
+  function refreshCities(){const province=provinceSelect.value==='__custom__'?dialog.querySelector('[data-custom-input="province"]').value.trim():provinceSelect.value;
+   const list=cityOptionsByProvince[province]||[],existing=String(r.city||'');
+   citySelect.innerHTML='<option value="">انتخاب شهر</option>'+list.map(v=>'<option value="'+esc(v)+'">'+esc(v)+'</option>').join('')+'<option value="__custom__">سایر / ورود مقدار دلخواه</option>';
+   citySelect.value=list.includes(existing)?existing:existing?'__custom__':'';cityCustom.value=existing&&!list.includes(existing)?existing:'';
+   cityCustom.hidden=citySelect.value!=='__custom__';
+  }
+  provinceSelect.addEventListener('change',()=>{refreshCities();citySelect.value='';cityCustom.value='';cityCustom.hidden=true;});
+  dialog.querySelector('[data-custom-input="province"]').addEventListener('input',refreshCities);
+  citySelect.addEventListener('change',()=>{cityCustom.hidden=citySelect.value!=='__custom__';if(!cityCustom.hidden)cityCustom.focus();});
+  refreshCities();
   supabase.from('collaboration_request_events').select('created_at,event_type,changed_fields,old_values,new_values').eq('request_id',r.id).order('created_at',{ascending:false}).limit(50).then(({data,error})=>{
    const box=dialog.querySelector('#cr-history');if(!box)return;
    if(error){box.textContent='تاریخچه در دسترس نیست: '+error.message;return}
@@ -176,11 +221,19 @@ function mount(host,{supabase,userId,isManager=false,XLSX=global.XLSX}={}){
     const key=select.dataset.customSelect;
     if(select.value==='__custom__')d[key]=dialog.querySelector('[data-custom-input="'+key+'"]').value.trim();
    });
-   if(Object.keys(dropdownFields).some(key=>d[key]==='__custom__')||d.province==='__custom__'){message('لطفاً مقدار دلخواه را وارد کنید');return}\n   // Preserve historical count: the existing record_collaboration_followup RPC owns increments.
+   if(Object.keys(dropdownFields).some(key=>d[key]==='__custom__')||d.province==='__custom__'){message('لطفاً مقدار دلخواه را وارد کنید');return}
+   d.city=citySelect.value==='__custom__'?cityCustom.value.trim():citySelect.value;
+   if(citySelect.value==='__custom__'&&!d.city){message('لطفاً نام شهر را وارد کنید');return}
+   // Preserve historical count: the existing record_collaboration_followup RPC owns increments.
    delete d.call_count;
+   dialog.querySelectorAll('[data-date-field]').forEach(input=>{
+    const key=input.dataset.dateField;
+    if(input.value){const parsed=new Date(input.value);if(!Number.isNaN(parsed.getTime()))d[key]=input.value.replace('T',' ').replace(/-/g,'/');}
+   });
    if(!requestTypeOptions.includes(d.request_type)){message('نوع درخواست نامعتبر است');return}
    if(!requestStatusLabels.includes(d.request_status)){message('وضعیت درخواست نامعتبر است');return}
    if(isManager&&d.owner_auth_id){const p=expertProfiles.find(x=>x.id===d.owner_auth_id);d.expert_name=p?(p.display_name||p.username):'مدیر'}else delete d.owner_auth_id;
+   // City is persisted only when the additive city-column migration has been applied.
    let q=supabase.from('collaboration_requests').update(d).eq('id',r.id);if(!isManager)q=q.eq('owner_auth_id',userId);
    const {error}=await q;if(error){message('خطا در ذخیره: '+error.message);return}
    dialog.close();await load();
