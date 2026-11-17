@@ -254,6 +254,30 @@ body{background:radial-gradient(ellipse at 20% 5%,rgba(0,85,160,.11),transparent
 .ref-bell{border:0;cursor:pointer;font-size:18px}
 @media(max-width:760px){.ref-brand .logo-text{font-size:21px}.ref-sidebar-user{position:static}.ref-search{width:clamp(150px,42vw,260px)}}
 
+
+/* Quick Jalali calendar, design 3. Native inputs retain ISO values for Supabase. */
+.jp-native{position:absolute!important;width:1px!important;height:1px!important;opacity:0!important;pointer-events:none!important}
+.jp-trigger{background:#13243b;color:#e2e8f0;border:1px solid #315173;border-radius:9px;padding:10px 13px;min-width:185px;text-align:right;cursor:pointer;font:inherit;direction:rtl}
+.jp-trigger:hover,.jp-trigger:focus-visible{border-color:#34b76a;outline:2px solid #34b76a33}
+.jp-popup{position:fixed;z-index:99999;width:min(340px,calc(100vw - 16px));max-height:calc(100vh - 20px);overflow:auto;background:#102039;border:1px solid #365575;border-radius:16px;padding:15px;box-shadow:0 20px 60px #0009;color:#e9f1fa;font-family:inherit}
+.jp-popup button{font:inherit;cursor:pointer;border:1px solid #37506a;background:#1b304b;color:#e9f1fa;border-radius:8px;padding:7px}
+.jp-popup .jp-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:13px}
+.jp-popup .jp-head button{width:36px;height:36px}
+.jp-popup .jp-week,.jp-popup .jp-days{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));text-align:center;gap:3px}
+.jp-popup .jp-week{font-size:12px;color:#a5b9d0;margin-bottom:6px}
+.jp-popup .jp-days button{border:0;background:transparent;min-width:0;padding:9px 0}
+.jp-popup .jp-days button:hover{background:#25503e}
+.jp-popup .jp-days button.jp-selected{background:#20884c;color:#fff;font-weight:800}
+.jp-popup .jp-days button:disabled{opacity:.25;cursor:not-allowed}
+.jp-popup .jp-times{border-top:1px solid #365575;margin-top:12px;padding-top:12px;display:grid;gap:9px}
+.jp-popup .jp-presets{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:5px}
+.jp-popup .jp-presets button{font-size:11px;padding:8px 3px;border-color:#2e9e59}
+.jp-popup .jp-times label{display:flex;align-items:center;gap:12px}
+.jp-popup .jp-times input{background:#192d47;color:#fff;border:1px solid #456482;border-radius:8px;padding:7px;direction:ltr}
+.jp-popup .jp-times small{color:#a5b9d0;font-size:11px}
+.jp-popup .jp-actions{display:flex;gap:8px;margin-top:14px}
+.jp-popup .jp-actions button{flex:1}
+.jp-popup .jp-actions [data-confirm]{background:#20884c;border-color:#20884c;color:white}
 </style>
 </head>
 <body>
@@ -921,5 +945,5 @@ function importCrmBackup(event){
 }
 function showNotification(msg,type='success'){const el=document.getElementById('notification');el.textContent=msg;el.className='notification '+(type==='error'?'error':'')+' show';setTimeout(()=>el.classList.remove('show'),3000);}
 </script>
-</body>
+<script src="scripts/jalali-picker.js"></script>\n</body>
 </html>
