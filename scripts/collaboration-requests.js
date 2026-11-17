@@ -32,7 +32,7 @@ const dropdownFields={
 };
 const provinceOptions=['آذربایجان شرقی','آذربایجان غربی','اردبیل','اصفهان','البرز','ایلام','بوشهر','تهران','چهارمحال و بختیاری','خراسان جنوبی','خراسان رضوی','خراسان شمالی','خوزستان','زنجان','سمنان','سیستان و بلوچستان','فارس','قزوین','قم','کردستان','کرمان','کرمانشاه','کهگیلویه و بویراحمد','گلستان','گیلان','لرستان','مازندران','مرکزی','هرمزگان','همدان','یزد'];
 function dropdownMarkup(key,value){
- const opts=dropdownFields[key]||provinceOptions,raw=String(value??''),current=raw==='عدم همکاری-'?'عدم همکاری':raw;
+ const opts=dropdownFields[key]||provinceOptions,raw=String(value??''),current=raw;
  const known=opts.includes(current),custom=!!current&&!known;
  return '<select name="'+key+'" data-custom-select="'+key+'">'+
  '<option value="" '+(!current?'selected':'')+'>انتخاب کنید</option>'+
@@ -176,7 +176,7 @@ function mount(host,{supabase,userId,isManager=false,XLSX=global.XLSX}={}){
     const key=select.dataset.customSelect;
     if(select.value==='__custom__')d[key]=dialog.querySelector('[data-custom-input="'+key+'"]').value.trim();
    });
-   // Preserve historical count: the existing record_collaboration_followup RPC owns increments.
+   if(Object.keys(dropdownFields).some(key=>d[key]==='__custom__')||d.province==='__custom__'){message('لطفاً مقدار دلخواه را وارد کنید');return}\n   // Preserve historical count: the existing record_collaboration_followup RPC owns increments.
    delete d.call_count;
    if(!requestTypeOptions.includes(d.request_type)){message('نوع درخواست نامعتبر است');return}
    if(!requestStatusLabels.includes(d.request_status)){message('وضعیت درخواست نامعتبر است');return}
