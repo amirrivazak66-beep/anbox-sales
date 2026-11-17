@@ -974,7 +974,8 @@ function render(){
 }
 function open(input){close();active=input;clock=(input.value.split('T')[1]||'09:00').slice(0,5);selected=parse(input.value);view=jalali(selected);popup=document.createElement('div');popup.className='jp-popup';popup.dir='rtl';popup.setAttribute('role','dialog');popup.setAttribute('aria-label','انتخاب تاریخ شمسی و ساعت');const dialog=input.closest('dialog[open]');(dialog||document.body).appendChild(popup);render();const rect=input._jalaliButton.getBoundingClientRect();if(dialog){popup.classList.add('jp-in-dialog');popup.style.top='auto';popup.style.left='auto';}else{popup.style.top=Math.min(window.innerHeight-470,Math.max(8,rect.bottom+6))+'px';popup.style.left=Math.max(8,Math.min(rect.left,window.innerWidth-350))+'px';}}
 function setQuick(minutes){const d=new Date(Date.now()+minutes*60000);selected=new Date(d.getFullYear(),d.getMonth(),d.getDate(),12);view=jalali(selected);render();if(active.type==='datetime-local'){clock=String(d.getHours()).padStart(2,'0')+':'+String(d.getMinutes()).padStart(2,'0');popup.querySelector('#jp-clock').value=clock;}}
-document.addEventListener('change',e=>{if(e.target?.id==='jp-clock')clock=e.target.value;});\ndocument.addEventListener('click',e=>{if(!popup)return;const t=e.target.closest('button');if(!popup.contains(e.target)&&e.target!==active._jalaliButton){close();return;}if(!t)return;
+document.addEventListener('change',e=>{if(e.target?.id==='jp-clock')clock=e.target.value;});
+document.addEventListener('click',e=>{if(!popup)return;const t=e.target.closest('button');if(!popup.contains(e.target)&&e.target!==active._jalaliButton){close();return;}if(!t)return;
  if(t.hasAttribute('data-nav')){let m=view.m+Number(t.dataset.nav),y=view.y;if(m<1){m=12;y--;}if(m>12){m=1;y++;}view={y,m};render();}
  else if(t.hasAttribute('data-day')){selected=dateOf(view.y,view.m,+t.dataset.day);render();}
  else if(t.hasAttribute('data-quick'))setQuick(t.dataset.quick==='now'?0:Number(t.dataset.quick));
