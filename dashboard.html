@@ -315,6 +315,12 @@ body{background:radial-gradient(ellipse at 20% 5%,rgba(0,85,160,.11),transparent
  <div><div class="dash-eyebrow">MANAGERNEGAR</div><h2 class="dash-welcome">سلام، به مدیرنگر خوش آمدید</h2><p class="dash-subtitle">مرکز مدیریت درخواست‌های همکاری، پایش فروش و تحلیل عملکرد تیم</p></div>
  <div class="dash-actions"><button class="dash-action primary" onclick="switchPage(event,'collaboration')">＋ ثبت درخواست</button><button class="dash-action" onclick="switchPage(event,'reports')">⇩ خروجی گزارش</button></div>
 </section>
+<section id="expertOwnLeads" class="dash-panel" style="display:none;margin-bottom:18px">
+ <div class="dash-panel-title" style="display:flex;justify-content:space-between;gap:12px;align-items:center;flex-wrap:wrap"><span>📋 لیدهای اختصاص‌یافته به من</span><button class="dash-action" type="button" onclick="renderExpertOwnLeads()">به‌روزرسانی</button></div>
+ <div id="expertOwnLeadsSummary" class="dash-kpis" style="margin:12px 0"></div>
+ <div id="expertOwnLeadsList" style="overflow-x:auto">در حال دریافت لیدهای شما…</div>
+ <p style="font-size:11px;color:var(--txt2);margin-top:10px">این بخش فقط درخواست‌ها و لیدهایی را نمایش می‌دهد که مالک حساب کاربری شما هستند.</p>
+ </section>
 <section class="dash-kpis">
  <article class="dash-kpi blue"><div class="dash-kpi-head"><span>کل لیدها</span><span class="dash-kpi-icon">♟</span></div><div class="dash-kpi-value" id="stat-total">۰</div><div class="dash-kpi-note">مجموع لیدهای ثبت‌شده</div></article>
  <article class="dash-kpi red"><div class="dash-kpi-head"><span>نیازمند پیگیری</span><span class="dash-kpi-icon">◷</span></div><div class="dash-kpi-value" id="dash-followups">۰</div><div class="dash-kpi-note">بر اساس تاریخ پیگیری ثبت‌شده</div></article>
@@ -625,7 +631,29 @@ function parseCsvRows(text){text=String(text??'');if(text.charCodeAt(0)===0xFEFF
 let dashboardRangeDays=30;
 async function runHeaderSearch(e){e.preventDefault();const input=document.getElementById('headerSearchInput'),q=String(input?.value||'').trim();if(!q)return;const nav=document.querySelector('.nav-item[onclick*="leads"]');await switchPage({preventDefault(){},currentTarget:nav},'leads');const target=document.getElementById('searchInput');if(target){target.value=q;filterLeads();}}
 function updateDashboardRange(value){dashboardRangeDays=Math.max(30,Math.min(180,Number(value)||30));renderExecutiveDashboard().catch(e=>{console.error(e);showNotification('بارگذاری نمودارها ناموفق بود','error');});}
-function updateDashboard(){document.getElementById('stat-total').textContent=leads.length.toLocaleString('fa-IR');document.getElementById('stat-hot').textContent=leads.filter(l=>l.status?.type==='hot').length;document.getElementById('stat-warm').textContent=leads.filter(l=>l.status?.type==='warm').length;document.getElementById('stat-qualified').textContent=leads.filter(l=>parseInt(l.sales_stage)>=5).length;const today=new Date();document.getElementById('dash-followups').textContent=leads.filter(l=>l.followup_date&&new Date(l.followup_date)<=today).length.toLocaleString('fa-IR');renderPipeline();renderExecutiveDashboard().catch(e=>{console.error('Executive dashboard data load failed',e);});}
+async function renderExpertOwnLeads(){
+ const panel=document.getElementById('expertOwnLeads');if(!panel)return;
+ if(!currentProfile||currentProfile.role==='manager'){panel.style.display='none';return;}
+ panel.style.display='block';
+ const summary=document.getElementById('expertOwnLeadsSummary'),list=document.getElementById('expertOwnLeadsList');
+ list.textContent='در حال دریافت لیدهای اختصاصی…';
+ const escOwn=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+ try{
+  const [cr,ld]=await Promise.all([
+   sb.from('collaboration_requests').select('id,external_id,company,phone,request_type,request_status,next_followup_text,owner_auth_id').eq('owner_auth_id',currentProfile.id).order('created_at',{ascending:false}).limit(1000),
+   sb.from('leads').select('id,company_name,phone,lead_status,followup_date,owner_auth_id').eq('owner_auth_id',currentProfile.id).order('updated_at',{ascending:false}).limit(1000)
+  ]);
+  if(cr.error)throw cr.error;if(ld.error)throw ld.error;
+  const requests=cr.data||[],sales=ld.data||[];
+  const count=(label,n)=>'<article class="dash-kpi blue" style="min-height:88px;padding:12px"><div class="dash-kpi-head"><span>'+label+'</span></div><div class="dash-kpi-value" style="font-size:23px">'+n.toLocaleString('fa-IR')+'</div></article>';
+  summary.innerHTML=count('درخواست همکاری من',requests.length)+count('لید فروش من',sales.length)+count('تجاری',requests.filter(x=>x.request_type==='commercial').length)+count('استخدامی',requests.filter(x=>x.request_type==='employment').length);
+  const rows=requests.map(r=>({source:'درخواست همکاری',title:r.company||r.external_id,phone:r.phone,status:r.request_status||'جدید',due:r.next_followup_text||'—',page:'collaboration'})).concat(sales.map(r=>({source:'لید فروش',title:r.company_name,phone:r.phone,status:r.lead_status||'—',due:r.followup_date||'—',page:'leads'})));
+  if(!rows.length){list.innerHTML='<div class="dash-empty">هنوز هیچ لید یا درخواست همکاری به حساب شما اختصاص داده نشده است. برای تخصیص، با مدیر سیستم هماهنگ کنید.</div>';return;}
+  list.innerHTML='<table style="width:100%;min-width:670px;border-collapse:collapse;font-size:12px"><thead><tr><th style="padding:12px;text-align:right">منبع</th><th style="padding:12px;text-align:right">شرکت / متقاضی</th><th style="padding:12px;text-align:right">تلفن</th><th style="padding:12px;text-align:right">وضعیت</th><th style="padding:12px;text-align:right">پیگیری بعدی</th><th style="padding:12px;text-align:right">عملیات</th></tr></thead><tbody>'+rows.slice(0,100).map(r=>'<tr style="border-top:1px solid var(--bd)"><td style="padding:10px">'+escOwn(r.source)+'</td><td style="padding:10px">'+escOwn(r.title)+'</td><td style="padding:10px">'+escOwn(r.phone)+'</td><td style="padding:10px">'+escOwn(r.status)+'</td><td style="padding:10px">'+escOwn(r.due)+'</td><td style="padding:10px"><button class="dash-action" type="button" data-own-page="'+r.page+'">مشاهده</button></td></tr>').join('')+'</tbody></table>'+(rows.length>100?'<p class="dash-empty">۱۰۰ مورد اول نمایش داده شد؛ برای مشاهده همه موارد به بخش مربوطه بروید.</p>':'');
+  list.querySelectorAll('[data-own-page]').forEach(btn=>btn.onclick=()=>{const page=btn.dataset.ownPage,nav=[...document.querySelectorAll('.nav-item')].find(n=>n.getAttribute('onclick')?.includes("'"+page+"'"));switchPage({preventDefault(){},currentTarget:nav||btn},page)});
+ }catch(err){console.error('Personal leads dashboard failed',err);list.textContent='دریافت لیدهای اختصاصی ناموفق بود: '+(err.message||'خطای نامشخص');}
+}
+function updateDashboard(){document.getElementById('stat-total').textContent=leads.length.toLocaleString('fa-IR');document.getElementById('stat-hot').textContent=leads.filter(l=>l.status?.type==='hot').length;document.getElementById('stat-warm').textContent=leads.filter(l=>l.status?.type==='warm').length;document.getElementById('stat-qualified').textContent=leads.filter(l=>parseInt(l.sales_stage)>=5).length;const today=new Date();document.getElementById('dash-followups').textContent=leads.filter(l=>l.followup_date&&new Date(l.followup_date)<=today).length.toLocaleString('fa-IR');renderPipeline();renderExpertOwnLeads().catch(e=>console.error('Personal leads load failed',e));renderExecutiveDashboard().catch(e=>{console.error('Executive dashboard data load failed',e);});}
 async function renderExecutiveDashboard(){
  if(!currentProfile)return;
  const set=(id,v)=>{const el=document.getElementById(id);if(el)el.textContent=Number(v||0).toLocaleString('fa-IR');};
