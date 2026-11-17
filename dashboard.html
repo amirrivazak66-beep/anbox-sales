@@ -256,6 +256,9 @@ body{background:radial-gradient(ellipse at 20% 5%,rgba(0,85,160,.11),transparent
 
 
 /* Quick Jalali calendar, design 3. Native inputs retain ISO values for Supabase. */
+.cr-edit .jp-native{display:none!important}
+.cr-edit .jp-trigger{display:block;width:100%;margin-top:7px}
+.jp-popup.jp-in-dialog{position:relative;inset:auto!important;margin:12px auto 0;max-height:min(450px,55vh);box-shadow:0 12px 28px #0007}
 .jp-native{position:absolute!important;width:1px!important;height:1px!important;opacity:0!important;pointer-events:none!important}
 .jp-trigger{background:#13243b;color:#e2e8f0;border:1px solid #315173;border-radius:9px;padding:10px 13px;min-width:185px;text-align:right;cursor:pointer;font:inherit;direction:rtl}
 .jp-trigger:hover,.jp-trigger:focus-visible{border-color:#34b76a;outline:2px solid #34b76a33}
@@ -945,5 +948,6 @@ function importCrmBackup(event){
 }
 function showNotification(msg,type='success'){const el=document.getElementById('notification');el.textContent=msg;el.className='notification '+(type==='error'?'error':'')+' show';setTimeout(()=>el.classList.remove('show'),3000);}
 </script>
-<script src="scripts/jalali-picker.js"></script>\n</body>
+<script src="scripts/jalali-picker.js"></script>
+</body>
 </html>
