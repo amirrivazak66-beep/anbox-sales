@@ -32,3 +32,12 @@ Status: draft branch only. No production database writes, migrations, or main me
 2. Approve additive DB migration separately; verify RLS and rollback.
 3. Complete UI (city + Jalali datetime), migration dry-run, tests, CI.
 4. Approve merge/deployment separately. No live records modified in this branch.
+
+## Second-stage verification (read-only)
+- RPC `record_collaboration_followup` ALREADY increments `collaboration_requests.call_count` once for `interaction_type='call'`, and not for `note`. Do not add an additional counter/trigger; the current `call_count` is the historical baseline and RPC increments are already additive.
+- Existing RPC writes `last_contact_text` and `next_followup_text` as **Gregorian** `YYYY/MM/DD HH:MI` in Asia/Tehran timezone, despite UI showing Jalali elsewhere. Avoid treating all text dates as Jalali.
+- Last contact: 259 values are Jalali **date only** (no hour), 7 values are Gregorian date-time, 2 remaining populated values require review; 44 empty. Never invent 00:00 for unknown hour without separate decision.
+- Next followup: 7 Gregorian date-time; 261 other populated values include free-text notes like «ندارد», «تماس مجدد», «ارجاع به منابع انسانی»; 44 empty. Do not parse non-dates as dates or overwrite notes.
+- `docs/collaboration-editor-dry-run.sql` contains SELECT-only classification/mapping review queries. It must not be used to perform UPDATE.
+- `scripts/collaboration-city-draft.mjs` is a 31-province **non-exhaustive prototype** with selected cities, not a production-ready authoritative city dataset; `tests/collaboration-city-draft.test.mjs` checks mapping consistency.
+- Pending: authoritative complete city data, exact timezone/unknown-hour handling, and explicit approval for adding `city`, `last_contact_at`, `next_followup_at` columns. No production writes or merge until approval.
