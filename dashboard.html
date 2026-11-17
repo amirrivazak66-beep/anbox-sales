@@ -429,6 +429,12 @@ body{background:radial-gradient(ellipse at 20% 5%,rgba(0,85,160,.11),transparent
 <div id="reportsStatus" style="color:var(--txt2);font-size:12px;margin:10px 0">گزارش‌ها هنوز بارگذاری نشده‌اند.</div>
 <div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse;min-width:680px"><thead><tr><th style="padding:10px;text-align:right;border-bottom:1px solid var(--bd)">تاریخ</th><th style="padding:10px;text-align:right;border-bottom:1px solid var(--bd)">کارشناس</th><th style="padding:10px;text-align:right;border-bottom:1px solid var(--bd)">تماس</th><th style="padding:10px;text-align:right;border-bottom:1px solid var(--bd)">فالوآپ</th><th style="padding:10px;text-align:right;border-bottom:1px solid var(--bd)">اطلاعات</th><th style="padding:10px;text-align:right;border-bottom:1px solid var(--bd)">پنل</th><th style="padding:10px;text-align:right;border-bottom:1px solid var(--bd)">بارکد</th><th style="padding:10px;text-align:right;border-bottom:1px solid var(--bd)">یادداشت</th></tr></thead><tbody id="reportsTableBody"><tr><td colspan="8" style="padding:14px;color:var(--txt2)">در انتظار دریافت اطلاعات…</td></tr></tbody></table></div>
 </div>
+<div class="card" id="managerExpertActivityCard" style="display:none">
+<div style="display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap"><div class="card-title" style="margin:0">📋 عملکرد واقعی کارشناسان و درخواست‌های همکاری</div><button type="button" class="btn secondary" onclick="loadManagerExpertActivity()">↻ دریافت آخرین فعالیت‌ها</button></div>
+<div id="managerExpertActivityStatus" style="font-size:12px;color:var(--txt2);margin:12px 0">در انتظار بارگذاری…</div>
+<div style="overflow-x:auto"><table style="width:100%;min-width:880px;border-collapse:collapse;font-size:12px"><thead><tr><th>کارشناس</th><th>درخواست‌های فعلی</th><th>لید فروش</th><th>تماس‌های ثبت‌شده توسط کارشناس</th><th>یادداشت‌ها</th><th>پیگیری‌های تکمیل‌شده توسط کارشناس</th><th>پیگیری باز پرونده‌ها</th><th>عقب‌افتاده پرونده‌ها</th></tr></thead><tbody id="managerExpertActivityBody"></tbody></table></div>
+<div style="font-size:11px;color:var(--txt2);line-height:1.9;margin-top:12px">«درخواست‌های فعلی» بر اساس مالک فعلی پرونده است؛ «تماس و یادداشت» بر اساس شخص ثبت‌کننده و «تکمیل» بر اساس شخص تکمیل‌کننده محاسبه می‌شود. انتقال مالکیت، فعالیت‌های قبلی را به نام کارشناس جدید ثبت نمی‌کند. گزارش روزانه دستی در جدول بالایی جداست.</div>
+</div>
 <div class="card">
 <div class="card-title">🔥 وضعیت لیدها و تبدیل قیف</div>
 <div id="reportsPipelineSummary" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:12px"></div>
@@ -671,9 +677,50 @@ async function renderExecutiveDashboard(){
  if(activity){const ev=await sb.from('collaboration_request_events').select('event_type,changed_fields,new_values,created_at').order('created_at',{ascending:false}).limit(5);if(ev.error){activity.innerHTML='<div class="dash-empty">تاریخچه فعالیت‌ها در دسترس نیست.</div>';}else{activity.innerHTML=ev.data?.length?ev.data.map(e=>{const n=e.new_values||{};const label=e.event_type==='created'?'درخواست ثبت شد':e.event_type==='owner_reassigned'?'مالک درخواست تغییر کرد':'وضعیت درخواست به‌روزرسانی شد';const detail=[n.company,n.request_status,n.request_type==='employment'?'استخدامی':n.request_type==='commercial'?'تجاری':''].filter(Boolean).join(' · ');return '<div class="dash-activity-item"><span class="dash-activity-dot">↻</span><div style="min-width:0;flex:1"><div class="dash-activity-title">'+label+'</div><div class="dash-activity-meta">'+escapeLeadHtml(detail||'درخواست همکاری')+'</div></div><small style="color:var(--txt2);white-space:nowrap">'+new Date(e.created_at).toLocaleDateString('fa-IR')+'</small></div>'}).join(''):'<div class="dash-empty">هنوز فعالیتی ثبت نشده است.</div>';}}
 }
 function renderPipeline(){const grid=document.getElementById('pipelineGrid');let html='';const total=leads.length||1;SALES_STAGES.forEach(stage=>{const count=leads.filter(l=>parseInt(l.sales_stage)===stage.id).length;const percent=Math.round((count/total)*100);html+=`<div class="pipeline-box"><div class="pipeline-stage">${stage.name}</div><div class="pipeline-count">${count}</div><div class="progress-bar"><div class="progress-fill" style="width:${percent}%"></div></div><div class="pipeline-percent">${percent}%</div></div>`;});grid.innerHTML=html;}
+async function loadManagerExpertActivity(){
+ const card=document.getElementById('managerExpertActivityCard');if(!card)return;
+ if(currentProfile?.role!=='manager'){card.style.display='none';return;}
+ card.style.display='block';
+ const status=document.getElementById('managerExpertActivityStatus'),body=document.getElementById('managerExpertActivityBody');
+ status.textContent='در حال دریافت داده‌های واقعی از سرور…';body.innerHTML='';
+ const esc=v=>escapeLeadHtml(String(v??'—'));
+ try{
+  const fetchAll=async(table,columns,sort='created_at')=>{
+   let result=[];
+   for(let from=0;from<20000;from+=1000){
+    const {data,error}=await sb.from(table).select(columns).order(sort,{ascending:false}).range(from,from+999);
+    if(error)throw error;
+    result.push(...(data||[]));
+    if((data||[]).length<1000)return result;
+   }
+   throw new Error('تعداد رکوردها بیش از سقف گزارش است؛ برای جلوگیری از نمایش آمار ناقص گزارش متوقف شد.');
+  };
+  const [profiles,requests,activities,sales]=await Promise.all([
+   fetchAll('profiles','id,display_name,username,role','id'),
+   fetchAll('collaboration_requests','id,owner_auth_id,created_at'),
+   fetchAll('collaboration_request_followups','id,request_id,actor_auth_id,completed_by,interaction_type,completed_at,due_at,created_at'),
+   fetchAll('leads','id,owner_auth_id,created_at')
+  ]);
+  const experts=profiles.filter(p=>p.role==='sales'),now=Date.now(),owners=new Map();
+  for(const p of experts)owners.set(p.id,{name:p.display_name||p.username||'کارشناس',requests:0,leads:0,calls:0,notes:0,completed:0,open:0,overdue:0});
+  const requestOwner=new Map();
+  requests.forEach(r=>{requestOwner.set(r.id,r.owner_auth_id);const e=owners.get(r.owner_auth_id);if(e)e.requests++;});
+  sales.forEach(r=>{const e=owners.get(r.owner_auth_id);if(e)e.leads++;});
+  activities.forEach(a=>{
+   const actor=owners.get(a.actor_auth_id);if(actor){if(a.interaction_type==='call')actor.calls++;else actor.notes++;}
+   const completer=owners.get(a.completed_by);if(completer&&a.completed_at)completer.completed++;
+   const owner=owners.get(requestOwner.get(a.request_id));
+   if(owner&&!a.completed_at){owner.open++;if(a.due_at&&new Date(a.due_at).getTime()<now)owner.overdue++;}
+  });
+  const num=n=>n.toLocaleString('fa-IR');
+  body.innerHTML=[...owners.values()].sort((a,b)=>b.requests-a.requests).map(e=>'<tr style="border-top:1px solid var(--bd)">'+[e.name,num(e.requests),num(e.leads),num(e.calls),num(e.notes),num(e.completed),num(e.open),num(e.overdue)].map(v=>'<td style="padding:12px 8px;text-align:right">'+esc(v)+'</td>').join('')+'</tr>').join('')||'<tr><td colspan="8">کارشناسی یافت نشد.</td></tr>';
+  status.textContent='به‌روزرسانی شد · '+num(requests.length)+' درخواست همکاری · '+num(activities.length)+' فعالیت ثبت‌شده';
+ }catch(error){console.error('Manager expert activity report failed',error);status.textContent='خطا در بارگذاری عملکرد کارشناسان: '+(error.message||'خطای نامشخص');}
+}
 async function loadReports(){
  const status=document.getElementById('reportsStatus'),body=document.getElementById('reportsTableBody'),summary=document.getElementById('reportsSummary'),pipeSummary=document.getElementById('reportsPipelineSummary');
  if(!currentProfile){if(status)status.textContent='برای مشاهده گزارش‌ها ابتدا وارد حساب شوید.';return;}
+ if(currentProfile.role==='manager')loadManagerExpertActivity().catch(e=>console.error('Expert report failed',e));else{const expertCard=document.getElementById('managerExpertActivityCard');if(expertCard)expertCard.style.display='none';}
  if(status)status.textContent='در حال دریافت گزارش‌ها از Supabase…';
  if(body)body.innerHTML='<tr><td colspan="8" style="padding:14px;color:var(--txt2)">در حال بارگذاری…</td></tr>';
  try{
