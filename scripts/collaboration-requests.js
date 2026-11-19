@@ -48,9 +48,7 @@ const requestStatusLabels=['جدید','در حال بررسی','نیازمند �
 const norm=v=>String(v??'').trim().replace(/[۰-۹]/g,c=>String('۰۱۲۳۴۵۶۷۸۹'.indexOf(c))).replace(/[٠-٩]/g,c=>String('٠١٢٣٤٥٦٧٨٩'.indexOf(c)));
 const esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const pct=(a,b)=>b?Math.min(100,Math.round(a*100/b)):0;
-function parseRows(rows,{defaultCallCount=1}={}){
- const fallbackCount=Number(defaultCallCount);
- if(!Number.isSafeInteger(fallbackCount)||fallbackCount<1||fallbackCount>9999)throw Error('تعداد تماس پیش‌فرض نامعتبر است');
+function parseRows(rows){
  if(!Array.isArray(rows)||rows.length<2)throw Error('فایل باید حداقل یک ردیف عنوان و یک ردیف داده داشته باشد');
  const heads=rows[0].map(norm),mapped={};
  schema.forEach(([key,,aliases])=>{mapped[key]=heads.findIndex(h=>aliases.some(a=>norm(a).toLowerCase()===h.toLowerCase()))});
@@ -59,9 +57,9 @@ function parseRows(rows,{defaultCallCount=1}={}){
  const o={};schema.forEach(([key],j)=>{o[key]=mapped[key]>=0?norm(row[mapped[key]]):''});
  if(!o.external_id)throw Error('شناسه در ردیف '+(i+2)+' خالی است');
  const importedCount=norm(o.call_count);
- o.call_count=importedCount?Number(importedCount):fallbackCount;
+ o.call_count=importedCount?Number(importedCount):1;
  if(!Number.isSafeInteger(o.call_count)||o.call_count<0||o.call_count>9999)throw Error('تعداد تماس در ردیف '+(i+2)+' نامعتبر است');
- if(o.call_count===0)o.call_count=fallbackCount;
+ if(o.call_count===0)o.call_count=1;
  o.request_type='unclassified';o.request_status='جدید';
  o.request_status='جدید';
  return o;
@@ -93,14 +91,6 @@ function mount(host,{supabase,userId,isManager=false,XLSX=global.XLSX}={}){
  <div class="cr-head"><div><h2>🤝 درخواست همکاری</h2><p class="cr-muted">مدیریت درخواست‌های همکاری کارشناسان</p></div>
  <div class="cr-actions"><label class="cr-btn" for="cr-file">⬆ آپلود اکسل درخواست همکاری</label><input hidden type="file" id="cr-file" accept=".xlsx,.xls"><select id="cr-import-owner" aria-label="مالک فایل"></select><button class="cr-btn alt" id="cr-export-employment">خروجی استخدامی Excel</button><button class="cr-btn alt" id="cr-reload">به‌روزرسانی</button></div></div>
 
- <div class="cr-call-band" role="group" aria-label="تعداد تماس‌های پیش‌فرض">
-  <div class="cr-call-heading"><span class="cr-call-icon" aria-hidden="true">☎</span><div><strong>تعداد تماس‌ها</strong><small>مقدار اولیه برای درخواست‌های جدید</small></div></div>
-  <div class="cr-call-stepper" data-call-stepper>
-   <input id="cr-call-count-default" type="number" min="1" max="9999" step="1" value="1" inputmode="numeric" aria-label="تعداد تماس اولیه">
-   <div class="cr-call-step-actions"><button type="button" data-call-step="1" aria-label="افزایش تعداد تماس">⌃</button><button type="button" data-call-step="-1" aria-label="کاهش تعداد تماس">⌄</button></div>
-  </div>
-  <div class="cr-call-help">ⓘ با اسکرول موس یا دکمه‌های بالا و پایین، تعداد تماس‌ها را تغییر دهید.</div>
- </div>
  <p class="cr-status" id="cr-message" role="status" aria-live="polite"></p>
  <div class="cr-grid" id="cr-kpis"></div>
  <section class="cr-panel"><div class="cr-head"><div><h3>◷ کارهای پیگیری</h3><p class="cr-muted">پیگیری‌های امروز و عقب‌افتاده</p></div><div class="cr-actions"><button class="cr-btn alt" id="cr-export-daily">خروجی گزارش روزانه Excel</button><button class="cr-btn alt" id="cr-followup-reload">به‌روزرسانی</button></div></div><div class="cr-grid" id="cr-followup-kpis"></div>
@@ -131,7 +121,7 @@ function mount(host,{supabase,userId,isManager=false,XLSX=global.XLSX}={}){
   input.addEventListener('input',()=>{input.dataset.dirty='true'});
   input.addEventListener('blur',()=>{input.value=String(bounded(input.value))});
  }
- wireCallStepper(el('cr-call-count-default').closest('[data-call-stepper]'));
+ 
  const distinct=k=>[...new Set(records.map(r=>r[k]).filter(Boolean))].sort((a,b)=>a.localeCompare(b,'fa'));
  function fill(id,values,label){const select=el(id),v=select.value;select.innerHTML='<option value="">'+label+'</option>'+values.map(x=>'<option>'+esc(x)+'</option>').join('');select.value=v}
  function filtered(){const q=norm(el('cr-search').value).toLowerCase();return records.filter(r=>(view==='all'||r.request_type===view||(view==='unclassified'&&(!r.request_type||r.request_type==='unclassified')))&&(!q||[r.company,r.phone,r.external_id].some(v=>norm(v).toLowerCase().includes(q)))&&(!el('cr-province').value||r.province===el('cr-province').value)&&(!el('cr-result').value||r.call_result===el('cr-result').value)&&(!el('cr-stage').value||r.request_status===el('cr-stage').value)&&(!el('cr-priority').value||r.priority===el('cr-priority').value)&&(!el('cr-expert').value||r.expert_name===el('cr-expert').value)&&(!el('cr-category').value||r.sales_category===el('cr-category').value)&&(!el('cr-type').value||r.request_type===el('cr-type').value))}
@@ -281,7 +271,7 @@ function mount(host,{supabase,userId,isManager=false,XLSX=global.XLSX}={}){
   };
   dialog.onclose=()=>dialog.remove();
  }
- el('cr-file').onchange=async e=>{const file=e.target.files?.[0];if(!file)return;try{if(!XLSX?.read)throw Error('کتابخانه اکسل بارگذاری نشده است');if(file.size>10*1024*1024)throw Error('حداکثر حجم فایل ۱۰ مگابایت است');const wb=XLSX.read(await file.arrayBuffer(),{type:'array',cellDates:false});const sheet=wb.Sheets.CRM||wb.Sheets[wb.SheetNames[0]];if(!sheet)throw Error('شیت قابل خواندن نیست');const rows=XLSX.utils.sheet_to_json(sheet,{header:1,defval:'',raw:false});const parsed=parseRows(rows,{defaultCallCount:Number(el('cr-call-count-default').value)});if(!parsed.length)throw Error('هیچ ردیف داده‌ای پیدا نشد');const targetOwner=el('cr-import-owner').value||(!isManager?userId:'');if(!targetOwner)throw Error('برای فایل، مالک را انتخاب کنید');const ownerLabel=targetOwner===userId?(isManager?'مدیر':'شما'):(expertProfiles.find(p=>p.id===targetOwner)?.display_name||'کارشناس');if(!global.confirm(parsed.length+' درخواست به نام '+ownerLabel+' ثبت شود؟'))return;let existingQuery=supabase.from('collaboration_requests').select('external_id');if(!isManager)existingQuery=existingQuery.eq('owner_auth_id',userId);const existing=await existingQuery.in('external_id',parsed.map(r=>r.external_id));if(existing.error)throw existing.error;const known=new Set((existing.data||[]).map(r=>r.external_id));const fresh=parsed.filter(r=>!known.has(r.external_id));const skipped=parsed.length-fresh.length;if(!fresh.length){message('تمام '+skipped+' ردیف قبلاً ثبت شده‌اند؛ هیچ اطلاعاتی بازنویسی نشد');return}for(let i=0;i<fresh.length;i+=100){const payload=fresh.slice(i,i+100).map(r=>({...r,owner_auth_id:targetOwner}));const {error}=await supabase.from('collaboration_requests').insert(payload);if(error)throw error}await load();message(fresh.length.toLocaleString('fa-IR')+' درخواست جدید ثبت شد؛ '+skipped+' ردیف تکراری بدون بازنویسی رد شد')}catch(err){message('خطا: '+(err.message||String(err)))}finally{e.target.value=''}};
+ el('cr-file').onchange=async e=>{const file=e.target.files?.[0];if(!file)return;try{if(!XLSX?.read)throw Error('کتابخانه اکسل بارگذاری نشده است');if(file.size>10*1024*1024)throw Error('حداکثر حجم فایل ۱۰ مگابایت است');const wb=XLSX.read(await file.arrayBuffer(),{type:'array',cellDates:false});const sheet=wb.Sheets.CRM||wb.Sheets[wb.SheetNames[0]];if(!sheet)throw Error('شیت قابل خواندن نیست');const rows=XLSX.utils.sheet_to_json(sheet,{header:1,defval:'',raw:false});const parsed=parseRows(rows);if(!parsed.length)throw Error('هیچ ردیف داده‌ای پیدا نشد');const targetOwner=el('cr-import-owner').value||(!isManager?userId:'');if(!targetOwner)throw Error('برای فایل، مالک را انتخاب کنید');const ownerLabel=targetOwner===userId?(isManager?'مدیر':'شما'):(expertProfiles.find(p=>p.id===targetOwner)?.display_name||'کارشناس');if(!global.confirm(parsed.length+' درخواست به نام '+ownerLabel+' ثبت شود؟'))return;let existingQuery=supabase.from('collaboration_requests').select('external_id');if(!isManager)existingQuery=existingQuery.eq('owner_auth_id',userId);const existing=await existingQuery.in('external_id',parsed.map(r=>r.external_id));if(existing.error)throw existing.error;const known=new Set((existing.data||[]).map(r=>r.external_id));const fresh=parsed.filter(r=>!known.has(r.external_id));const skipped=parsed.length-fresh.length;if(!fresh.length){message('تمام '+skipped+' ردیف قبلاً ثبت شده‌اند؛ هیچ اطلاعاتی بازنویسی نشد');return}for(let i=0;i<fresh.length;i+=100){const payload=fresh.slice(i,i+100).map(r=>({...r,owner_auth_id:targetOwner}));const {error}=await supabase.from('collaboration_requests').insert(payload);if(error)throw error}await load();message(fresh.length.toLocaleString('fa-IR')+' درخواست جدید ثبت شد؛ '+skipped+' ردیف تکراری بدون بازنویسی رد شد')}catch(err){message('خطا: '+(err.message||String(err)))}finally{e.target.value=''}};
  ['cr-search','cr-province','cr-result','cr-stage','cr-priority','cr-expert','cr-category','cr-type'].forEach(id=>el(id).addEventListener(id==='cr-search'?'input':'change',render));
  ['cr-followup-from','cr-followup-to','cr-followup-status'].forEach(id=>el(id).addEventListener('change',renderFollowups));
  if(isManager)el('cr-followup-expert').addEventListener('change',renderFollowups);
