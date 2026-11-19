@@ -108,42 +108,10 @@ try {
   await app.locator("#dashboardPage").waitFor({ state: "visible", timeout: 10000 });
   console.log("PASS login validation and mocked manager session");
   
-  // Approved collaboration call-count stepper: mock-only browser interaction test.
+  // Global call count control is intentionally absent; per-request editing remains available.
   await app.addScriptTag({ content: readFileSync(resolve(root, "scripts/collaboration-requests.js"), "utf8") });
-  await app.evaluate(() => {
-    const host = document.createElement("div");
-    host.id = "cr-counter-browser-sandbox";
-    host.style.cssText = "position:fixed;top:95px;left:40px;width:min(940px,85vw);z-index:99999;max-height:65vh;overflow:auto";
-    document.body.append(host);
-    const query = new Proxy({}, {
-      get(_target, field) {
-        if (field === "then") return resolve => Promise.resolve({ data: [], error: null }).then(resolve);
-        return () => query;
-      }
-    });
-    window.OnboxCollaborationRequests.mount(host, {
-      supabase: { from: () => query }, userId: "test-manager", isManager: true
-    });
-  });
-  const callDefault = app.locator("#cr-counter-browser-sandbox #cr-call-count-default");
-  await callDefault.waitFor({ state: "visible", timeout: 5000 });
-  assert.equal(await callDefault.inputValue(), "1");
-  await app.locator('#cr-counter-browser-sandbox [data-call-step="1"]').first().click();
-  assert.equal(await callDefault.inputValue(), "2");
-  await callDefault.hover();
-  await app.mouse.wheel(0, -100);
-  assert.equal(await callDefault.inputValue(), "3", "scroll up increments the number of calls");
-  await app.mouse.wheel(0, 100);
-  assert.equal(await callDefault.inputValue(), "2", "scroll down decrements the number of calls");
-  await app.locator('#cr-counter-browser-sandbox [data-call-step="-1"]').first().click();
-  await app.locator('#cr-counter-browser-sandbox [data-call-step="-1"]').first().click();
-  assert.equal(await callDefault.inputValue(), "1", "count can never fall below one");
-  await callDefault.fill("5");
-  await callDefault.blur();
-  assert.equal(await callDefault.inputValue(), "5");
-  await app.evaluate(() => document.getElementById("cr-counter-browser-sandbox").remove());
-  console.log("PASS collaboration count stepper default, buttons, scroll and minimum");
-
+  assert.ok(!readFileSync(resolve(root, "scripts/collaboration-requests.js"), "utf8").includes('id="cr-call-count-default"'));
+  console.log("PASS global call count control removed");
 
   const navCases = [
     ["داشبورد", "dashboard"],
