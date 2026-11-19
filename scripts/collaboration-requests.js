@@ -48,7 +48,9 @@ const requestStatusLabels=['جدید','در حال بررسی','نیازمند �
 const norm=v=>String(v??'').trim().replace(/[۰-۹]/g,c=>String('۰۱۲۳۴۵۶۷۸۹'.indexOf(c))).replace(/[٠-٩]/g,c=>String('٠١٢٣٤٥٦٧٨٩'.indexOf(c)));
 const esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const pct=(a,b)=>b?Math.min(100,Math.round(a*100/b)):0;
-function parseRows(rows){
+function parseRows(rows,{defaultCallCount=1}={}){
+ const fallbackCount=Number(defaultCallCount);
+ if(!Number.isSafeInteger(fallbackCount)||fallbackCount<1||fallbackCount>9999)throw Error('تعداد تماس پیش‌فرض نامعتبر است');
  if(!Array.isArray(rows)||rows.length<2)throw Error('فایل باید حداقل یک ردیف عنوان و یک ردیف داده داشته باشد');
  const heads=rows[0].map(norm),mapped={};
  schema.forEach(([key,,aliases])=>{mapped[key]=heads.findIndex(h=>aliases.some(a=>norm(a).toLowerCase()===h.toLowerCase()))});
@@ -56,7 +58,10 @@ function parseRows(rows){
  const output=rows.slice(1).filter(row=>row.some(v=>String(v??'').trim())).map((row,i)=>{
  const o={};schema.forEach(([key],j)=>{o[key]=mapped[key]>=0?norm(row[mapped[key]]):''});
  if(!o.external_id)throw Error('شناسه در ردیف '+(i+2)+' خالی است');
- o.call_count=Number(o.call_count||0);if(!Number.isInteger(o.call_count)||o.call_count<0)throw Error('تعداد تماس در ردیف '+(i+2)+' نامعتبر است');
+ const importedCount=norm(o.call_count);
+ o.call_count=importedCount?Number(importedCount):fallbackCount;
+ if(!Number.isSafeInteger(o.call_count)||o.call_count<0||o.call_count>9999)throw Error('تعداد تماس در ردیف '+(i+2)+' نامعتبر است');
+ if(o.call_count===0)o.call_count=fallbackCount;
  o.request_type='unclassified';o.request_status='جدید';
  o.request_status='جدید';
  return o;
@@ -69,10 +74,33 @@ function mount(host,{supabase,userId,isManager=false,XLSX=global.XLSX}={}){
  host.dir='rtl';host.innerHTML=`
  <style>
  .cr-wrap{color:var(--txt,#e2e8f0);direction:rtl}.cr-head{display:flex;justify-content:space-between;gap:12px;align-items:center;flex-wrap:wrap;margin-bottom:18px}.cr-actions{display:flex;gap:8px;flex-wrap:wrap}.cr-btn{border:1px solid var(--bd, #334155);border-radius:10px;padding:10px 14px;background:#2563eb;color:white;cursor:pointer;font:inherit}.cr-btn.alt{background:transparent;color:inherit}.cr-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin-bottom:16px}.cr-kpi,.cr-panel{background:var(--card,rgba(15,23,42,.65));border:1px solid var(--bd,rgba(59,130,246,.18));border-radius:14px;padding:16px;margin-bottom:14px}.cr-kpi small,.cr-muted{color:var(--txt2,#94a3b8)}.cr-kpi strong{display:block;font-size:25px;margin-top:7px}.cr-gauges{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}.cr-followup-list{display:grid;gap:8px}.cr-followup-item{display:flex;justify-content:space-between;gap:12px;align-items:center;padding:12px;border:1px solid var(--bd);border-radius:11px}.cr-followup-item.overdue{border-color:#b45353}.cr-followup-meta{font-size:11px;color:var(--txt2);margin-top:5px}.cr-btn.sm{padding:7px 10px;font-size:11px}.cr-edit textarea{width:100%;min-height:80px;background:#101b30;color:white;border:1px solid var(--bd);padding:10px}.cr-edit input{width:100%;background:#101b30;color:white;border:1px solid var(--bd);padding:10px}.cr-history-item{padding:10px 0;border-bottom:1px solid var(--bd)}@media(max-width:850px){.cr-followup-item{display:block}}.cr-gauge{width:132px;height:132px;margin:12px auto;border-radius:50%;display:grid;place-items:center;background:conic-gradient(var(--g) calc(var(--v)*1%),rgba(148,163,184,.18) 0);position:relative}.cr-gauge:before{content:'';position:absolute;inset:12px;border-radius:50%;background:#111c31}.cr-gauge b{z-index:1;font-size:23px}.cr-filters{display:grid;grid-template-columns:repeat(5,minmax(120px,1fr));gap:9px}.cr-filters input,.cr-filters select,.cr-edit input,.cr-edit select{width:100%;padding:10px;border-radius:9px;border:1px solid var(--bd);background:rgba(15,23,42,.75);color:inherit;font:inherit}.cr-table{overflow:auto}.cr-table table{width:100%;min-width:760px;border-collapse:collapse}.cr-table th,.cr-table td{text-align:right;padding:11px;border-bottom:1px solid var(--bd);font-size:13px}.cr-pill{padding:4px 8px;border-radius:18px;background:rgba(59,130,246,.18)}.cr-edit{max-width:680px;width:95%;max-height:85vh;overflow:auto;background:#101b30;color:#fff;border:1px solid var(--bd);border-radius:14px;padding:18px;margin:auto}.cr-edit label{display:block;margin:10px 0}.cr-edit button{margin-top:10px}.cr-status{margin:8px 0;min-height:22px;color:#93c5fd}@media(max-width:850px){.cr-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.cr-gauges{grid-template-columns:1fr}.cr-filters{grid-template-columns:repeat(2,minmax(0,1fr))}}
+ /* Approved call-count control: same dark-blue gradient, 1 as default, mouse-wheel/button stepping. */
+ .cr-call-band{display:flex;align-items:center;gap:22px;flex-wrap:wrap;margin:2px 0 13px;padding:15px 22px;min-height:86px;border:2px solid #3b82f6;border-radius:17px;background:linear-gradient(110deg,#0b1e38,#162a49 45%,#101d34);box-shadow:0 0 0 2px rgba(44,125,245,.1),0 8px 24px rgba(19,95,244,.19);color:#f2f7ff}
+ .cr-call-heading{display:flex;gap:13px;align-items:center;flex:0 0 auto}.cr-call-heading strong{font-size:17px;display:block}.cr-call-heading small{display:block;color:#9db5d6;font-size:10px;margin-top:5px}
+ .cr-call-icon{display:grid;place-items:center;width:44px;height:44px;background:rgba(49,99,211,.65);border-radius:12px;font-size:24px}
+ .cr-call-stepper{direction:rtl;display:flex;align-items:center;justify-content:center;gap:2px;border:1px solid #4788f7;border-radius:12px;padding:3px 7px;background:#0d1b31;min-width:168px;height:56px;flex:0 0 auto}
+ .cr-call-stepper input[type=number]{width:83px!important;min-width:0;height:43px;padding:4px 6px!important;background:transparent!important;border:0!important;outline:0;color:#fff;font-size:24px!important;font-weight:700;text-align:center;direction:ltr;font-family:inherit;appearance:textfield;-moz-appearance:textfield}
+ .cr-call-stepper input::-webkit-outer-spin-button,.cr-call-stepper input::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
+ .cr-call-step-actions{display:flex;flex-direction:column;gap:3px}.cr-call-step-actions button{display:grid;place-items:center;border:0;border-radius:7px;background:#273f69;color:#f2f7ff;width:40px;height:22px;padding:0;cursor:pointer;font:700 19px/1 Tahoma;transition:background .15s}
+ .cr-call-step-actions button:hover,.cr-call-step-actions button:focus-visible{background:#3b82f6}
+ .cr-call-help{flex:1 1 225px;color:#b8cbe7;font-size:12px;line-height:1.9;background:rgba(48,86,139,.19);border-radius:25px;padding:6px 13px;text-align:right}
+ .cr-call-stepper-edit{margin:8px 0 4px;max-width:220px}.cr-edit-call-row{margin:10px 0;padding:12px;border:1px solid var(--bd,rgba(59,130,246,.18));border-radius:10px}
+ .cr-edit-call-row>label{margin:0 0 4px!important}.cr-edit-call-row small{display:block;color:var(--txt2,#94a3b8);font-size:11px;margin-top:7px}
+ @media(max-width:670px){.cr-call-band{gap:12px;padding:13px}.cr-call-heading{width:100%}.cr-call-help{flex-basis:100%}.cr-call-stepper{height:53px}}
+
  </style>
  <div class="cr-wrap">
  <div class="cr-head"><div><h2>🤝 درخواست همکاری</h2><p class="cr-muted">مدیریت درخواست‌های همکاری کارشناسان</p></div>
  <div class="cr-actions"><label class="cr-btn" for="cr-file">⬆ آپلود اکسل درخواست همکاری</label><input hidden type="file" id="cr-file" accept=".xlsx,.xls"><select id="cr-import-owner" aria-label="مالک فایل"></select><button class="cr-btn alt" id="cr-export-employment">خروجی استخدامی Excel</button><button class="cr-btn alt" id="cr-reload">به‌روزرسانی</button></div></div>
+
+ <div class="cr-call-band" role="group" aria-label="تعداد تماس‌های پیش‌فرض">
+  <div class="cr-call-heading"><span class="cr-call-icon" aria-hidden="true">☎</span><div><strong>تعداد تماس‌ها</strong><small>مقدار اولیه برای درخواست‌های جدید</small></div></div>
+  <div class="cr-call-stepper" data-call-stepper>
+   <input id="cr-call-count-default" type="number" min="1" max="9999" step="1" value="1" inputmode="numeric" aria-label="تعداد تماس اولیه">
+   <div class="cr-call-step-actions"><button type="button" data-call-step="1" aria-label="افزایش تعداد تماس">⌃</button><button type="button" data-call-step="-1" aria-label="کاهش تعداد تماس">⌄</button></div>
+  </div>
+  <div class="cr-call-help">ⓘ با اسکرول موس یا دکمه‌های بالا و پایین، تعداد تماس‌ها را تغییر دهید.</div>
+ </div>
  <p class="cr-status" id="cr-message" role="status" aria-live="polite"></p>
  <div class="cr-grid" id="cr-kpis"></div>
  <section class="cr-panel"><div class="cr-head"><div><h3>◷ کارهای پیگیری</h3><p class="cr-muted">پیگیری‌های امروز و عقب‌افتاده</p></div><div class="cr-actions"><button class="cr-btn alt" id="cr-export-daily">خروجی گزارش روزانه Excel</button><button class="cr-btn alt" id="cr-followup-reload">به‌روزرسانی</button></div></div><div class="cr-grid" id="cr-followup-kpis"></div>
@@ -91,6 +119,19 @@ function mount(host,{supabase,userId,isManager=false,XLSX=global.XLSX}={}){
  let records=[],expertProfiles=[],view='all';
  const ownerName=id=>id===userId?(isManager?'مدیر':'شما'):(expertProfiles.find(p=>p.id===id)?.display_name||expertProfiles.find(p=>p.id===id)?.username||'کارشناس نامشخص');
  const el=id=>host.querySelector('#'+id),message=t=>{el('cr-message').textContent=t};
+
+ // Usable from mouse-wheel, keyboard, touch buttons and manual numeric input.
+ // This is a UI control only; old counts are never changed until explicitly saved.
+ function wireCallStepper(root){
+  const input=root.querySelector('input[type="number"]');
+  const bounded=value=>{const n=Number(norm(value));return Number.isFinite(n)?Math.max(1,Math.min(9999,Math.trunc(n))):1};
+  function apply(value){input.value=String(bounded(value));input.dataset.dirty='true'}
+  root.querySelectorAll('[data-call-step]').forEach(button=>button.addEventListener('click',()=>apply(bounded(input.value)+Number(button.dataset.callStep))));
+  root.addEventListener('wheel',event=>{if(!event.deltaY)return;event.preventDefault();apply(bounded(input.value)+(event.deltaY<0?1:-1))},{passive:false});
+  input.addEventListener('input',()=>{input.dataset.dirty='true'});
+  input.addEventListener('blur',()=>{input.value=String(bounded(input.value))});
+ }
+ wireCallStepper(el('cr-call-count-default').closest('[data-call-stepper]'));
  const distinct=k=>[...new Set(records.map(r=>r[k]).filter(Boolean))].sort((a,b)=>a.localeCompare(b,'fa'));
  function fill(id,values,label){const select=el(id),v=select.value;select.innerHTML='<option value="">'+label+'</option>'+values.map(x=>'<option>'+esc(x)+'</option>').join('');select.value=v}
  function filtered(){const q=norm(el('cr-search').value).toLowerCase();return records.filter(r=>(view==='all'||r.request_type===view||(view==='unclassified'&&(!r.request_type||r.request_type==='unclassified')))&&(!q||[r.company,r.phone,r.external_id].some(v=>norm(v).toLowerCase().includes(q)))&&(!el('cr-province').value||r.province===el('cr-province').value)&&(!el('cr-result').value||r.call_result===el('cr-result').value)&&(!el('cr-stage').value||r.request_status===el('cr-stage').value)&&(!el('cr-priority').value||r.priority===el('cr-priority').value)&&(!el('cr-expert').value||r.expert_name===el('cr-expert').value)&&(!el('cr-category').value||r.sales_category===el('cr-category').value)&&(!el('cr-type').value||r.request_type===el('cr-type').value))}
@@ -175,7 +216,7 @@ function mount(host,{supabase,userId,isManager=false,XLSX=global.XLSX}={}){
   const fields=editable.map(k=>{const f=schema.find(x=>x[0]===k);
    if(k==='request_type')return '<label>'+esc(f[1])+'<select name="request_type">'+requestTypeOptions.map(v=>'<option value="'+v+'" '+((r.request_type||'unclassified')===v?'selected':'')+'>'+requestTypeLabels[v]+'</option>').join('')+'</select></label>';
    if(k==='request_status')return '<label>'+esc(f[1])+'<select name="request_status">'+requestStatusLabels.map(v=>'<option '+((r.request_status||'جدید')===v?'selected':'')+'>'+v+'</option>').join('')+'</select></label>';
-   if(k==='call_count')return '<label>'+esc(f[1])+'<input value="'+esc(r.call_count??0)+'" readonly aria-label="تعداد تماس؛ محاسبه خودکار" title="مقدار تاریخی حفظ می‌شود و تماس‌های جدید از مسیر ثبت پیگیری شمارش می‌شوند"></label>';
+   if(k==='call_count')return '<div class="cr-edit-call-row"><label for="cr-edit-call-count">'+esc(f[1])+'</label><div class="cr-call-stepper cr-call-stepper-edit" data-call-stepper><input id="cr-edit-call-count" name="call_count" type="number" min="1" max="9999" step="1" inputmode="numeric" value="'+esc(Math.max(1,Number(r.call_count)||1))+'" aria-label="تعداد تماس این درخواست"><div class="cr-call-step-actions"><button type="button" data-call-step="1" aria-label="افزایش تعداد تماس">⌃</button><button type="button" data-call-step="-1" aria-label="کاهش تعداد تماس">⌄</button></div></div><small>برای اصلاح این درخواست اسکرول کنید؛ شمارش تماس‌های ثبت پیگیری نیز همچنان خودکار انجام می‌شود.</small></div>';
    if(k==='province')return '<label>'+esc(f[1])+'<select name="province"><option value="">انتخاب استان</option>'+provinceOptions.map(v=>'<option value="'+esc(v)+'" '+(r.province===v?'selected':'')+'>'+esc(v)+'</option>').join('')+'</select></label>';
    if(dropdownFields[k])return '<label>'+esc(f[1])+dropdownMarkup(k,r[k])+'</label>';
    if(k==='last_contact_text'||k==='next_followup_text')return '<label>'+esc(f[1])+'<input type="datetime-local" data-date-field="'+k+'" aria-label="'+esc(f[1])+'"><small>مقدار قبلی: '+esc(r[k]||'ثبت نشده')+' — برای حفظ مقدار قبلی، تاریخ جدید انتخاب نکنید.</small></label>';
@@ -183,6 +224,7 @@ function mount(host,{supabase,userId,isManager=false,XLSX=global.XLSX}={}){
   }).join('');
   dialog.innerHTML='<form method="dialog"><h3>ویرایش درخواست همکاری</h3>'+fields+ownerField+'<button class="cr-btn" value="save">ذخیره تغییرات</button> <button class="cr-btn alt" value="cancel">انصراف</button></form><section class="cr-panel" id="cr-history">در حال دریافت تاریخچه…</section>';
   host.append(dialog);dialog.showModal();
+  wireCallStepper(dialog.querySelector('[data-call-stepper]'));
   dialog.querySelectorAll('[data-custom-select]').forEach(select=>{
    const input=dialog.querySelector('[data-custom-input="'+select.dataset.customSelect+'"]');
    const toggle=()=>{const custom=select.value==='__custom__';input.hidden=!custom;input.disabled=!custom;if(custom)input.focus();};
@@ -219,8 +261,12 @@ function mount(host,{supabase,userId,isManager=false,XLSX=global.XLSX}={}){
    if(Object.keys(dropdownFields).some(key=>d[key]==='__custom__')){message('لطفاً مقدار دلخواه را وارد کنید');return}
    d.city=citySelect.value;
    if(d.city&&!(cityOptionsByProvince[d.province]||[]).includes(d.city)&&!(d.city===r.city&&d.province===r.province)){message('شهر باید متعلق به استان انتخاب‌شده باشد');return}
-   // Preserve historical count: the existing record_collaboration_followup RPC owns increments.
-   delete d.call_count;
+   const countInput=dialog.querySelector('[name="call_count"]');
+   const correctedCount=Number(norm(countInput.value));
+   if(!Number.isSafeInteger(correctedCount)||correctedCount<1||correctedCount>9999){message('تعداد تماس باید عددی از ۱ تا ۹۹۹۹ باشد');return}
+   // Preserve existing data unless the user intentionally changes this control.
+   if(countInput.dataset.dirty==='true')d.call_count=correctedCount;
+   else delete d.call_count;
    dialog.querySelectorAll('[data-date-field]').forEach(input=>{
     const key=input.dataset.dateField;
     if(input.value){const parsed=new Date(input.value);if(!Number.isNaN(parsed.getTime())){const parts=Object.fromEntries(new Intl.DateTimeFormat('en-US-u-ca-persian',{year:'numeric',month:'2-digit',day:'2-digit'}).formatToParts(parsed).filter(p=>p.type!=='literal').map(p=>[p.type,p.value]));d[key]=parts.year+'/'+parts.month+'/'+parts.day+' '+input.value.slice(11,16);}}
@@ -235,7 +281,7 @@ function mount(host,{supabase,userId,isManager=false,XLSX=global.XLSX}={}){
   };
   dialog.onclose=()=>dialog.remove();
  }
- el('cr-file').onchange=async e=>{const file=e.target.files?.[0];if(!file)return;try{if(!XLSX?.read)throw Error('کتابخانه اکسل بارگذاری نشده است');if(file.size>10*1024*1024)throw Error('حداکثر حجم فایل ۱۰ مگابایت است');const wb=XLSX.read(await file.arrayBuffer(),{type:'array',cellDates:false});const sheet=wb.Sheets.CRM||wb.Sheets[wb.SheetNames[0]];if(!sheet)throw Error('شیت قابل خواندن نیست');const rows=XLSX.utils.sheet_to_json(sheet,{header:1,defval:'',raw:false});const parsed=parseRows(rows);if(!parsed.length)throw Error('هیچ ردیف داده‌ای پیدا نشد');const targetOwner=el('cr-import-owner').value||(!isManager?userId:'');if(!targetOwner)throw Error('برای فایل، مالک را انتخاب کنید');const ownerLabel=targetOwner===userId?(isManager?'مدیر':'شما'):(expertProfiles.find(p=>p.id===targetOwner)?.display_name||'کارشناس');if(!global.confirm(parsed.length+' درخواست به نام '+ownerLabel+' ثبت شود؟'))return;let existingQuery=supabase.from('collaboration_requests').select('external_id');if(!isManager)existingQuery=existingQuery.eq('owner_auth_id',userId);const existing=await existingQuery.in('external_id',parsed.map(r=>r.external_id));if(existing.error)throw existing.error;const known=new Set((existing.data||[]).map(r=>r.external_id));const fresh=parsed.filter(r=>!known.has(r.external_id));const skipped=parsed.length-fresh.length;if(!fresh.length){message('تمام '+skipped+' ردیف قبلاً ثبت شده‌اند؛ هیچ اطلاعاتی بازنویسی نشد');return}for(let i=0;i<fresh.length;i+=100){const payload=fresh.slice(i,i+100).map(r=>({...r,owner_auth_id:targetOwner}));const {error}=await supabase.from('collaboration_requests').insert(payload);if(error)throw error}await load();message(fresh.length.toLocaleString('fa-IR')+' درخواست جدید ثبت شد؛ '+skipped+' ردیف تکراری بدون بازنویسی رد شد')}catch(err){message('خطا: '+(err.message||String(err)))}finally{e.target.value=''}};
+ el('cr-file').onchange=async e=>{const file=e.target.files?.[0];if(!file)return;try{if(!XLSX?.read)throw Error('کتابخانه اکسل بارگذاری نشده است');if(file.size>10*1024*1024)throw Error('حداکثر حجم فایل ۱۰ مگابایت است');const wb=XLSX.read(await file.arrayBuffer(),{type:'array',cellDates:false});const sheet=wb.Sheets.CRM||wb.Sheets[wb.SheetNames[0]];if(!sheet)throw Error('شیت قابل خواندن نیست');const rows=XLSX.utils.sheet_to_json(sheet,{header:1,defval:'',raw:false});const parsed=parseRows(rows,{defaultCallCount:Number(el('cr-call-count-default').value)});if(!parsed.length)throw Error('هیچ ردیف داده‌ای پیدا نشد');const targetOwner=el('cr-import-owner').value||(!isManager?userId:'');if(!targetOwner)throw Error('برای فایل، مالک را انتخاب کنید');const ownerLabel=targetOwner===userId?(isManager?'مدیر':'شما'):(expertProfiles.find(p=>p.id===targetOwner)?.display_name||'کارشناس');if(!global.confirm(parsed.length+' درخواست به نام '+ownerLabel+' ثبت شود؟'))return;let existingQuery=supabase.from('collaboration_requests').select('external_id');if(!isManager)existingQuery=existingQuery.eq('owner_auth_id',userId);const existing=await existingQuery.in('external_id',parsed.map(r=>r.external_id));if(existing.error)throw existing.error;const known=new Set((existing.data||[]).map(r=>r.external_id));const fresh=parsed.filter(r=>!known.has(r.external_id));const skipped=parsed.length-fresh.length;if(!fresh.length){message('تمام '+skipped+' ردیف قبلاً ثبت شده‌اند؛ هیچ اطلاعاتی بازنویسی نشد');return}for(let i=0;i<fresh.length;i+=100){const payload=fresh.slice(i,i+100).map(r=>({...r,owner_auth_id:targetOwner}));const {error}=await supabase.from('collaboration_requests').insert(payload);if(error)throw error}await load();message(fresh.length.toLocaleString('fa-IR')+' درخواست جدید ثبت شد؛ '+skipped+' ردیف تکراری بدون بازنویسی رد شد')}catch(err){message('خطا: '+(err.message||String(err)))}finally{e.target.value=''}};
  ['cr-search','cr-province','cr-result','cr-stage','cr-priority','cr-expert','cr-category','cr-type'].forEach(id=>el(id).addEventListener(id==='cr-search'?'input':'change',render));
  ['cr-followup-from','cr-followup-to','cr-followup-status'].forEach(id=>el(id).addEventListener('change',renderFollowups));
  if(isManager)el('cr-followup-expert').addEventListener('change',renderFollowups);
