@@ -20,19 +20,20 @@ assert.equal(rows.length, 1);
 assert.equal(rows[0].request_type, "unclassified", "new imports must wait for explicit commercial/employment classification");
 assert.equal(rows[0].external_id, "REQ-001");
 assert.equal(rows[0].call_count, 1, "blank or zero legacy import call counts default to one");
-const customRows=api.parseRows([
+const importedRows=api.parseRows([
   ["شناسه", "تعداد تماس"],
   ["REQ-002", ""],
   ["REQ-003", "0"],
   ["REQ-004", "5"]
-], { defaultCallCount: 3 });
-assert.deepEqual(Array.from(customRows, r => r.call_count), [3, 3, 5], "import default must not override positive explicit history");
-assert.throws(() => api.parseRows([["شناسه"], ["REQ-005"]], { defaultCallCount: 0 }), /پیش‌فرض/);
-assert.ok(source.includes('id="cr-call-count-default"'), "approved wide call-count control must be present");
-assert.ok(source.includes('wireCallStepper'), "count control must support buttons and wheel");
-assert.ok(source.includes("event.deltaY<0?1:-1"), "mouse wheel changes count in both directions");
-assert.ok(source.includes("if(countInput.dataset.dirty==='true')d.call_count=correctedCount"), "editing a count must persist intentionally and preserve untouched history");
-assert.ok(source.includes("defaultCallCount:Number(el('cr-call-count-default').value)"), "import must consume selected default count");
+]);
+assert.deepEqual(Array.from(importedRows, r => r.call_count), [1, 1, 5], "new imports start at one and retain positive imported values");
+assert.ok(!source.includes('id="cr-call-count-default"'), "global count selector must be removed");
+assert.ok(!source.includes('class="cr-call-band"'), "global call-count banner must be removed");
+assert.ok(source.includes('id="cr-edit-call-count"'), "per-request count editor must remain");
+assert.ok(source.includes('min="1" max="9999"'), "per-request count starts at one");
+assert.ok(source.includes('wireCallStepper'), "per-request count supports buttons and wheel");
+assert.ok(source.includes("event.deltaY<0?1:-1"), "mouse wheel changes per-request count");
+assert.ok(source.includes("if(countInput.dataset.dirty==='true')d.call_count=correctedCount"), "save only intentional per-request changes");
 
 assert.ok(source.includes("requestTypeOptions"), "classification options must be present");
 assert.ok(source.includes("cr-type"), "request type filter must be present");
