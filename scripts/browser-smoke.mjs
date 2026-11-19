@@ -108,7 +108,7 @@ try {
   await app.locator("#dashboardPage").waitFor({ state: "visible", timeout: 10000 });
   console.log("PASS login validation and mocked manager session");
   
-  // Approved collaboration call-count stepper: mock-only browser interaction test.
+  // Collaboration page no longer exposes a global default count selector.
   await app.addScriptTag({ content: readFileSync(resolve(root, "scripts/collaboration-requests.js"), "utf8") });
   await app.evaluate(() => {
     const host = document.createElement("div");
@@ -125,25 +125,10 @@ try {
       supabase: { from: () => query }, userId: "test-manager", isManager: true
     });
   });
-  const callDefault = app.locator("#cr-counter-browser-sandbox #cr-call-count-default");
-  await callDefault.waitFor({ state: "visible", timeout: 5000 });
-  assert.equal(await callDefault.inputValue(), "1");
-  await app.locator('#cr-counter-browser-sandbox [data-call-step="1"]').first().click();
-  assert.equal(await callDefault.inputValue(), "2");
-  await callDefault.hover();
-  await app.mouse.wheel(0, -100);
-  assert.equal(await callDefault.inputValue(), "3", "scroll up increments the number of calls");
-  await app.mouse.wheel(0, 100);
-  assert.equal(await callDefault.inputValue(), "2", "scroll down decrements the number of calls");
-  await app.locator('#cr-counter-browser-sandbox [data-call-step="-1"]').first().click();
-  await app.locator('#cr-counter-browser-sandbox [data-call-step="-1"]').first().click();
-  assert.equal(await callDefault.inputValue(), "1", "count can never fall below one");
-  await callDefault.fill("5");
-  await callDefault.blur();
-  assert.equal(await callDefault.inputValue(), "5");
+  assert.equal(await app.locator("#cr-counter-browser-sandbox .cr-call-band").count(), 0);
+  assert.equal(await app.locator("#cr-counter-browser-sandbox #cr-call-count-default").count(), 0);
   await app.evaluate(() => document.getElementById("cr-counter-browser-sandbox").remove());
-  console.log("PASS collaboration count stepper default, buttons, scroll and minimum");
-
+  console.log("PASS removed global count selector from collaboration page");
 
   const navCases = [
     ["داشبورد", "dashboard"],
