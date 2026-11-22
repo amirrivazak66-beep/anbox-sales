@@ -199,12 +199,15 @@ try {
   const iconRect=await app.locator(".ul-stat-icon").first().boundingBox();
   assert.ok(cardRect && iconRect && iconRect.y>=cardRect.y && iconRect.y+iconRect.height<=cardRect.y+cardRect.height,"KPI icon must remain fully inside card");
   assert.equal(await app.locator("#ul-export").isVisible(),true);
-  assert.equal(await app.locator(".ul-table th").count(),10);
+  assert.equal(await app.locator(".ul-table th").count(),12);
   assert.equal(await app.locator('#ul-rows tr[data-record-key="direct:d-a"] [data-edit="stage"]').inputValue(),"تماس اولیه","existing legacy stage stays selected");
   assert.equal(await app.locator('#ul-rows [data-inline-open]').count(),0,"no row requires clicking Edit");
   assert.equal(await app.locator('#ul-rows [data-inline-save]').count(),4,"every row shows Save by default");
   assert.equal(await app.locator('#ul-rows [data-inline-cancel]').count(),4,"every row shows Cancel by default");
   assert.equal(await app.locator('#ul-rows [data-inline-delete]').count(),4,"every row shows Delete by default");
+  assert.equal(await app.locator('#ul-rows [data-edit="monthlyShipments"]').count(),4,"monthly shipments dropdown exists for both sources");
+  assert.equal(await app.locator('#ul-rows [data-edit="contactName"]').count(),4,"contact person inline input is present");
+  assert.equal(await app.locator('#ul-rows [data-edit="industry"]').count(),4,"industry inline input is present");
   // Regression: rows must stay fully inside the leads frame without any horizontal scroll.
   const verifyNoHorizontalOverflow=async(width,height)=>{
     await app.setViewportSize({width,height});
@@ -258,6 +261,9 @@ try {
     await row.locator('[data-edit="stage"]').selectOption(stage);
     await row.locator('[data-edit="status"]').selectOption(status);
     await row.locator('[data-edit="nextAction"]').selectOption(key.startsWith("direct:")?"ارسال پروپوزال":"تماس مجدد");
+    await row.locator('[data-edit="monthlyShipments"]').selectOption("2000 تا 5000");
+    await row.locator('[data-edit="contactName"]').fill("فرد تست");
+    await row.locator('[data-edit="industry"]').fill("صنعت تست");
     // Jalali enhancement hides the native date input: update its underlying value as the date-picker does.
     await row.locator('[data-edit="followupRaw"]').evaluate(input=>{
       input.value="2026-11-23";
@@ -269,6 +275,9 @@ try {
     assert.equal(await row.locator("[data-edit='stage']").count(),1,"row stays editable after save");
     assert.equal(await row.locator("[data-inline-save]").isDisabled(),true,"save resets to clean state");
     assert.match(await row.innerText(), key.startsWith("direct:")?/ارسال پروپوزال/:/تماس مجدد/);
+    assert.equal(await row.locator('[data-edit="monthlyShipments"]').inputValue(),"2000 تا 5000","shipment choice persists after save");
+    assert.equal(await row.locator('[data-edit="contactName"]').inputValue(),"فرد تست","contact persists after save");
+    assert.equal(await row.locator('[data-edit="industry"]').inputValue(),"صنعت تست","industry persists after save");
     assert.equal(await app.evaluate(()=>window.__openedUnified??null),null,"inline save must never navigate to original page");
   }
   const beforeCancel=await app.locator('#ul-rows tr[data-record-key="commercial:c-a"]').innerText();
