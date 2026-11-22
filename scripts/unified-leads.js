@@ -67,7 +67,7 @@ function mount(host,{supabase,userId,isManager=false,onOpenRequest=()=>{},onOpen
  $('ul-new').onclick=()=>global.openLeadModal?.();
  $('ul-analytics').onclick=openAnalytics;
  $('ul-refresh').onclick=()=>load().catch(e=>status('بارگذاری ناموفق: '+e.message));
- $('ul-legacy').onclick=()=>{host.closest('#leads')?.classList.remove('unified-active');$('ul-legacy').textContent='نمای یکپارچه';$('ul-legacy').onclick=()=>{host.closest('#leads')?.classList.add('unified-active');$('ul-legacy').textContent='ابزارهای لید مستقیم';$('ul-legacy').onclick=()=>{host.closest('#leads')?.classList.remove('unified-active');$('ul-legacy').textContent='نمای یکپارچه'}}};
+ $('ul-legacy').onclick=()=>{const page=host.closest('#leads');const showUnified=!page.classList.contains('unified-active');page.classList.toggle('unified-active',showUnified);$('ul-legacy').textContent=showUnified?'ابزارهای لید مستقیم':'بازگشت به نمای یکپارچه';};
  host.querySelectorAll('[data-tab]').forEach(b=>b.onclick=()=>{tab=b.dataset.tab;host.querySelectorAll('[data-tab]').forEach(x=>x.classList.toggle('active',x===b));render()});
  ['ul-search','ul-owner','ul-stage','ul-status-filter','ul-date'].forEach(id=>$(id).addEventListener(id==='ul-search'?'input':'change',render));
  load().catch(e=>status('نمای یکپارچه بارگذاری نشد: '+e.message+'؛ ابزارهای قبلی همچنان در دسترس هستند.'));
