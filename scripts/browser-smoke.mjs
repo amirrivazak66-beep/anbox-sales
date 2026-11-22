@@ -9,7 +9,7 @@ const root = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const server = createServer((req, res) => {
   const pathname = new URL(req.url || "/", "http://127.0.0.1").pathname;
   const relative = pathname === "/" ? "index.html" : pathname.slice(1);
-  if (!["index.html", "dashboard.html"].includes(relative)) {
+  if (!["index.html", "dashboard.html", "scripts/unified-leads.js"].includes(relative)) {
     res.writeHead(404); res.end("Not found"); return;
   }
   try {
@@ -128,6 +128,19 @@ try {
     assert.ok(size > 0, `Page ${id} has no rendered height`);
   }
   console.log("PASS dashboard, leads, team, pipeline, reports and settings navigation");
+  // Manager-only aggregate insights appear in the new unified leads view.
+  await app.locator(".nav-item").filter({ hasText: "لیدها" }).click();
+  await app.locator("#ul-status").filter({ hasText: "لید قابل مشاهده" }).waitFor({ state: "visible", timeout: 10000 });
+  assert.equal(await app.locator("#ul-owner").isVisible(), true, "manager needs an expert filter");
+  assert.equal(await app.locator("#ul-rows tr").count(), 1, "empty state should be visible with mock data");
+  await app.locator("#ul-analytics").click();
+  await app.locator('[role="dialog"][aria-label="نمودارها و گیج‌های لیدها"]').waitFor({ state: "visible", timeout: 5000 });
+  assert.equal(await app.locator("#ul-analysis-body .ul-gauge").count(), 4);
+  assert.match(await app.locator("#ul-analysis-body").innerText(), /داده کافی نیست/);
+  await app.locator("#ul-close").click();
+  assert.equal(await app.locator('[role="dialog"][aria-label="نمودارها و گیج‌های لیدها"]').count(), 0);
+  console.log("PASS unified leads manager filters and analytics overlay");
+
 
   // Regression coverage for the settings panel: content must remain rendered, not merely have a visible wrapper.
   await app.locator("#settings-user-tab").waitFor({ state: "visible", timeout: 5000 });
