@@ -136,6 +136,7 @@ try {
   await app.locator("#ul-analytics").click();
   await app.locator("#ul-analytics-panel").waitFor({ state: "visible", timeout: 5000 });
   assert.equal(await app.locator("#ul-analytics").getAttribute("aria-expanded"), "true");
+  assert.equal(await app.locator("#ul-analytics").innerText(),"◎","analytics trigger must remain an icon rather than overlap page title");
   assert.equal(await app.locator("#ul-analytics-panel").evaluate(el => getComputedStyle(el).position),"static");
   assert.equal(await app.locator("#ul-analysis-body .ul-gauge-svg").count(),5,"all gauges should use semicircular SVG");
   assert.equal(await app.locator("#ul-analysis-body .ul-donut").count(),1,"lead source donut should appear");
