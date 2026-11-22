@@ -82,7 +82,8 @@ try {
     const managerial = normalize(direct,requests,profiles,true,"manager");
     assert.equal(managerial.length,4,"manager sees two direct and two commercial records without employment");
     assert.equal(direct.length,2,"source records remain intact");
-    assert.ok(!unifiedScript.includes(".insert(")&&!unifiedScript.includes(".upsert(")&&!unifiedScript.includes(".delete("),"unified view must not insert, duplicate, or delete original lead records");
+    assert.ok(!unifiedScript.includes(".insert(")&&!unifiedScript.includes(".upsert("),"unified view must never duplicate lead records");
+    assert.ok(unifiedScript.includes("global.confirm(")&&unifiedScript.includes(".delete().eq('id',r.id)")&&unifiedScript.includes("query=query.eq('owner_auth_id',userId)"),"delete requires confirmation, original row ID, and expert ownership");
     assert.ok(unifiedScript.includes(".update(payload).eq('id',r.id)")&&unifiedScript.includes("if(!isManager)query=query.eq('owner_auth_id',userId)"),"inline update must target the original ID and scope expert edits to ownership");
   }
   const dashboard = readFileSync(join(root, "dashboard.html"), "utf8");
