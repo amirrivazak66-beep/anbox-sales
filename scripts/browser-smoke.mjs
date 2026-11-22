@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import { createServer } from "node:http";
-import { readFileSync } from "node:fs";
+import { readFileSync, mkdirSync } from "node:fs";
 import { resolve, dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { chromium } from "playwright";
@@ -140,6 +140,70 @@ try {
   await app.locator("#ul-close").click();
   assert.equal(await app.locator('[role="dialog"][aria-label="نمودارها و گیج‌های لیدها"]').count(), 0);
   console.log("PASS unified leads manager filters and analytics overlay");
+
+  mkdirSync("artifacts", {recursive:true});
+  // Visual role previews with synthetic records only. Never connect to production.
+  const preview = await app.evaluate(() => {
+    const entries = {
+      leads: [
+        {id:"d-a",owner_auth_id:"expert-a",company_name:"فروشگاه نمونه الف",phone:"09120000001",sales_stage:"تماس اولیه",lead_status:"در حال پیگیری",created_at:"2026-11-20"},
+        {id:"d-b",owner_auth_id:"expert-b",company_name:"فروشگاه نمونه ب",phone:"09120000002",sales_stage:"مذاکره",lead_status:"در حال پیگیری",created_at:"2026-11-19"}
+      ],
+      collaboration_requests: [
+        {id:"c-a",owner_auth_id:"expert-a",company:"شرکت نمونه تجاری",phone:"09120000003",request_type:"commercial",sales_stage:"نیازسنجی",request_status:"جدید",created_at:"2026-11-20"},
+        {id:"c-b",owner_auth_id:"expert-b",company:"شرکت نمونه دوم",phone:"09120000004",request_type:"commercial",sales_stage:"ارسال تعرفه",request_status:"در حال پیگیری",created_at:"2026-11-20"},
+        {id:"h-a",owner_auth_id:"expert-a",company:"درخواست استخدام نمونه",request_type:"employment",created_at:"2026-11-20"}
+      ],
+      profiles: [
+        {id:"expert-a",display_name:"کارشناس اول",username:"first"},
+        {id:"expert-b",display_name:"کارشناس دوم",username:"second"}
+      ]
+    };
+    const db={from(table){
+      const filters=[];
+      const q={select(){return q},eq(field,value){filters.push([field,value]);return q},order(){return q},limit(){return q},then(resolve,reject){
+        let data=(entries[table]||[]).filter(row=>filters.every(([field,value])=>String(row[field])===String(value)));
+        return Promise.resolve({data,error:null}).then(resolve,reject);
+      }};
+      return q;
+    }};
+    window.__unifiedPreviewDb=db;
+    return true;
+  });
+  assert.equal(preview,true);
+  await app.setViewportSize({width:1440,height:900});
+  await app.evaluate(() => {
+    window.ManagerNegarUnifiedLeads.mount(document.getElementById("unifiedLeadsMount"),{
+      supabase:window.__unifiedPreviewDb,userId:"manager",isManager:true,
+      onOpenRequest:()=>{},onOpenDirect:()=>{}
+    });
+  });
+  await app.locator("#ul-status").filter({hasText:"۴ لید"}).waitFor({state:"visible",timeout:5000});
+  assert.equal(await app.locator("#ul-rows tr").count(),4);
+  assert.equal(await app.locator("#ul-owner").isVisible(),true);
+  await app.screenshot({path:"artifacts/unified-leads-manager.png",fullPage:true});
+  await app.locator("#ul-owner").selectOption("expert-a");
+  assert.equal(await app.locator("#ul-rows tr").count(),2,"manager expert filter should show one owner's records");
+  await app.locator("#ul-owner").selectOption("");
+  await app.locator("#ul-analytics").click();
+  await app.screenshot({path:"artifacts/unified-leads-manager-charts.png",fullPage:true});
+  await app.locator("#ul-close").click();
+  await app.evaluate(() => {
+    window.ManagerNegarUnifiedLeads.mount(document.getElementById("unifiedLeadsMount"),{
+      supabase:window.__unifiedPreviewDb,userId:"expert-a",isManager:false,
+      onOpenRequest:()=>{},onOpenDirect:()=>{}
+    });
+  });
+  await app.locator("#ul-status").filter({hasText:"۲ لید"}).waitFor({state:"visible",timeout:5000});
+  assert.equal(await app.locator("#ul-rows tr").count(),2);
+  assert.equal(await app.locator("#ul-owner").isVisible(),false,"expert must not have cross-owner filter");
+  assert.equal(await app.locator("#ul-rows").innerText().then(t=>t.includes("فروشگاه نمونه ب")),false,"another expert's lead must be excluded");
+  await app.screenshot({path:"artifacts/unified-leads-expert.png",fullPage:true});
+  await app.locator("#ul-analytics").click();
+  await app.screenshot({path:"artifacts/unified-leads-expert-charts.png",fullPage:true});
+  await app.locator("#ul-close").click();
+  console.log("PASS role-separated synthetic leads and visual screenshot previews");
+
   await app.locator(".nav-item").filter({ hasText: "تنظیمات" }).click();
 
 
