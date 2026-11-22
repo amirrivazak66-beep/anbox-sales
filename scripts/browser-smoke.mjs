@@ -177,7 +177,7 @@ try {
     return true;
   });
   assert.equal(preview,true);
-  await app.setViewportSize({width:1440,height:900});
+  await app.setViewportSize({width:1672,height:941});
   await app.evaluate(() => {const toast=document.getElementById("notification");if(toast)toast.style.display="none";});
   await app.evaluate(() => {
     window.ManagerNegarUnifiedLeads.mount(document.getElementById("unifiedLeadsMount"),{
@@ -188,6 +188,12 @@ try {
   await app.locator("#ul-status").filter({hasText:"۴ لید"}).waitFor({state:"visible",timeout:5000});
   assert.equal(await app.locator("#ul-rows tr").count(),4);
   assert.equal(await app.locator("#ul-owner").isVisible(),true);
+  assert.match(await app.locator(".header-title").innerText(),/لیدها/);
+  const cardRect=await app.locator(".ul-stat").first().boundingBox();
+  const iconRect=await app.locator(".ul-stat-icon").first().boundingBox();
+  assert.ok(cardRect && iconRect && iconRect.y>=cardRect.y && iconRect.y+iconRect.height<=cardRect.y+cardRect.height,"KPI icon must remain fully inside card");
+  assert.equal(await app.locator("#ul-export").isVisible(),true);
+  assert.equal(await app.locator(".ul-table th").count(),9);
   await app.screenshot({path:"artifacts/unified-leads-manager.png",fullPage:true});
   await app.locator("#ul-owner").selectOption("expert-a");
   assert.equal(await app.locator("#ul-rows tr").count(),2,"manager expert filter should show one owner's records");
