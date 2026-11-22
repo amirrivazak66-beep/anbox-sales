@@ -199,7 +199,7 @@ try {
   assert.ok(cardRect && iconRect && iconRect.y>=cardRect.y && iconRect.y+iconRect.height<=cardRect.y+cardRect.height,"KPI icon must remain fully inside card");
   assert.equal(await app.locator("#ul-export").isVisible(),true);
   assert.equal(await app.locator(".ul-table th").count(),10);
-  assert.equal(await app.locator('#ul-rows tr[data-record-key="direct:d-a"] .ul-stage-badge').innerText(),"تماس اولیه و امکان‌سنجی","numeric direct sales stages must be displayed as readable labels");
+  assert.equal(await app.locator('#ul-rows tr[data-record-key="direct:d-a"] .ul-stage-badge').innerText(),"تماس اولیه","unknown legacy stage labels remain readable");
   await app.screenshot({path:"artifacts/unified-leads-manager.png",fullPage:true});
   await app.locator("#ul-owner").selectOption("expert-a");
   assert.equal(await app.locator("#ul-rows tr").count(),2,"manager expert filter should show one owner's records");
