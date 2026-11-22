@@ -58,6 +58,13 @@ try {
   }
 
   // Keep these protections explicit: smoke checks must never mutate production data or browser storage.
+  // Regression: Phase 3 PDF print must read the class-based report wrapper.
+  const phase3 = readFileSync(join(root, "scripts/phase3-management-analytics.js"), "utf8");
+  const phase3Check = spawnSync(process.execPath, ["--check", join(root, "scripts/phase3-management-analytics.js")], { encoding: "utf8" });
+  if (phase3Check.status !== 0) errors.push("Phase 3 analytics script syntax error: " + (phase3Check.stderr || phase3Check.stdout));
+  if (!phase3.includes("const report=host.querySelector('.p3-wrap')")) errors.push("Phase 3 print must select the report by class");
+  if (phase3.includes("$('.p3-wrap')")) errors.push("Phase 3 print uses the ID-only selector helper for a class");
+  if (!phase3.includes("const body=report.innerHTML")) errors.push("Phase 3 print body is not built from the report wrapper");
   const dashboard = readFileSync(join(root, "dashboard.html"), "utf8");
   const csvParserMatch = dashboard.match(/function parseCsvRows\(text\)\{[^\r\n]*\}/);
   if (!csvParserMatch) {
