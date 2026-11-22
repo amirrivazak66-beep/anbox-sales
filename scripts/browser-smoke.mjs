@@ -134,12 +134,12 @@ try {
   assert.equal(await app.locator("#ul-owner").isVisible(), true, "manager needs an expert filter");
   assert.equal(await app.locator("#ul-rows tr").count(), 1, "empty state should be visible with mock data");
   await app.locator("#ul-analytics").click();
-  await app.locator('[role="dialog"][aria-label="نمودارها و گیج‌های لیدها"]').waitFor({ state: "visible", timeout: 5000 });
+  await app.locator("#ul-analytics-panel").waitFor({ state: "visible", timeout: 5000 });
   assert.equal(await app.locator("#ul-analysis-body .ul-gauge").count(), 4);
   assert.match(await app.locator("#ul-analysis-body").innerText(), /داده کافی نیست/);
   await app.locator("#ul-close").click();
-  assert.equal(await app.locator('[role="dialog"][aria-label="نمودارها و گیج‌های لیدها"]').count(), 0);
-  console.log("PASS unified leads manager filters and analytics overlay");
+  assert.equal(await app.locator("#ul-analytics-panel").isVisible(),false);
+  console.log("PASS unified leads manager filters and embedded analytics panel");
 
   mkdirSync("artifacts", {recursive:true});
   // Visual role previews with synthetic records only. Never connect to production.
