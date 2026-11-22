@@ -242,7 +242,7 @@ try {
   assert.equal(await app.locator("#ul-owner").isVisible(),false,"expert must not have cross-owner filter");
   assert.equal(await app.locator("#ul-rows").innerText().then(t=>t.includes("فروشگاه نمونه ب")),false,"another expert's lead must be excluded");
   await app.screenshot({path:"artifacts/unified-leads-expert.png",fullPage:true});
-  await app.locator("#ul-analytics").click();
+  assert.equal(await app.locator("#ul-analytics-panel").isVisible(),true,"expert charts open by default");
   await app.screenshot({path:"artifacts/unified-leads-expert-charts.png",fullPage:true});
   await app.locator("#ul-close").click();
   await app.evaluate(() => {document.getElementById("sidebarUsername").textContent="Test Manager";document.getElementById("headerUsername").textContent="Test Manager";});
