@@ -140,6 +140,7 @@ try {
   await app.locator("#ul-close").click();
   assert.equal(await app.locator('[role="dialog"][aria-label="نمودارها و گیج‌های لیدها"]').count(), 0);
   console.log("PASS unified leads manager filters and analytics overlay");
+  await app.locator(".nav-item").filter({ hasText: "تنظیمات" }).click();
 
 
   // Regression coverage for the settings panel: content must remain rendered, not merely have a visible wrapper.
