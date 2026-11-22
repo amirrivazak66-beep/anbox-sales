@@ -14,7 +14,7 @@ const server = createServer((req, res) => {
   }
   try {
     const body = readFileSync(join(root, relative));
-    res.writeHead(200, { "content-type": "text/html; charset=utf-8", "cache-control": "no-store" });
+    res.writeHead(200, { "content-type": relative.endsWith(".js") ? "application/javascript; charset=utf-8" : "text/html; charset=utf-8", "cache-control": "no-store" });
     res.end(body);
   } catch {
     res.writeHead(404); res.end("Not found");
