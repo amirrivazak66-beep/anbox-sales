@@ -165,10 +165,34 @@ function mount(host,{supabase,userId,isManager=false,onOpenRequest=()=>{},onOpen
  }
  $('ul-new').onclick=()=>global.openLeadModal?.();
  $('ul-analytics').onclick=()=>toggleAnalytics();
- $('ul-refresh').onclick=()=>load().catch(e=>status('بارگذاری ناموفق: '+e.message));
- $('ul-legacy').onclick=()=>{const page=host.closest('#leads');const showUnified=!page.classList.contains('unified-active');page.classList.toggle('unified-active',showUnified);$('ul-legacy').textContent=showUnified?'ابزارهای لید مستقیم':'بازگشت به نمای یکپارچه';};
- host.querySelectorAll('[data-tab]').forEach(b=>b.onclick=()=>{tab=b.dataset.tab;host.querySelectorAll('[data-tab]').forEach(x=>x.classList.toggle('active',x===b));render()});
- ['ul-search','ul-owner','ul-stage','ul-status-filter','ul-date'].forEach(id=>$(id).addEventListener(id==='ul-search'?'input':'change',render));
+ $('ul-requests').onclick=()=>{
+   const nav=global.document.querySelector('.nav-item[onclick*="collaboration"]');
+   if(nav)nav.click();else status('منوی درخواست‌های همکاری یافت نشد.');
+ };
+ $('ul-list-view').onclick=()=>{viewMode='list';render()};
+ $('ul-grid-view').onclick=()=>{viewMode='grid';render()};
+ $('ul-prev').onclick=()=>{if(page>1){page--;render()}};
+ $('ul-next').onclick=()=>{if(page*pageSize<view.length){page++;render()}};
+ $('ul-page-size').onchange=()=>{pageSize=Number($('ul-page-size').value)||10;page=1;render()};
+ $('ul-export').onclick=()=>{
+   const titles=['شرکت','شماره تماس','منبع','کارشناس','مرحله فروش','وضعیت','تاریخ پیگیری','ارزش تخمینی'];
+   const lines=[titles,...view.map(r=>[r.company,r.phone,r.source==='commercial'?'درخواست همکاری':'لید مستقیم',r.owner,r.stage,r.status,r.followup,r.estimatedValue??''])];
+   const csv='\uFEFF'+lines.map(row=>row.map(v=>'"'+String(v??'').replace(/"/g,'""')+'"').join(',')).join('\r\n');
+   const url=URL.createObjectURL(new Blob([csv],{type:'text/csv;charset=utf-8'}));
+   const link=global.document.createElement('a');link.href=url;link.download='managernegar-visible-leads.csv';global.document.body.appendChild(link);link.click();link.remove();URL.revokeObjectURL(url);
+ };
+ host.querySelectorAll('[data-analysis-tab]').forEach(b=>b.onclick=()=>{
+   analysisTab=b.dataset.analysisTab;
+   host.querySelectorAll('[data-analysis-tab]').forEach(x=>x.classList.toggle('active',x===b));
+   const target=$('ul-analysis-body').querySelector('[data-analysis-section="'+analysisTab+'"]');
+   target?.scrollIntoView({behavior:'smooth',block:'nearest'});
+ });
+ host.querySelectorAll('[data-tab]').forEach(b=>b.onclick=()=>{
+   tab=b.dataset.tab;page=1;
+   host.querySelectorAll('[data-tab]').forEach(x=>x.classList.toggle('active',x===b));
+   render();
+ });
+ ['ul-search','ul-owner','ul-stage','ul-status-filter','ul-date','ul-source'].forEach(id=>$(id).addEventListener(id==='ul-search'?'input':'change',()=>{page=1;render()}));
  load().catch(e=>status('نمای یکپارچه بارگذاری نشد: '+e.message+'؛ ابزارهای قبلی همچنان در دسترس هستند.'));
 }
 global.ManagerNegarUnifiedLeads={mount,normalizeRows};
