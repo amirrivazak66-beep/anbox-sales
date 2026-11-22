@@ -120,23 +120,28 @@ function mount(host,{supabase,userId,isManager=false,onOpenRequest=()=>{},onOpen
   const palette=['#087ded','#0aa876','#cb8a19','#8548bb','#314cb6','#0a7195'],max=Math.max(1,...items.map(x=>x[1]));
   return '<section class="ul-card"><h3>▽ توزیع مراحل فروش</h3>'+(items.length?'<div class="ul-funnel">'+items.slice(0,6).map(([name,num],i)=>'<div class="ul-funnel-step" style="width:'+Math.max(49,100-i*9)+'%;background:'+palette[i%palette.length]+'"><span>'+esc(name)+' <small>'+fmt(num)+' لید</small></span></div>').join('')+'</div>':'<p class="ul-muted">مرحله فروشی ثبت نشده است.</p>')+'<p class="ul-note">این نمودار توزیع مراحل است؛ نرخ تبدیل بین مراحل محسوب نمی‌شود.</p></section>';
  }
+ function verticalBars(title,items){
+  const max=Math.max(1,...items.map(x=>x[1]));
+  return '<section class="ul-card ul-vertical-chart"><h3>▥ '+esc(title)+'</h3>'+(items.length?'<div class="ul-chart-bar-group">'+items.slice(0,6).map(([label,num])=>'<div class="ul-chart-bar-item"><b>'+fmt(num)+'</b><div class="ul-chart-bar" style="height:'+Math.max(6,Math.round(num/max*114))+'px"></div><span>'+esc(label)+'</span></div>').join('')+'</div>':'<div class="ul-empty-metric">هنوز اطلاعاتی ثبت نشده است.</div>')+'</section>';
+ }
  function drawAnalytics(){
   const area=$('ul-analysis-body');if(!area)return;
   const total=view.length,withPlan=view.filter(r=>r.planned).length,complete=view.filter(r=>r.complete).length,commercial=view.filter(r=>r.source==='commercial').length;
-  const direct=total-commercial,knownStage=view.filter(r=>r.stage).length;
-  const stages=tally('stage');
-  const middle=isManager?chart('▥ عملکرد کارشناسان (تعداد لید)',tally('owner')):chart('▥ وضعیت لیدهای من',tally('status'));
-  area.innerHTML='<div class="ul-gauges">'+
-   gauge('نرخ برنامه‌ریزی پیگیری',withPlan,total,'#22d3ee')+
-   gauge('تکمیل اطلاعات پایه',complete,total,'#ffbc2e')+
-   gauge('سهم لیدهای تجاری',commercial,total,'#a879f6')+
-   gauge('دارای مرحله فروش',knownStage,total,'#29df95')+
-   gauge('سهم لید مستقیم',direct,total,'#43a4ff')+'</div>'+
-   '<div class="ul-charts">'+donut(commercial,direct)+middle+funnel(stages)+
+  const direct=total-commercial,knownStage=view.filter(r=>r.stage).length,stages=tally('stage');
+  const middle=isManager?verticalBars('عملکرد کارشناسان',tally('owner')):verticalBars('مراحل لیدهای من',stages);
+  area.innerHTML=
+   '<div class="ul-analytics-section" data-analysis-section="gauges"><div class="ul-gauges">'+
+   gauge(isManager?'نرخ برنامه‌ریزی پیگیری':'نرخ پیگیری من',withPlan,total,'#22d3ee')+
+   gauge('تکمیل اطلاعات',complete,total,'#ffbc2e')+
+   gauge(isManager?'سهم لیدهای تجاری':'سهم لیدهای تجاری من',commercial,total,'#a879f6')+
+   gauge('سلامت ثبت مراحل',knownStage,total,'#29df95')+
+   gauge('سهم لید مستقیم',direct,total,'#43a4ff')+'</div></div>'+
+   '<div class="ul-analytics-section" data-analysis-section="charts"><div class="ul-charts">'+
+   funnel(stages)+middle+donut(commercial,direct)+
    chart('▤ وضعیت پیگیری',[['دارای برنامه',withPlan],['فاقد برنامه',total-withPlan]])+
    chart('▤ وضعیت لیدها',tally('status'))+
-   chart('▤ مراحل فروش',stages)+'</div>'+
-   '<div class="ul-insight"><strong>⚡ جمع‌بندی سریع</strong><p>درخواست‌های تجاری بدون ایجاد رکورد تکراری در نمای لیدها دیده می‌شوند. نمودارها فقط از رکوردهای مجاز و فیلترهای فعلی محاسبه شده‌اند. نرخ تبدیل واقعی تا زمان تعریف رویداد قابل اتکا نمایش داده نمی‌شود.</p></div>';
+   chart('▤ مراحل فروش',stages)+'</div></div>'+
+   '<div class="ul-analytics-section" data-analysis-section="summary"><div class="ul-insight"><strong>⚡ جمع‌بندی سریع</strong><p>درخواست‌های همکاری تجاری بدون کپی اطلاعات، در همین صفحه لیدها نمایش داده می‌شوند. تمام شاخص‌ها بر اساس فیلترها و رکوردهای مجاز حساب شما محاسبه می‌شوند. نرخ تبدیل واقعی تا زمانی که ثبت قرارداد قابل‌اتکا وجود نداشته باشد با خط تیره نمایش داده می‌شود.</p></div></div>';
  }
  function toggleAnalytics(force){
   const panel=$('ul-analytics-panel');
