@@ -8,7 +8,14 @@ const STAGES=[['1','لیدسازی'],['2','تماس اولیه و امکان‌�
 const SHIPMENT_RANGES=['100 تا 500','500 تا 1000','1000 تا 2000','2000 تا 5000','5000 تا 10000','10000 تا 20000'];
 const DIRECT_ACTIONS=['ارسال پروپوزال','برقراری جلسه مذاکره','جلسه متقاعد سازی','ارسال درفت قرارداد','عقد قرارداد','عدم توافق'];
 const COMMERCIAL_ACTIONS=['تماس مجدد','ارسال پیامک','ارسال واتساپ','ارسال تعرفه','ارسال پیش‌فاکتور','برگزاری جلسه','ارسال قرارداد','پیگیری قرارداد','بستن پرونده'];
-const stageLabel=(stage,source)=>source==='direct'?(STAGES.find(([id])=>id===String(stage))?.[1]??String(stage||'—')):String(stage||'—');
+const stageCanonical=stage=>{
+ const raw=asciiDigits(String(stage??'').trim()).replace(/\s+/g,' ');
+ if(!raw)return 'نامشخص';
+ const numbered=raw.match(/^([1-6])(?:[.\-)،]\s*(.*))?$/);
+ if(numbered)return STAGES.find(([id])=>id===numbered[1])?.[1]??raw;
+ return raw;
+};
+const stageLabel=(stage,source)=>stageCanonical(stage)==='نامشخص'?'—':stageCanonical(stage);
 const asciiDigits=v=>String(v??'').replace(/[۰-۹]/g,c=>String(c.charCodeAt(0)-1776)).replace(/[٠-٩]/g,c=>String(c.charCodeAt(0)-1632));
 const dateInputValue=v=>{const a=asciiDigits(v);return /^\d{4}-\d{2}-\d{2}$/.test(a)?a:'';};
 const norm=v=>String(v??'').trim().toLocaleLowerCase('fa');
@@ -84,7 +91,7 @@ function mount(host,{supabase,userId,isManager=false,onOpenRequest=()=>{},onOpen
  const status=t=>{$('ul-status').textContent=t};
  const active=()=>{let v=rows.filter(r=>tab==='all'||r.source===tab);const q=norm($('ul-search').value),owner=$('ul-owner').value,stage=$('ul-stage').value,st=$('ul-status-filter').value,days=$('ul-date').value,source=$('ul-source').value;
   const cutoff=days==='all'?'':new Date(Date.now()-Number(days)*86400000).toISOString().slice(0,10);
-  return v.filter(r=>(!source||r.source===source)&&(!q||norm(r.company).includes(q)||norm(r.phone).includes(q))&&(!owner||r.ownerId===owner)&&(!stage||String(r.stage)===stage)&&(!st||r.status===st)&&(!cutoff||(r.created&&r.created>=cutoff)));
+  return v.filter(r=>(!source||r.source===source)&&(!q||norm(r.company).includes(q)||norm(r.phone).includes(q))&&(!owner||r.ownerId===owner)&&(!stage||stageCanonical(r.stage)===stage)&&(!st||r.status===st)&&(!cutoff||(r.created&&r.created>=cutoff)));
  };
  const box=(label,n,icon,description='')=>'<article class="ul-stat"><div class="ul-stat-content"><small>'+esc(label)+'</small><strong>'+fmt(n)+'</strong>'+(description?'<span class="ul-stat-caption">'+esc(description)+'</span>':'')+'</div><span class="ul-stat-icon" aria-hidden="true">'+icon+'</span></article>';
  const fmtMoney=n=>n===null||n===undefined||n===''?'—':(Number.isFinite(Number(n))?fmt(Number(n))+' ریال':'—');
@@ -224,7 +231,7 @@ function mount(host,{supabase,userId,isManager=false,onOpenRequest=()=>{},onOpen
   const max=Math.max(1,...items.map(x=>x[1]));
   return '<section class="ul-card"><h3>'+esc(title)+'</h3>'+(items.length?items.map(([label,num])=>'<div class="ul-bar"><div class="ul-bar-label"><span>'+esc(label)+'</span><b>'+fmt(num)+'</b></div><div class="ul-track"><div class="ul-fill" style="width:'+Math.round(num/max*100)+'%"></div></div></div>').join(''):'<p class="ul-muted">داده‌ای برای نمایش وجود ندارد.</p>')+'</section>';
  }
- function tally(key){const m=new Map();view.forEach(r=>{const n=r[key]||'نامشخص';m.set(n,(m.get(n)||0)+1)});return [...m].sort((a,b)=>b[1]-a[1]).slice(0,10);}
+ function tally(key){const m=new Map();view.forEach(r=>{const n=key==='stage'?stageCanonical(r.stage):(r[key]||'نامشخص');m.set(n,(m.get(n)||0)+1)});return [...m].sort((a,b)=>b[1]-a[1]).slice(0,10);}
  function donut(commercial,direct){
   const total=commercial+direct,share=pct(commercial,total)||0;
   return '<section class="ul-card"><h3>◉ تفکیک منبع لید</h3><div class="ul-donut-wrap"><div class="ul-donut" role="img" aria-label="سهم درخواست همکاری '+fmt(share)+' درصد" style="background:conic-gradient(#8d58f2 0 '+share+'%,#159ef2 '+share+'% 100%)"><div class="ul-donut-hole"><b>'+fmt(total)+'</b><small>لید</small></div></div><div class="ul-legend"><div class="ul-legend-row"><i class="ul-legend-dot" style="background:#8d58f2"></i>درخواست همکاری <b>'+fmt(commercial)+'</b></div><div class="ul-legend-row"><i class="ul-legend-dot" style="background:#159ef2"></i>لید مستقیم <b>'+fmt(direct)+'</b></div></div></div></section>';
@@ -274,7 +281,7 @@ function mount(host,{supabase,userId,isManager=false,onOpenRequest=()=>{},onOpen
   if(ld.error||cr.error||pr.error)throw Error((ld.error||cr.error||pr.error).message);
   profiles=pr.data||[];rows=normalizeRows(ld.data||[],cr.data||[],profiles,isManager,userId);
   const previous=$('ul-owner').value;const options=profiles.filter(p=>rows.some(r=>r.ownerId===String(p.id)));$('ul-owner').innerHTML='<option value="">همه کارشناسان</option>'+options.map(p=>'<option value="'+esc(p.id)+'">'+esc(p.display_name||p.username)+'</option>').join('');$('ul-owner').value=options.some(p=>String(p.id)===previous)?previous:'';
-  const stages=[...new Map(rows.filter(r=>r.stage).map(r=>[String(r.stage),{raw:String(r.stage),label:stageLabel(r.stage,r.source)}])).values()].sort((a,b)=>a.label.localeCompare(b.label,'fa'));$('ul-stage').innerHTML='<option value="">همه مراحل</option>'+stages.map(v=>'<option value="'+esc(v.raw)+'">'+esc(v.label)+'</option>').join('');
+  const stages=[...new Set(rows.filter(r=>r.stage).map(r=>stageCanonical(r.stage)))].sort((a,b)=>a.localeCompare(b,'fa'));$('ul-stage').innerHTML='<option value="">همه مراحل</option>'+stages.map(v=>'<option value="'+esc(v)+'">'+esc(v)+'</option>').join('');
   const statuses=[...new Set(rows.map(r=>r.status).filter(Boolean))].sort();$('ul-status-filter').innerHTML='<option value="">همه وضعیت‌ها</option>'+statuses.map(v=>'<option>'+esc(v)+'</option>').join('');
   host.closest('#leads')?.classList.add('unified-active');
   status(fmt(rows.length)+' لید قابل مشاهده — برای ویرایش هر نوع لید، «ویرایش» همان ردیف را بزنید.');
@@ -298,7 +305,7 @@ function mount(host,{supabase,userId,isManager=false,onOpenRequest=()=>{},onOpen
  $('ul-page-size').onchange=()=>{pageSize=Number($('ul-page-size').value)||10;page=1;render()};
  $('ul-export').onclick=()=>{
    const titles=['شرکت','شماره تماس','منبع','کارشناس','مرحله فروش','وضعیت','تاریخ پیگیری','تعداد مرسوله ماهیانه','فرد تماس','صنعت'];
-   const lines=[titles,...view.map(r=>[r.company,r.phone,r.source==='commercial'?'درخواست همکاری':'لید مستقیم',r.owner,r.stage,r.status,r.followup,r.monthlyShipments,r.contactName,r.industry])];
+   const lines=[titles,...view.map(r=>[r.company,r.phone,r.source==='commercial'?'درخواست همکاری':'لید مستقیم',r.owner,stageCanonical(r.stage),r.status,r.followup,r.monthlyShipments,r.contactName,r.industry])];
    const csv='\uFEFF'+lines.map(row=>row.map(v=>'"'+String(v??'').replace(/"/g,'""')+'"').join(',')).join('\r\n');
    const url=URL.createObjectURL(new Blob([csv],{type:'text/csv;charset=utf-8'}));
    const link=global.document.createElement('a');link.href=url;link.download='managernegar-visible-leads.csv';global.document.body.appendChild(link);link.click();link.remove();URL.revokeObjectURL(url);
