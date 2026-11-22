@@ -29,6 +29,16 @@ jobs:
       - name: Run browser smoke checks
         run: node scripts/browser-smoke.mjs
 
+      - name: Verify isolated PR61 preview URL and login adapter
+        run: |
+          set -euo pipefail
+          BASE="https://uaydruhkevdmvpyefdjm.supabase.co/functions/v1/modirnegar-pr61-preview"
+          curl --fail --show-error --location --retry 3 --max-time 30 "$BASE/dashboard.html" -o /tmp/modirnegar-preview-dashboard.html
+          grep -Fq "signInWithPassword" /tmp/modirnegar-preview-dashboard.html
+          grep -Fq "مدیریت لیدها" /tmp/modirnegar-preview-dashboard.html
+          curl --fail --show-error --location --retry 3 --max-time 30 "$BASE/scripts/unified-leads.js" -o /tmp/modirnegar-preview-unified.js
+          grep -Fq "ManagerNegarUnifiedLeads" /tmp/modirnegar-preview-unified.js
+
       - name: Upload role preview screenshots
         if: always()
         uses: actions/upload-artifact@v4
