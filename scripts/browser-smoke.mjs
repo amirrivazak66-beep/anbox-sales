@@ -199,6 +199,7 @@ try {
   assert.ok(cardRect && iconRect && iconRect.y>=cardRect.y && iconRect.y+iconRect.height<=cardRect.y+cardRect.height,"KPI icon must remain fully inside card");
   assert.equal(await app.locator("#ul-export").isVisible(),true);
   assert.equal(await app.locator(".ul-table th").count(),10);
+  assert.equal(await app.locator('#ul-rows tr[data-record-key="direct:d-a"] .ul-stage-badge').innerText(),"تماس اولیه و امکان‌سنجی","numeric direct sales stages must be displayed as readable labels");
   await app.screenshot({path:"artifacts/unified-leads-manager.png",fullPage:true});
   await app.locator("#ul-owner").selectOption("expert-a");
   assert.equal(await app.locator("#ul-rows tr").count(),2,"manager expert filter should show one owner's records");
@@ -224,19 +225,19 @@ try {
     await row.locator("[data-inline-open]").click();
     await row.locator('[data-edit="stage"]').selectOption(stage);
     await row.locator('[data-edit="status"]').selectOption(status);
-    await row.locator('[data-edit="nextAction"]').fill("تماس تست");
-    await row.locator('[data-edit="followupRaw"]').fill("1405/09/02");
+    await row.locator('[data-edit="nextAction"]').selectOption(key.startsWith("direct:")?"ارسال پروپوزال":"تماس مجدد");
+    await row.locator('[data-edit="followupRaw"]').fill("2026-11-23");
     await row.locator("[data-inline-save]").click();
     await app.locator("#ul-status").filter({hasText:"ذخیره شد"}).waitFor({state:"visible",timeout:5000});
     assert.equal(await row.locator("[data-inline-open]").count(),1,"row returns to inline view after save");
-    assert.match(await row.innerText(), /تماس تست/);
+    assert.match(await row.innerText(), key.startsWith("direct:")?/ارسال پروپوزال/:/تماس مجدد/);
     assert.equal(await app.evaluate(()=>window.__openedUnified??null),null,"inline save must never navigate to original page");
   }
   const beforeCancel=await app.locator('#ul-rows tr[data-record-key="commercial:c-a"]').innerText();
   await app.locator('#ul-rows tr[data-record-key="commercial:c-a"] [data-inline-open]').click();
-  await app.locator('#ul-rows tr[data-record-key="commercial:c-a"] [data-edit="nextAction"]').fill("نباید ذخیره شود");
+  await app.locator('#ul-rows tr[data-record-key="commercial:c-a"] [data-edit="nextAction"]').selectOption("ارسال تعرفه");
   await app.locator('#ul-rows tr[data-record-key="commercial:c-a"] [data-inline-cancel]').click();
-  assert.equal((await app.locator('#ul-rows tr[data-record-key="commercial:c-a"]').innerText()).includes("نباید ذخیره شود"),false,"cancel discards unsaved changes");
+  assert.equal((await app.locator('#ul-rows tr[data-record-key="commercial:c-a"]').innerText()).includes("ارسال تعرفه"),false,"cancel discards unsaved changes");
 
   assert.equal(await app.locator("#ul-rows tr").count(),2);
   assert.equal(await app.locator("#ul-owner").isVisible(),false,"expert must not have cross-owner filter");
