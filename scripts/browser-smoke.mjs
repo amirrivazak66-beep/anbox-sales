@@ -298,6 +298,35 @@ try {
   assert.equal(await app.locator("#ul-analytics-panel").isVisible(),true,"expert charts open by default");
   await app.screenshot({path:"artifacts/unified-leads-expert-charts.png",fullPage:true});
   await app.locator("#ul-close").click();
+  // Regression: stage 6, Persian numeral ۶, and textual عقد قرارداد must be one chart category.
+  await app.evaluate(async()=>{
+    const db=window.__unifiedPreviewDb;
+    await db.from("leads").update({sales_stage:"۶"}).eq("id","d-a").select("id").maybeSingle();
+    await db.from("collaboration_requests").update({sales_stage:"عقد قرارداد"}).eq("id","c-a").select("id").maybeSingle();
+  });
+  await app.evaluate(()=>{
+    window.ManagerNegarUnifiedLeads.mount(document.getElementById("unifiedLeadsMount"),{
+      supabase:window.__unifiedPreviewDb,userId:"expert-a",isManager:false
+    });
+  });
+  await app.locator("#ul-status").filter({hasText:"۲ لید"}).waitFor({state:"visible",timeout:5000});
+  const expertContractBars=app.locator("#ul-analysis-body .ul-chart-bar-item").filter({hasText:"عقد قرارداد"});
+  assert.equal(await expertContractBars.count(),1,"expert must group numeric and textual contract stages");
+  assert.match(await expertContractBars.first().textContent(),/۲/,"expert combined contract bar must total two leads");
+  assert.equal(await app.locator("#ul-analysis-body .ul-chart-bar-item").count(),1,"no extra raw stage 6 bar");
+  await app.evaluate(()=>{
+    window.ManagerNegarUnifiedLeads.mount(document.getElementById("unifiedLeadsMount"),{
+      supabase:window.__unifiedPreviewDb,userId:"manager",isManager:true
+    });
+  });
+  await app.locator("#ul-status").filter({hasText:"۴ لید"}).waitFor({state:"visible",timeout:5000});
+  const managerContractFunnel=app.locator("#ul-analysis-body .ul-funnel-step").filter({hasText:"عقد قرارداد"});
+  assert.equal(await managerContractFunnel.count(),1,"manager funnel must group contract stage aliases");
+  assert.match(await managerContractFunnel.first().textContent(),/۲ لید/);
+  assert.equal(await app.locator('#ul-stage option').filter({hasText:"عقد قرارداد"}).count(),1,"stage filter must not duplicate contract stage");
+  await app.locator("#ul-stage").selectOption("عقد قرارداد");
+  assert.equal(await app.locator("#ul-rows tr[data-record-key]").count(),2,"canonical stage filter must include numeric and named stages");
+  await app.locator("#ul-stage").selectOption("");
   await app.evaluate(() => {document.getElementById("sidebarUsername").textContent="Test Manager";document.getElementById("headerUsername").textContent="Test Manager";});
   console.log("PASS role-separated synthetic leads and visual screenshot previews");
 
