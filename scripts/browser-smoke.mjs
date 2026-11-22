@@ -205,6 +205,32 @@ try {
   assert.equal(await app.locator('#ul-rows [data-inline-save]').count(),4,"every row shows Save by default");
   assert.equal(await app.locator('#ul-rows [data-inline-cancel]').count(),4,"every row shows Cancel by default");
   assert.equal(await app.locator('#ul-rows [data-inline-delete]').count(),4,"every row shows Delete by default");
+  // Regression: rows must stay fully inside the leads frame without any horizontal scroll.
+  const verifyNoHorizontalOverflow=async(width,height)=>{
+    await app.setViewportSize({width,height});
+    const fit=await app.evaluate(()=>{
+      const mount=document.getElementById("unifiedLeadsMount");
+      const frame=mount.querySelector(".ul-data-panel");
+      const table=mount.querySelector(".ul-table-scroll");
+      const rows=[...mount.querySelectorAll("#ul-rows tr[data-record-key]")];
+      const a=frame.getBoundingClientRect(),b=table.getBoundingClientRect();
+      return {screen:innerWidth,bodyOverflow:document.documentElement.scrollWidth>innerWidth+2,
+        tableOverflow:table.scrollWidth>table.clientWidth+2,
+        cardOverflow:rows.some(row=>{const x=row.getBoundingClientRect();return x.left<b.left-2||x.right>b.right+2}),
+        frameOverflow:a.right>innerWidth+2,rows:rows.length};
+    });
+    assert.equal(fit.tableOverflow,false,"table has horizontal overflow at "+width+": "+JSON.stringify(fit));
+    assert.equal(fit.cardOverflow,false,"lead card escapes its frame at "+width+": "+JSON.stringify(fit));
+    assert.equal(fit.frameOverflow,false,"leads panel escapes viewport at "+width+": "+JSON.stringify(fit));
+    if(width>=1100)assert.equal(fit.bodyOverflow,false,"desktop body has horizontal scrollbar: "+JSON.stringify(fit));
+  };
+  await verifyNoHorizontalOverflow(1366,900);
+  await app.screenshot({path:"artifacts/unified-leads-responsive-desktop.png",fullPage:true});
+  await verifyNoHorizontalOverflow(980,900);
+  await app.screenshot({path:"artifacts/unified-leads-responsive-compact.png",fullPage:true});
+  await verifyNoHorizontalOverflow(390,844);
+  await app.screenshot({path:"artifacts/unified-leads-responsive-mobile.png",fullPage:true});
+  await app.setViewportSize({width:1672,height:941});
   await app.screenshot({path:"artifacts/unified-leads-manager.png",fullPage:true});
   await app.locator("#ul-owner").selectOption("expert-a");
   assert.equal(await app.locator("#ul-rows tr").count(),2,"manager expert filter should show one owner's records");
