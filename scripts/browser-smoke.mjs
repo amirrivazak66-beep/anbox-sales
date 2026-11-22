@@ -168,7 +168,12 @@ try {
     };
     const db={from(table){
       const filters=[];
-      const q={select(){return q},eq(field,value){filters.push([field,value]);return q},order(){return q},limit(){return q},then(resolve,reject){
+      let pending=null;
+      const q={select(){return q},eq(field,value){filters.push([field,value]);return q},order(){return q},limit(){return q},update(payload){pending=payload;return q},
+        maybeSingle(){const matched=(entries[table]||[]).find(row=>filters.every(([field,value])=>String(row[field])===String(value)));
+          if(matched&&pending)Object.assign(matched,pending);
+          return Promise.resolve({data:matched?{id:matched.id}:null,error:null});
+        },then(resolve,reject){
         let data=(entries[table]||[]).filter(row=>filters.every(([field,value])=>String(row[field])===String(value)));
         return Promise.resolve({data,error:null}).then(resolve,reject);
       }};
@@ -194,11 +199,11 @@ try {
   const iconRect=await app.locator(".ul-stat-icon").first().boundingBox();
   assert.ok(cardRect && iconRect && iconRect.y>=cardRect.y && iconRect.y+iconRect.height<=cardRect.y+cardRect.height,"KPI icon must remain fully inside card");
   assert.equal(await app.locator("#ul-export").isVisible(),true);
-  assert.equal(await app.locator(".ul-table th").count(),9);
+  assert.equal(await app.locator(".ul-table th").count(),10);
   await app.screenshot({path:"artifacts/unified-leads-manager.png",fullPage:true});
   await app.locator("#ul-owner").selectOption("expert-a");
   assert.equal(await app.locator("#ul-rows tr").count(),2,"manager expert filter should show one owner's records");
-  await app.locator("#ul-analytics").click();
+  assert.equal(await app.locator("#ul-analytics-panel").isVisible(),true,"charts open on load");
   assert.match(await app.locator("#ul-analysis-body").innerText(),/۱ از ۲/);
   await app.locator("#ul-close").click();
   await app.locator("#ul-owner").selectOption("");
@@ -214,10 +219,25 @@ try {
     });
   });
   await app.locator("#ul-status").filter({hasText:"۲ لید"}).waitFor({state:"visible",timeout:5000});
-  await app.locator('#ul-rows button[data-source="commercial"][data-id="c-a"]').click();
-  assert.deepEqual(await app.evaluate(()=>window.__openedUnified),{source:"commercial",id:"c-a"},"commercial lead must link to its original request ID");
-  await app.locator('#ul-rows button[data-source="direct"][data-id="d-a"]').click();
-  assert.deepEqual(await app.evaluate(()=>window.__openedUnified),{source:"direct",id:"d-a"},"direct lead must link to its original ID");
+  // Both source types must edit and save *in the same row* without navigation.
+  for (const [key,stage,status] of [["commercial:c-a","مذاکره","در حال پیگیری"],["direct:d-a","2","در حال پیگیری"]]) {
+    const row=app.locator('#ul-rows tr[data-record-key="'+key+'"]');
+    await row.locator("[data-inline-open]").click();
+    await row.locator('[data-edit="stage"]').selectOption(stage);
+    await row.locator('[data-edit="status"]').selectOption(status);
+    await row.locator('[data-edit="nextAction"]').fill("تماس تست");
+    await row.locator('[data-edit="followupRaw"]').fill("1405/09/02");
+    await row.locator("[data-inline-save]").click();
+    await app.locator("#ul-status").filter({hasText:"ذخیره شد"}).waitFor({state:"visible",timeout:5000});
+    assert.equal(await row.locator("[data-inline-open]").count(),1,"row returns to inline view after save");
+    assert.match(await row.innerText(), /تماس تست/);
+    assert.equal(await app.evaluate(()=>window.__openedUnified??null),null,"inline save must never navigate to original page");
+  }
+  const beforeCancel=await app.locator('#ul-rows tr[data-record-key="commercial:c-a"]').innerText();
+  await app.locator('#ul-rows tr[data-record-key="commercial:c-a"] [data-inline-open]').click();
+  await app.locator('#ul-rows tr[data-record-key="commercial:c-a"] [data-edit="nextAction"]').fill("نباید ذخیره شود");
+  await app.locator('#ul-rows tr[data-record-key="commercial:c-a"] [data-inline-cancel]').click();
+  assert.equal((await app.locator('#ul-rows tr[data-record-key="commercial:c-a"]').innerText()).includes("نباید ذخیره شود"),false,"cancel discards unsaved changes");
 
   assert.equal(await app.locator("#ul-rows tr").count(),2);
   assert.equal(await app.locator("#ul-owner").isVisible(),false,"expert must not have cross-owner filter");
