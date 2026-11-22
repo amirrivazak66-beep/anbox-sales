@@ -172,6 +172,7 @@ try {
   });
   assert.equal(preview,true);
   await app.setViewportSize({width:1440,height:900});
+  await app.evaluate(() => {const toast=document.getElementById("notification");if(toast)toast.style.display="none";});
   await app.evaluate(() => {
     window.ManagerNegarUnifiedLeads.mount(document.getElementById("unifiedLeadsMount"),{
       supabase:window.__unifiedPreviewDb,userId:"manager",isManager:true,
@@ -188,6 +189,7 @@ try {
   await app.locator("#ul-analytics").click();
   await app.screenshot({path:"artifacts/unified-leads-manager-charts.png",fullPage:true});
   await app.locator("#ul-close").click();
+  await app.evaluate(() => {document.getElementById("sidebarUsername").textContent="کارشناس اول";document.getElementById("headerUsername").textContent="کارشناس اول";});
   await app.evaluate(() => {
     window.ManagerNegarUnifiedLeads.mount(document.getElementById("unifiedLeadsMount"),{
       supabase:window.__unifiedPreviewDb,userId:"expert-a",isManager:false,
@@ -202,6 +204,7 @@ try {
   await app.locator("#ul-analytics").click();
   await app.screenshot({path:"artifacts/unified-leads-expert-charts.png",fullPage:true});
   await app.locator("#ul-close").click();
+  await app.evaluate(() => {document.getElementById("sidebarUsername").textContent="Test Manager";document.getElementById("headerUsername").textContent="Test Manager";});
   console.log("PASS role-separated synthetic leads and visual screenshot previews");
 
   await app.locator(".nav-item").filter({ hasText: "تنظیمات" }).click();
