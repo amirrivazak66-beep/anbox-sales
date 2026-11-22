@@ -93,7 +93,7 @@ function mount(host,{supabase,userId,isManager=false,onOpenRequest=()=>{},onOpen
    stage:editingField('stage','مرحله فروش','<select data-edit="stage" aria-label="مرحله فروش '+esc(r.company)+'">'+stageOptions(r)+'</select>'),
    status:editingField('status','وضعیت','<select data-edit="status" aria-label="وضعیت '+esc(r.company)+'">'+options(statuses,r.status)+'</select>'),
    action:editingField('action','اقدام بعدی','<select data-edit="nextAction" aria-label="اقدام بعدی '+esc(r.company)+'"><option value="">انتخاب اقدام بعدی</option>'+options(r.source==='direct'?DIRECT_ACTIONS:COMMERCIAL_ACTIONS,r.nextAction)+'</select>'),
-   date:editingField('date','تاریخ پیگیری','<input type="date" data-edit="followupRaw" value="'+esc(dateInputValue(r.followupRaw))+'" aria-label="تاریخ پیگیری '+esc(r.company)+'" data-date-original="'+esc(r.followupRaw)+'">'+(!dateInputValue(r.followupRaw)&&r.followupRaw?'<small class="ul-old-date">تاریخ قبلی: '+esc(r.followupRaw)+'</small>':'')')
+   date:editingField('date','تاریخ پیگیری','<input type="date" data-edit="followupRaw" value="'+esc(dateInputValue(r.followupRaw))+'" aria-label="تاریخ پیگیری '+esc(r.company)+'" data-date-original="'+esc(r.followupRaw)+'">'+(!dateInputValue(r.followupRaw)&&r.followupRaw?'<small class="ul-old-date">تاریخ قبلی: '+esc(r.followupRaw)+'</small>':'')
   };
  };
  const saveRow=async(key)=>{
