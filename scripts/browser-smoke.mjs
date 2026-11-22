@@ -258,7 +258,12 @@ try {
     await row.locator('[data-edit="stage"]').selectOption(stage);
     await row.locator('[data-edit="status"]').selectOption(status);
     await row.locator('[data-edit="nextAction"]').selectOption(key.startsWith("direct:")?"ارسال پروپوزال":"تماس مجدد");
-    await row.locator('[data-edit="followupRaw"]').fill("2026-11-23");
+    // Jalali enhancement hides the native date input: update its underlying value as the date-picker does.
+    await row.locator('[data-edit="followupRaw"]').evaluate(input=>{
+      input.value="2026-11-23";
+      input.dispatchEvent(new Event("input",{bubbles:true}));
+      input.dispatchEvent(new Event("change",{bubbles:true}));
+    });
     await row.locator("[data-inline-save]").click();
     await app.locator("#ul-status").filter({hasText:"ذخیره شد"}).waitFor({state:"visible",timeout:5000});
     assert.equal(await row.locator("[data-edit='stage']").count(),1,"row stays editable after save");
