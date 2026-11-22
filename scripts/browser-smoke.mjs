@@ -135,6 +135,9 @@ try {
   assert.equal(await app.locator("#ul-rows tr").count(), 1, "empty state should be visible with mock data");
   await app.locator("#ul-analytics").click();
   await app.locator("#ul-analytics-panel").waitFor({ state: "visible", timeout: 5000 });
+  assert.equal(await app.locator("#ul-analytics").getAttribute("aria-expanded"), "true");
+  assert.equal(await app.locator("#ul-analytics-panel").evaluate(el => getComputedStyle(el).position),"static");
+  assert.equal(await app.locator("#ul-analytics-panel").evaluate(el => el.closest("#leads")?.id),"leads");
   assert.equal(await app.locator("#ul-analysis-body .ul-gauge").count(), 4);
   assert.match(await app.locator("#ul-analysis-body").innerText(), /داده کافی نیست/);
   await app.locator("#ul-close").click();
@@ -185,6 +188,9 @@ try {
   await app.screenshot({path:"artifacts/unified-leads-manager.png",fullPage:true});
   await app.locator("#ul-owner").selectOption("expert-a");
   assert.equal(await app.locator("#ul-rows tr").count(),2,"manager expert filter should show one owner's records");
+  await app.locator("#ul-analytics").click();
+  assert.match(await app.locator("#ul-analysis-body").innerText(),/۱ از ۲/);
+  await app.locator("#ul-close").click();
   await app.locator("#ul-owner").selectOption("");
   await app.locator("#ul-analytics").click();
   await app.screenshot({path:"artifacts/unified-leads-manager-charts.png",fullPage:true});
