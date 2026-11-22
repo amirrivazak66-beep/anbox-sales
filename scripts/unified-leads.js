@@ -34,6 +34,7 @@ function mount(host,{supabase,userId,isManager=false,onOpenRequest=()=>{},onOpen
  ".ul-reference .ul-actions{flex-direction:row-reverse}.ul-reference .ul-bottom-tiles{display:grid;grid-template-columns:1fr;gap:13px;margin-top:13px}.ul-reference .ul-bottom-tiles.ul-manager-bottom{grid-template-columns:1fr 2fr}.ul-reference .ul-bottom-tiles .ul-card{background:linear-gradient(145deg,#102b49,#0b2037);border:1px solid #2b5680;border-radius:16px;padding:16px;min-height:135px}.ul-reference .ul-bottom-tiles .ul-card h3{margin:0 0 16px;font-size:14px}.ul-reference .ul-bottom-tiles .ul-insight{margin-top:0;min-height:135px;display:flex;flex-direction:column;justify-content:center}@media(max-width:740px){.ul-reference .ul-bottom-tiles.ul-manager-bottom{grid-template-columns:1fr}}"+
  ".ul-reference .ul-table{min-width:1160px}.ul-reference .ul-inline-active{outline:2px solid #368af9;outline-offset:-2px;background:rgba(29,83,150,.19)}.ul-reference .ul-inline-label{display:grid;gap:5px;font-size:10px;color:#a7c2e6;min-width:110px}.ul-reference .ul-inline-label select,.ul-reference .ul-inline-label input{min-width:0;max-width:210px;width:100%;min-height:38px;padding:8px 10px;border:1px solid #3a6091;border-radius:10px;background:#112340;color:#f6f9ff;font:inherit;font-size:12px;direction:rtl}.ul-reference .ul-inline-label input:focus,.ul-reference .ul-inline-label select:focus{outline:2px solid #408dff}.ul-reference .ul-row-edit-actions{display:flex;align-items:center;gap:6px;white-space:nowrap}.ul-reference .ul-row-edit-actions button,.ul-reference .ul-edit-trigger{min-height:38px;padding:7px 11px;border-radius:10px;font:inherit;font-size:12px;font-weight:750;cursor:pointer}.ul-reference .ul-save-btn{background:#1466d9;border:1px solid #61a6ff;color:white}.ul-reference .ul-cancel-btn{background:#162944;border:1px solid #49617e;color:#f2f6ff}.ul-reference .ul-row-edit-actions button:disabled{opacity:.5;cursor:wait}.ul-reference .ul-edit-trigger{width:auto;white-space:nowrap;background:#173a68;color:#cce6ff;border:1px solid #386ab4}.ul-reference .ul-table-scroll{overflow-x:auto}" +
  ".ul-reference .ul-inline-label select{cursor:pointer;max-width:235px;min-width:146px}.ul-reference .ul-inline-label input[type=date]{color-scheme:dark;min-width:175px}.ul-reference .ul-inline-label .jp-trigger{max-width:210px;min-width:165px;white-space:nowrap;min-height:38px;background:#112c50;border:1px solid #4180d5;border-radius:10px;color:#eaf3ff;font-size:12px;cursor:pointer}.ul-reference .ul-inline-label .ul-old-date{font-size:10px;color:#a5bbd7;line-height:1.6}.ul-reference .ul-inline-active{box-shadow:inset 0 0 24px rgba(37,116,246,.08)}" +
+ ".ul-reference .ul-row-edit-actions{flex-wrap:wrap;gap:6px}.ul-reference .ul-row-edit-actions .ul-delete-btn{background:linear-gradient(120deg,#ad2929,#cf3737);border:1px solid #e45454;color:white;min-height:38px;padding:7px 10px;border-radius:10px;font:inherit;font-size:12px;font-weight:750;cursor:pointer}.ul-reference .ul-row-edit-actions button:disabled{opacity:.42;cursor:default}.ul-reference .ul-inline-active{outline:1px solid #315e9a;outline-offset:-1px}.ul-reference .ul-row-dirty{outline:2px solid #4e9bff;outline-offset:-2px;background:#112f53!important}" +
  `</style><div class="ul-wrap ul-reference">
  <div class="ul-topbar">
   <div class="ul-heading-block">
@@ -75,7 +76,7 @@ function mount(host,{supabase,userId,isManager=false,onOpenRequest=()=>{},onOpen
  </div><p class="ul-note">لید مستقیم و درخواست همکاری هر دو در همین جدول ویرایش می‌شوند. تغییرات فقط پس از زدن «ذخیره» در رکورد اصلی ثبت می‌شوند.</p>
  </div>`;
  const $=id=>host.querySelector('#'+id);
- let rows=[],profiles=[],tab='all',view=[],page=1,pageSize=10,viewMode='list',analysisTab='gauges',editKey='',savingKey='';
+ let rows=[],profiles=[],tab='all',view=[],page=1,pageSize=10,viewMode='list',analysisTab='gauges',savingKey='',drafts=new Map();
  const status=t=>{$('ul-status').textContent=t};
  const active=()=>{let v=rows.filter(r=>tab==='all'||r.source===tab);const q=norm($('ul-search').value),owner=$('ul-owner').value,stage=$('ul-stage').value,st=$('ul-status-filter').value,days=$('ul-date').value,source=$('ul-source').value;
   const cutoff=days==='all'?'':new Date(Date.now()-Number(days)*86400000).toISOString().slice(0,10);
@@ -117,11 +118,30 @@ function mount(host,{supabase,userId,isManager=false,onOpenRequest=()=>{},onOpen
    if(error)throw error;
    if(!data)throw Error('دسترسی ویرایش این رکورد وجود ندارد یا رکورد تغییر کرده است.');
    Object.assign(r,{stage:values.stage,status:values.status,nextAction:values.nextAction,followupRaw:values.followupRaw,followup:toDate(values.followupRaw),planned:!!values.followupRaw});
-   editKey='';status('تغییرات «'+r.company+'» در رکورد اصلی ذخیره شد.');render();
+   drafts.delete(key);status('تغییرات «'+r.company+'» در رکورد اصلی ذخیره شد.');render();
   }catch(err){status('ذخیره انجام نشد: '+(err.message||'خطای نامشخص'));buttons.forEach(b=>b.disabled=false)}
   finally{savingKey=''}
  };
 
+ const deleteRow=async(key)=>{
+  const r=rows.find(x=>keyOf(x)===key);
+  if(!r||savingKey)return;
+  if(!global.confirm('آیا از حذف «'+r.company+'» مطمئن هستید؟ این عملیات رکورد اصلی را حذف می‌کند و قابل بازگشت نیست.'))return;
+  savingKey=key;status('در حال حذف «'+r.company+'»…');
+  const tr=[...host.querySelectorAll('#ul-rows tr[data-record-key]')].find(x=>x.dataset.recordKey===key);
+  tr?.querySelectorAll('button').forEach(b=>b.disabled=true);
+  try{
+   let query=supabase.from(r.source==='direct'?'leads':'collaboration_requests').delete().eq('id',r.id);
+   if(r.source==='commercial')query=query.eq('request_type','commercial');
+   if(!isManager)query=query.eq('owner_auth_id',userId);
+   const {data,error}=await query.select('id').maybeSingle();
+   if(error)throw error;
+   if(!data)throw Error('این رکورد قابل حذف نیست یا دسترسی کافی وجود ندارد.');
+   rows=rows.filter(x=>keyOf(x)!==key);drafts.delete(key);
+   status('رکورد «'+r.company+'» حذف شد.');render();
+  }catch(error){status('حذف انجام نشد: '+(error.message||'خطای نامشخص'));tr?.querySelectorAll('button').forEach(b=>b.disabled=false)}
+  finally{savingKey=''}
+ };
  function render(){
   view=active();
   const commercial=view.filter(r=>r.source==='commercial').length,direct=view.length-commercial;
@@ -136,20 +156,47 @@ function mount(host,{supabase,userId,isManager=false,onOpenRequest=()=>{},onOpen
   $('ul-prev').disabled=page<=1;$('ul-next').disabled=page>=totalPages;
   const rowsHtml=current.map(r=>{
    const st=norm(r.status),kind=/(قرارداد|تکمیل|موفق|انجام)/.test(st)?'good':/(پیگیری|انتظار|مذاکره)/.test(st)?'pending':'';
-   const editing=editKey===keyOf(r),controls=editing?editable(r):null;
-   const actions=editing?'<div class="ul-row-edit-actions"><button type="button" class="ul-save-btn" data-inline-save>✓ ذخیره</button><button type="button" class="ul-cancel-btn" data-inline-cancel>✕ لغو</button></div>':'<button type="button" class="ul-row-icon ul-edit-trigger" data-inline-open aria-label="ویرایش در همین سطر '+esc(r.company)+'" title="ویرایش در همین سطر">✎ ویرایش</button>';
-   return '<tr data-record-key="'+esc(keyOf(r))+'" class="'+(editing?'ul-inline-active':'')+'"><td class="ul-check-col"><input type="checkbox" class="ul-row-check" aria-label="انتخاب '+esc(r.company)+'"></td><td><strong class="ul-company">'+esc(r.company)+'</strong><div class="ul-muted">'+esc(r.phone)+'</div></td><td><span class="ul-source '+esc(r.source)+'">'+(r.source==='commercial'?'◈ درخواست همکاری':'↗ لید مستقیم')+'</span></td><td><span class="ul-owner-name">♙ '+esc(r.owner)+'</span></td><td>'+(editing?controls.stage:'<span class="ul-stage-badge">'+esc(stageLabel(r.stage,r.source))+'</span>')+'</td><td>'+(editing?controls.status:'<span class="ul-status-badge '+kind+'">'+esc(r.status)+'</span>')+'</td><td>'+(editing?controls.action:'<span class="ul-muted">'+esc(r.nextAction||'—')+'</span>')+'</td><td>'+(editing?controls.date:esc(r.followupRaw||r.followup||'—'))+'</td><td class="ul-money">'+fmtMoney(r.estimatedValue)+'</td><td>'+actions+'</td></tr>';
+   const editing=true,controls=editable(r);
+   const actions='<div class="ul-row-edit-actions"><button type="button" class="ul-save-btn" data-inline-save disabled>✓ ذخیره</button><button type="button" class="ul-cancel-btn" data-inline-cancel disabled>✕ لغو</button><button type="button" class="ul-delete-btn" data-inline-delete>حذف</button></div>';
+   return '<tr data-record-key="'+esc(keyOf(r))+'" class="ul-inline-active"><td class="ul-check-col"><input type="checkbox" class="ul-row-check" aria-label="انتخاب '+esc(r.company)+'"></td><td><strong class="ul-company">'+esc(r.company)+'</strong><div class="ul-muted">'+esc(r.phone)+'</div></td><td><span class="ul-source '+esc(r.source)+'">'+(r.source==='commercial'?'◈ درخواست همکاری':'↗ لید مستقیم')+'</span></td><td><span class="ul-owner-name">♙ '+esc(r.owner)+'</span></td><td>'+(editing?controls.stage:'<span class="ul-stage-badge">'+esc(stageLabel(r.stage,r.source))+'</span>')+'</td><td>'+(editing?controls.status:'<span class="ul-status-badge '+kind+'">'+esc(r.status)+'</span>')+'</td><td>'+(editing?controls.action:'<span class="ul-muted">'+esc(r.nextAction||'—')+'</span>')+'</td><td>'+(editing?controls.date:esc(r.followupRaw||r.followup||'—'))+'</td><td class="ul-money">'+fmtMoney(r.estimatedValue)+'</td><td>'+actions+'</td></tr>';
   }).join('');
   $('ul-rows').innerHTML=rowsHtml||'<tr><td colspan="10" class="ul-empty">لیدی با فیلترهای فعلی پیدا نشد.</td></tr>';
   $('ul-grid-rows').innerHTML=current.length?current.map(r=>'<article class="ul-grid-card"><div class="ul-grid-card-head"><strong>'+esc(r.company)+'</strong><span class="ul-source '+esc(r.source)+'">'+(r.source==='commercial'?'درخواست همکاری':'لید مستقیم')+'</span></div><div class="ul-muted">'+esc(r.phone)+'</div><div class="ul-grid-card-meta"><span>کارشناس: '+esc(r.owner)+'</span><span>مرحله: '+esc(stageLabel(r.stage,r.source))+'</span><span>وضعیت: '+esc(r.status)+'</span><span>اقدام بعدی: '+esc(r.nextAction||'—')+'</span><span>پیگیری: '+esc(r.followupRaw||r.followup||'—')+'</span></div><button type="button" class="ul-action ul-row-action" data-inline-grid="'+esc(keyOf(r))+'">✎ ویرایش در جدول</button></article>').join(''):'<p class="ul-empty">لیدی با فیلترهای فعلی پیدا نشد.</p>';
   host.querySelectorAll('#ul-rows tr[data-record-key]').forEach(tr=>{
    const key=tr.dataset.recordKey;
    tr.querySelector('[data-edit="followupRaw"]')?.addEventListener('change',e=>{e.currentTarget.dataset.dateChanged='true'});
-   tr.querySelector('[data-inline-open]')?.addEventListener('click',()=>{editKey=key;viewMode='list';render()});
-   tr.querySelector('[data-inline-cancel]')?.addEventListener('click',()=>{editKey='';render();status('ویرایش لغو شد؛ تغییری ذخیره نشد.')});
+   const r=rows.find(x=>keyOf(x)===key);
+   const fields=['stage','status','nextAction','followupRaw'];
+   const getValues=()=>Object.fromEntries(fields.map(name=>[name,tr.querySelector('[data-edit="'+name+'"]')?.value??'']));
+   const baseline=()=>({stage:String(r.stage??''),status:String(r.status??''),nextAction:String(r.nextAction??''),followupRaw:dateInputValue(r.followupRaw)});
+   const setDirty=()=>{
+    const draft=getValues(),base=baseline(),dirty=fields.some(name=>draft[name]!==base[name]);
+    tr.querySelector('[data-inline-save]').disabled=!dirty||!!savingKey;
+    tr.querySelector('[data-inline-cancel]').disabled=!dirty||!!savingKey;
+    if(dirty)drafts.set(key,{...draft,dateChanged:tr.querySelector('[data-edit="followupRaw"]').dataset.dateChanged==='true'});
+    else drafts.delete(key);
+    tr.classList.toggle('ul-row-dirty',dirty);
+   };
+   const cached=drafts.get(key);
+   if(cached){
+    fields.forEach(name=>{const el=tr.querySelector('[data-edit="'+name+'"]');if(el)el.value=cached[name]});
+    if(cached.dateChanged)tr.querySelector('[data-edit="followupRaw"]').dataset.dateChanged='true';
+   }
+   fields.forEach(name=>tr.querySelector('[data-edit="'+name+'"]')?.addEventListener('change',setDirty));
+   fields.forEach(name=>tr.querySelector('[data-edit="'+name+'"]')?.addEventListener('input',setDirty));
+   setDirty();
+   tr.querySelector('[data-inline-cancel]')?.addEventListener('click',()=>{
+    drafts.delete(key);const original=baseline();
+    fields.forEach(name=>tr.querySelector('[data-edit="'+name+'"]').value=original[name]);
+    tr.querySelector('[data-edit="followupRaw"]').dataset.dateChanged='false';
+    tr.querySelector('[data-edit="followupRaw"]').dispatchEvent(new Event('change',{bubbles:false}));
+    tr.querySelector('[data-edit="followupRaw"]').dataset.dateChanged='false';
+    setDirty();status('تغییرات این ردیف لغو شد.');
+   });
    tr.querySelector('[data-inline-save]')?.addEventListener('click',()=>saveRow(key));
+   tr.querySelector('[data-inline-delete]')?.addEventListener('click',()=>deleteRow(key));
   });
-  host.querySelectorAll('[data-inline-grid]').forEach(b=>b.onclick=()=>{editKey=b.dataset.inlineGrid;viewMode='list';render()});
+  host.querySelectorAll('[data-inline-grid]').forEach(b=>b.onclick=()=>{viewMode='list';render();host.querySelector('[data-record-key="'+b.dataset.inlineGrid+'"]')?.scrollIntoView({block:'center',behavior:'smooth'})});
   global.ManagerNegarJalaliPicker?.scan?.();
   $('ul-grid-rows').hidden=viewMode!=='grid';
   $('ul-rows').closest('table').hidden=viewMode==='grid';
