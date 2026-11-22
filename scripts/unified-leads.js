@@ -1,4 +1,4 @@
-/* ManagerNegar: unified, read-only leads view. No record copying or writes. */
+/* ManagerNegar: unified leads dashboard. Owner-scoped, inline edits update original records only. */
 (function(global){
 'use strict';
 const esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -10,8 +10,8 @@ function normalizeRows(direct,requests,profiles,isManager,userId){
  const names=new Map(profiles.map(p=>[String(p.id),p.display_name||p.username||'—']));
  const allowed=r=>isManager||String(r.owner_auth_id)===String(userId);
  return [
-  ...direct.filter(allowed).map(r=>({id:String(r.id),source:'direct',company:r.company_name||'—',phone:r.phone||'',ownerId:String(r.owner_auth_id||''),owner:names.get(String(r.owner_auth_id))||r.sales_expert||'—',stage:r.sales_stage||'',status:r.lead_status||'—',followup:toDate(r.followup_date),created:toDate(r.created_at),complete:!!(r.company_name&&r.phone&&r.owner_auth_id),planned:!!r.followup_date,estimatedValue:r.estimated_value??null})),
-  ...requests.filter(r=>r.request_type==='commercial'&&allowed(r)).map(r=>({id:String(r.id),source:'commercial',company:r.company||r.external_id||'—',phone:r.phone||'',ownerId:String(r.owner_auth_id||''),owner:names.get(String(r.owner_auth_id))||r.expert_name||'—',stage:r.sales_stage||'',status:r.request_status||'—',followup:toDate(r.next_followup_at)||toDate(r.next_followup_text),created:toDate(r.created_at),complete:!!(r.company&&r.phone&&r.owner_auth_id),planned:!!(r.next_followup_at||r.next_followup_text&&r.next_followup_text!=='ندارد'),estimatedValue:r.estimated_value??null}))
+  ...direct.filter(allowed).map(r=>({id:String(r.id),source:'direct',company:r.company_name||'—',phone:r.phone||'',ownerId:String(r.owner_auth_id||''),owner:names.get(String(r.owner_auth_id))||r.sales_expert||'—',stage:r.sales_stage||'',status:r.lead_status||'—',followup:toDate(r.followup_date),created:toDate(r.created_at),complete:!!(r.company_name&&r.phone&&r.owner_auth_id),planned:!!r.followup_date,estimatedValue:r.estimated_value??null,nextAction:r.next_action||'',followupRaw:r.followup_date||''})),
+  ...requests.filter(r=>r.request_type==='commercial'&&allowed(r)).map(r=>({id:String(r.id),source:'commercial',company:r.company||r.external_id||'—',phone:r.phone||'',ownerId:String(r.owner_auth_id||''),owner:names.get(String(r.owner_auth_id))||r.expert_name||'—',stage:r.sales_stage||'',status:r.request_status||'—',followup:toDate(r.next_followup_at)||toDate(r.next_followup_text),created:toDate(r.created_at),complete:!!(r.company&&r.phone&&r.owner_auth_id),planned:!!(r.next_followup_at||r.next_followup_text&&r.next_followup_text!=='ندارد'),estimatedValue:r.estimated_value??null,nextAction:r.next_action||'',followupRaw:r.next_followup_text||''}))
  ];
 }
 function mount(host,{supabase,userId,isManager=false,onOpenRequest=()=>{},onOpenDirect=()=>{}}={}){
@@ -26,6 +26,7 @@ function mount(host,{supabase,userId,isManager=false,onOpenRequest=()=>{},onOpen
  ".ul-reference .ul-topbar{flex-direction:row;justify-content:space-between}.ul-reference .ul-heading-block{margin:0;flex:0 1 auto}.ul-reference .ul-actions{margin:0;flex:0 1 auto}.ul-reference .ul-stat{flex-direction:row;align-items:center;justify-content:space-between}.ul-reference .ul-stat-icon{position:static;inset:auto;order:0;align-self:center;margin:0;z-index:1}.ul-reference .ul-stat-content{flex:1;order:1;align-items:flex-start;text-align:right}.ul-reference .ul-stat:has(.ul-stat-content) small{line-height:1.7}.ul-reference .ul-panel-title:before{display:none}"+
  ".ul-reference .ul-topbar{min-height:69px;margin:0 0 12px}.ul-reference .ul-analytics-trigger{width:auto;min-width:180px;min-height:44px;height:auto;display:inline-flex;justify-content:center;align-items:center;gap:8px;overflow:visible;white-space:normal;padding:10px 15px;font-size:14px;font-weight:750;background:linear-gradient(135deg,#144e96,#0865cd);color:#fff;border:1px solid #3b97ed;box-shadow:0 6px 20px rgba(12,92,202,.28)}.ul-reference .ul-title-row{gap:8px}"+
  ".ul-reference .ul-actions{flex-direction:row-reverse}.ul-reference .ul-bottom-tiles{display:grid;grid-template-columns:1fr;gap:13px;margin-top:13px}.ul-reference .ul-bottom-tiles.ul-manager-bottom{grid-template-columns:1fr 2fr}.ul-reference .ul-bottom-tiles .ul-card{background:linear-gradient(145deg,#102b49,#0b2037);border:1px solid #2b5680;border-radius:16px;padding:16px;min-height:135px}.ul-reference .ul-bottom-tiles .ul-card h3{margin:0 0 16px;font-size:14px}.ul-reference .ul-bottom-tiles .ul-insight{margin-top:0;min-height:135px;display:flex;flex-direction:column;justify-content:center}@media(max-width:740px){.ul-reference .ul-bottom-tiles.ul-manager-bottom{grid-template-columns:1fr}}"+
+ ".ul-reference .ul-table{min-width:1160px}.ul-reference .ul-inline-active{outline:2px solid #368af9;outline-offset:-2px;background:rgba(29,83,150,.19)}.ul-reference .ul-inline-label{display:grid;gap:5px;font-size:10px;color:#a7c2e6;min-width:110px}.ul-reference .ul-inline-label select,.ul-reference .ul-inline-label input{min-width:0;max-width:210px;width:100%;min-height:38px;padding:8px 10px;border:1px solid #3a6091;border-radius:10px;background:#112340;color:#f6f9ff;font:inherit;font-size:12px;direction:rtl}.ul-reference .ul-inline-label input:focus,.ul-reference .ul-inline-label select:focus{outline:2px solid #408dff}.ul-reference .ul-row-edit-actions{display:flex;align-items:center;gap:6px;white-space:nowrap}.ul-reference .ul-row-edit-actions button,.ul-reference .ul-edit-trigger{min-height:38px;padding:7px 11px;border-radius:10px;font:inherit;font-size:12px;font-weight:750;cursor:pointer}.ul-reference .ul-save-btn{background:#1466d9;border:1px solid #61a6ff;color:white}.ul-reference .ul-cancel-btn{background:#162944;border:1px solid #49617e;color:#f2f6ff}.ul-reference .ul-row-edit-actions button:disabled{opacity:.5;cursor:wait}.ul-reference .ul-edit-trigger{width:auto;white-space:nowrap;background:#173a68;color:#cce6ff;border:1px solid #386ab4}.ul-reference .ul-table-scroll{overflow-x:auto}" +
  `</style><div class="ul-wrap ul-reference">
  <div class="ul-topbar">
   <div class="ul-heading-block">
@@ -62,12 +63,12 @@ function mount(host,{supabase,userId,isManager=false,onOpenRequest=()=>{},onOpen
    <div class="ul-analytics-tabs" role="group" aria-label="بخش‌های تحلیل"><button type="button" class="active" data-analysis-tab="gauges">◉ گیج‌ها</button><button type="button" data-analysis-tab="charts">▥ نمودارها</button><button type="button" data-analysis-tab="summary">▤ خلاصه</button></div>
    <div id="ul-analysis-body"></div>
   </section>
-  <div class="ul-table-scroll"><table class="ul-table"><thead><tr><th class="ul-check-col"><input type="checkbox" id="ul-check-all" aria-label="انتخاب همه ردیف‌های این صفحه"></th><th>شرکت / سازمان</th><th>منبع</th><th>کارشناس</th><th>مرحله فروش</th><th>وضعیت پیگیری</th><th>آخرین / برنامه پیگیری</th><th>ارزش تخمینی</th><th>عملیات</th></tr></thead><tbody id="ul-rows"></tbody></table><div id="ul-grid-rows" class="ul-grid-rows" hidden></div></div>
+  <div class="ul-table-scroll"><table class="ul-table"><thead><tr><th class="ul-check-col"><input type="checkbox" id="ul-check-all" aria-label="انتخاب همه ردیف‌های این صفحه"></th><th>شرکت / سازمان</th><th>منبع</th><th>کارشناس</th><th>مرحله فروش</th><th>وضعیت پیگیری</th><th>اقدام بعدی</th><th>آخرین / برنامه پیگیری</th><th>ارزش تخمینی</th><th>عملیات</th></tr></thead><tbody id="ul-rows"></tbody></table><div id="ul-grid-rows" class="ul-grid-rows" hidden></div></div>
   <div class="ul-pagination"><span id="ul-page-info">نمایش ۰ لید</span><div class="ul-page-controls"><button type="button" id="ul-prev" class="ul-page-button" aria-label="صفحه قبل">‹</button><span id="ul-page-num">۱</span><button type="button" id="ul-next" class="ul-page-button" aria-label="صفحه بعد">›</button></div><label>نمایش در صفحه: <select id="ul-page-size" aria-label="تعداد لید در هر صفحه"><option value="10">۱۰</option><option value="20">۲۰</option><option value="50">۵۰</option></select></label></div>
- </div><p class="ul-note">درخواست‌های تجاری بدون کپی داده نمایش داده می‌شوند؛ مشاهده و ویرایش آن‌ها از رکورد اصلی انجام می‌شود.</p>
+ </div><p class="ul-note">لید مستقیم و درخواست همکاری هر دو در همین جدول ویرایش می‌شوند. تغییرات فقط پس از زدن «ذخیره» در رکورد اصلی ثبت می‌شوند.</p>
  </div>`;
  const $=id=>host.querySelector('#'+id);
- let rows=[],profiles=[],tab='all',view=[],page=1,pageSize=10,viewMode='list',analysisTab='gauges';
+ let rows=[],profiles=[],tab='all',view=[],page=1,pageSize=10,viewMode='list',analysisTab='gauges',editKey='',savingKey='';
  const status=t=>{$('ul-status').textContent=t};
  const active=()=>{let v=rows.filter(r=>tab==='all'||r.source===tab);const q=norm($('ul-search').value),owner=$('ul-owner').value,stage=$('ul-stage').value,st=$('ul-status-filter').value,days=$('ul-date').value,source=$('ul-source').value;
   const cutoff=days==='all'?'':new Date(Date.now()-Number(days)*86400000).toISOString().slice(0,10);
@@ -75,6 +76,43 @@ function mount(host,{supabase,userId,isManager=false,onOpenRequest=()=>{},onOpen
  };
  const box=(label,n,icon,description='')=>'<article class="ul-stat"><div class="ul-stat-content"><small>'+esc(label)+'</small><strong>'+fmt(n)+'</strong>'+(description?'<span class="ul-stat-caption">'+esc(description)+'</span>':'')+'</div><span class="ul-stat-icon" aria-hidden="true">'+icon+'</span></article>';
  const fmtMoney=n=>n===null||n===undefined||n===''?'—':(Number.isFinite(Number(n))?fmt(Number(n))+' ریال':'—');
+ const keyOf=r=>r.source+':'+r.id;
+ const options=(values,current)=>[...new Set([String(current??''),...values.map(String)].filter(Boolean))].map(v=>'<option value="'+esc(v)+'"'+(String(current)===v?' selected':'')+'>'+esc(v)+'</option>').join('');
+ const editingField=(field,label,control)=>'<label class="ul-inline-label">'+label+control+'</label>';
+ const editable=r=>{
+  const stages=r.source==='direct'?['1','2','3','4','5','6']:[...new Set(rows.filter(x=>x.source==='commercial').map(x=>x.stage).filter(Boolean)),'جدید','تماس اولیه','نیازسنجی','مذاکره','ارسال قرارداد','عقد قرارداد'];
+  const statuses=[...new Set(rows.filter(x=>x.source===r.source).map(x=>x.status).filter(Boolean)),'جدید','در حال پیگیری','در حال بررسی','در حال عقد قرارداد','تکمیل‌شده','ردشده'];
+  return {
+   stage:editingField('stage','مرحله فروش','<select data-edit="stage" aria-label="مرحله فروش '+esc(r.company)+'">'+options(stages,r.stage)+'</select>'),
+   status:editingField('status','وضعیت','<select data-edit="status" aria-label="وضعیت '+esc(r.company)+'">'+options(statuses,r.status)+'</select>'),
+   action:editingField('action','اقدام بعدی','<input type="text" data-edit="nextAction" maxlength="300" value="'+esc(r.nextAction)+'" placeholder="اقدام بعدی" aria-label="اقدام بعدی '+esc(r.company)+'">'),
+   date:editingField('date','تاریخ پیگیری','<input type="text" data-edit="followupRaw" maxlength="100" value="'+esc(r.followupRaw)+'" placeholder="۱۴۰۵/۰۸/۲۷ یا 2026-11-18" aria-label="تاریخ پیگیری '+esc(r.company)+'">')
+  };
+ };
+ const saveRow=async(key)=>{
+  const r=rows.find(x=>keyOf(x)===key),tr=[...host.querySelectorAll('#ul-rows tr[data-record-key]')].find(x=>x.dataset.recordKey===key);
+  if(!r||!tr||savingKey)return;
+  const v=name=>tr.querySelector('[data-edit="'+name+'"]')?.value.trim()??'';
+  const values={stage:v('stage'),status:v('status'),nextAction:v('nextAction'),followupRaw:v('followupRaw')};
+  if(!values.stage||!values.status){status('مرحله فروش و وضعیت پیگیری باید مشخص باشند.');return;}
+  const payload=r.source==='direct'?
+    {sales_stage:values.stage,lead_status:values.status,next_action:values.nextAction,followup_date:values.followupRaw}:
+    {sales_stage:values.stage,request_status:values.status,next_action:values.nextAction,next_followup_text:values.followupRaw};
+  const buttons=tr.querySelectorAll('[data-inline-save],[data-inline-cancel]');buttons.forEach(b=>b.disabled=true);savingKey=key;
+  status('در حال ذخیره تغییرات '+r.company+'…');
+  try{
+   let query=supabase.from(r.source==='direct'?'leads':'collaboration_requests').update(payload).eq('id',r.id);
+   if(r.source==='commercial')query=query.eq('request_type','commercial');
+   if(!isManager)query=query.eq('owner_auth_id',userId);
+   const {data,error}=await query.select('id').maybeSingle();
+   if(error)throw error;
+   if(!data)throw Error('دسترسی ویرایش این رکورد وجود ندارد یا رکورد تغییر کرده است.');
+   Object.assign(r,{stage:values.stage,status:values.status,nextAction:values.nextAction,followupRaw:values.followupRaw,followup:toDate(values.followupRaw),planned:!!values.followupRaw});
+   editKey='';status('تغییرات «'+r.company+'» در رکورد اصلی ذخیره شد.');render();
+  }catch(err){status('ذخیره انجام نشد: '+(err.message||'خطای نامشخص'));buttons.forEach(b=>b.disabled=false)}
+  finally{savingKey=''}
+ };
+
  function render(){
   view=active();
   const commercial=view.filter(r=>r.source==='commercial').length,direct=view.length-commercial;
@@ -89,12 +127,19 @@ function mount(host,{supabase,userId,isManager=false,onOpenRequest=()=>{},onOpen
   $('ul-prev').disabled=page<=1;$('ul-next').disabled=page>=totalPages;
   const rowsHtml=current.map(r=>{
    const st=norm(r.status),kind=/(قرارداد|تکمیل|موفق|انجام)/.test(st)?'good':/(پیگیری|انتظار|مذاکره)/.test(st)?'pending':'';
-   return '<tr><td class="ul-check-col"><input type="checkbox" class="ul-row-check" aria-label="انتخاب '+esc(r.company)+'"></td><td><strong class="ul-company">'+esc(r.company)+'</strong><div class="ul-muted">'+esc(r.phone)+'</div></td><td><span class="ul-source '+esc(r.source)+'">'+(r.source==='commercial'?'◈ درخواست همکاری':'↗ لید مستقیم')+'</span></td><td><span class="ul-owner-name">♙ '+esc(r.owner)+'</span></td><td><span class="ul-stage-badge">'+esc(r.stage||'—')+'</span></td><td><span class="ul-status-badge '+kind+'">'+esc(r.status)+'</span></td><td>'+esc(r.followup||'—')+'</td><td class="ul-money">'+fmtMoney(r.estimatedValue)+'</td><td><button type="button" class="ul-row-icon" data-source="'+esc(r.source)+'" data-id="'+esc(r.id)+'" aria-label="'+(r.source==='commercial'?'مشاهده درخواست':'ویرایش لید')+' '+esc(r.company)+'" title="'+(r.source==='commercial'?'مشاهده درخواست':'ویرایش لید')+'">✎</button><button type="button" class="ul-row-icon" data-more="'+esc(r.id)+'" data-source="'+esc(r.source)+'" aria-label="بازکردن رکورد '+esc(r.company)+'" title="بازکردن رکورد">⋮</button></td></tr>';
+   const editing=editKey===keyOf(r),controls=editing?editable(r):null;
+   const actions=editing?'<div class="ul-row-edit-actions"><button type="button" class="ul-save-btn" data-inline-save>✓ ذخیره</button><button type="button" class="ul-cancel-btn" data-inline-cancel>✕ لغو</button></div>':'<button type="button" class="ul-row-icon ul-edit-trigger" data-inline-open aria-label="ویرایش در همین سطر '+esc(r.company)+'" title="ویرایش در همین سطر">✎ ویرایش</button>';
+   return '<tr data-record-key="'+esc(keyOf(r))+'" class="'+(editing?'ul-inline-active':'')+'"><td class="ul-check-col"><input type="checkbox" class="ul-row-check" aria-label="انتخاب '+esc(r.company)+'"></td><td><strong class="ul-company">'+esc(r.company)+'</strong><div class="ul-muted">'+esc(r.phone)+'</div></td><td><span class="ul-source '+esc(r.source)+'">'+(r.source==='commercial'?'◈ درخواست همکاری':'↗ لید مستقیم')+'</span></td><td><span class="ul-owner-name">♙ '+esc(r.owner)+'</span></td><td>'+(editing?controls.stage:'<span class="ul-stage-badge">'+esc(r.stage||'—')+'</span>')+'</td><td>'+(editing?controls.status:'<span class="ul-status-badge '+kind+'">'+esc(r.status)+'</span>')+'</td><td>'+(editing?controls.action:'<span class="ul-muted">'+esc(r.nextAction||'—')+'</span>')+'</td><td>'+(editing?controls.date:esc(r.followupRaw||r.followup||'—'))+'</td><td class="ul-money">'+fmtMoney(r.estimatedValue)+'</td><td>'+actions+'</td></tr>';
   }).join('');
-  $('ul-rows').innerHTML=rowsHtml||'<tr><td colspan="9" class="ul-empty">لیدی با فیلترهای فعلی پیدا نشد.</td></tr>';
-  $('ul-grid-rows').innerHTML=current.length?current.map(r=>'<article class="ul-grid-card"><div class="ul-grid-card-head"><strong>'+esc(r.company)+'</strong><span class="ul-source '+esc(r.source)+'">'+(r.source==='commercial'?'درخواست همکاری':'لید مستقیم')+'</span></div><div class="ul-muted">'+esc(r.phone)+'</div><div class="ul-grid-card-meta"><span>کارشناس: '+esc(r.owner)+'</span><span>مرحله: '+esc(r.stage||'—')+'</span><span>وضعیت: '+esc(r.status)+'</span><span>پیگیری: '+esc(r.followup||'—')+'</span></div><button type="button" class="ul-action ul-row-action" data-source="'+esc(r.source)+'" data-id="'+esc(r.id)+'">'+(r.source==='commercial'?'مشاهده درخواست':'ویرایش لید')+'</button></article>').join(''):'<p class="ul-empty">لیدی با فیلترهای فعلی پیدا نشد.</p>';
-  const openRecord=b=>{if(b.dataset.source==='commercial')onOpenRequest(b.dataset.id);else onOpenDirect(b.dataset.id)};
-  host.querySelectorAll('#ul-rows [data-id],#ul-grid-rows [data-id],#ul-rows [data-more]').forEach(b=>b.onclick=()=>openRecord(b));
+  $('ul-rows').innerHTML=rowsHtml||'<tr><td colspan="10" class="ul-empty">لیدی با فیلترهای فعلی پیدا نشد.</td></tr>';
+  $('ul-grid-rows').innerHTML=current.length?current.map(r=>'<article class="ul-grid-card"><div class="ul-grid-card-head"><strong>'+esc(r.company)+'</strong><span class="ul-source '+esc(r.source)+'">'+(r.source==='commercial'?'درخواست همکاری':'لید مستقیم')+'</span></div><div class="ul-muted">'+esc(r.phone)+'</div><div class="ul-grid-card-meta"><span>کارشناس: '+esc(r.owner)+'</span><span>مرحله: '+esc(r.stage||'—')+'</span><span>وضعیت: '+esc(r.status)+'</span><span>اقدام بعدی: '+esc(r.nextAction||'—')+'</span><span>پیگیری: '+esc(r.followupRaw||r.followup||'—')+'</span></div><button type="button" class="ul-action ul-row-action" data-inline-grid="'+esc(keyOf(r))+'">✎ ویرایش در جدول</button></article>').join(''):'<p class="ul-empty">لیدی با فیلترهای فعلی پیدا نشد.</p>';
+  host.querySelectorAll('#ul-rows tr[data-record-key]').forEach(tr=>{
+   const key=tr.dataset.recordKey;
+   tr.querySelector('[data-inline-open]')?.addEventListener('click',()=>{editKey=key;viewMode='list';render()});
+   tr.querySelector('[data-inline-cancel]')?.addEventListener('click',()=>{editKey='';render();status('ویرایش لغو شد؛ تغییری ذخیره نشد.')});
+   tr.querySelector('[data-inline-save]')?.addEventListener('click',()=>saveRow(key));
+  });
+  host.querySelectorAll('[data-inline-grid]').forEach(b=>b.onclick=()=>{editKey=b.dataset.inlineGrid;viewMode='list';render()});
   $('ul-grid-rows').hidden=viewMode!=='grid';
   $('ul-rows').closest('table').hidden=viewMode==='grid';
   $('ul-list-view').classList.toggle('active',viewMode==='list');
@@ -167,7 +212,7 @@ function mount(host,{supabase,userId,isManager=false,onOpenRequest=()=>{},onOpen
   const stages=[...new Set(rows.map(r=>String(r.stage||'')).filter(Boolean))].sort();$('ul-stage').innerHTML='<option value="">همه مراحل</option>'+stages.map(v=>'<option>'+esc(v)+'</option>').join('');
   const statuses=[...new Set(rows.map(r=>r.status).filter(Boolean))].sort();$('ul-status-filter').innerHTML='<option value="">همه وضعیت‌ها</option>'+statuses.map(v=>'<option>'+esc(v)+'</option>').join('');
   host.closest('#leads')?.classList.add('unified-active');
-  status(fmt(rows.length)+' لید قابل مشاهده — داده‌ها صرفاً خوانده شدند');
+  status(fmt(rows.length)+' لید قابل مشاهده — برای ویرایش هر نوع لید، «ویرایش» همان ردیف را بزنید.');
   render();
   // Open analytics by default, without unexpected scroll on initial page load.
   $('ul-analytics-panel').hidden=false;
