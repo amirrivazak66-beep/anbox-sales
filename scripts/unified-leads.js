@@ -85,7 +85,7 @@ function mount(host,{supabase,userId,isManager=false,onOpenRequest=()=>{},onOpen
  const fmtMoney=n=>n===null||n===undefined||n===''?'—':(Number.isFinite(Number(n))?fmt(Number(n))+' ریال':'—');
  const keyOf=r=>r.source+':'+r.id;
  const options=(values,current)=>[...new Set([String(current??''),...values.map(String)].filter(Boolean))].map(v=>'<option value="'+esc(v)+'"'+(String(current)===v?' selected':'')+'>'+esc(v)+'</option>').join('');
- const stageOptions=r=>r.source==='direct'?STAGES.map(([id,label])=>'<option value="'+id+'"'+(String(r.stage)===id?' selected':'')+'>'+esc(label)+'</option>').join(''):options([...new Set(rows.filter(x=>x.source==='commercial').map(x=>x.stage).filter(Boolean)),'جدید','تماس اولیه','نیازسنجی','معرفی خدمات','ارسال تعرفه','ساخت پنل','مذاکره','ارسال قرارداد','قرارداد منعقد شد','عدم همکاری'],r.stage);
+ const stageOptions=r=>r.source==='direct'?STAGES.map(([id,label])=>'<option value="'+id+'"'+(String(r.stage)===id?' selected':'')+'>'+esc(label)+'</option>').join(''):options([...new Set([...rows.filter(x=>x.source==='commercial').map(x=>x.stage).filter(Boolean),'جدید','تماس اولیه','نیازسنجی','معرفی خدمات','ارسال تعرفه','ساخت پنل','مذاکره','ارسال قرارداد','قرارداد منعقد شد','عدم همکاری'])],r.stage);
  const editingField=(field,label,control)=>'<label class="ul-inline-label">'+label+control+'</label>';
  const editable=r=>{
   const statuses=[...new Set(rows.filter(x=>x.source===r.source).map(x=>x.status).filter(Boolean)),'جدید','در حال پیگیری','در حال بررسی','در حال عقد قرارداد','تکمیل‌شده','ردشده'];
