@@ -139,7 +139,7 @@ try {
   assert.equal(await app.locator("#ul-analytics-panel").evaluate(el => getComputedStyle(el).position),"static");
   assert.equal(await app.locator("#ul-analysis-body .ul-gauge-svg").count(),5,"all gauges should use semicircular SVG");
   assert.equal(await app.locator("#ul-analysis-body .ul-donut").count(),1,"lead source donut should appear");
-  assert.equal(await app.locator("#ul-analysis-body .ul-funnel").count(),1,"sales stage distribution funnel should appear");
+  assert.match(await app.locator("#ul-analysis-body").innerText(),/توزیع مراحل فروش/,"funnel section must show empty state if no stages exist");
   assert.equal(await app.locator("#ul-analytics-panel").evaluate(el => el.closest("#leads")?.id),"leads");
   assert.equal(await app.locator("#ul-analysis-body .ul-gauge").count(), 5);
   assert.match(await app.locator("#ul-analysis-body").innerText(), /داده کافی نیست/);
@@ -196,6 +196,7 @@ try {
   await app.locator("#ul-close").click();
   await app.locator("#ul-owner").selectOption("");
   await app.locator("#ul-analytics").click();
+  assert.equal(await app.locator("#ul-analysis-body .ul-funnel").count(),1,"funnel appears for synthetic leads with stages");
   await app.screenshot({path:"artifacts/unified-leads-manager-charts.png",fullPage:true});
   await app.locator("#ul-close").click();
   await app.evaluate(() => {document.getElementById("sidebarUsername").textContent="کارشناس اول";document.getElementById("headerUsername").textContent="کارشناس اول";});
