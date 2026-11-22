@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import { createServer } from "node:http";
-import { readFileSync } from "node:fs";
+import { readFileSync, mkdirSync } from "node:fs";
 import { resolve, dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { chromium } from "playwright";
@@ -9,12 +9,12 @@ const root = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const server = createServer((req, res) => {
   const pathname = new URL(req.url || "/", "http://127.0.0.1").pathname;
   const relative = pathname === "/" ? "index.html" : pathname.slice(1);
-  if (!["index.html", "dashboard.html"].includes(relative)) {
+  if (!["index.html", "dashboard.html", "scripts/unified-leads.js"].includes(relative)) {
     res.writeHead(404); res.end("Not found"); return;
   }
   try {
     const body = readFileSync(join(root, relative));
-    res.writeHead(200, { "content-type": "text/html; charset=utf-8", "cache-control": "no-store" });
+    res.writeHead(200, { "content-type": relative.endsWith(".js") ? "application/javascript; charset=utf-8" : "text/html; charset=utf-8", "cache-control": "no-store" });
     res.end(body);
   } catch {
     res.writeHead(404); res.end("Not found");
@@ -128,6 +128,181 @@ try {
     assert.ok(size > 0, `Page ${id} has no rendered height`);
   }
   console.log("PASS dashboard, leads, team, pipeline, reports and settings navigation");
+  // Manager-only aggregate insights appear in the new unified leads view.
+  await app.locator(".nav-item").filter({ hasText: "لیدها" }).click();
+  await app.locator("#ul-status").filter({ hasText: "لید قابل مشاهده" }).waitFor({ state: "visible", timeout: 10000 });
+  assert.equal(await app.locator("#ul-owner").isVisible(), true, "manager needs an expert filter");
+  assert.equal(await app.locator("#ul-rows tr").count(), 1, "empty state should be visible with mock data");
+  await app.locator("#ul-analytics-panel").waitFor({ state: "visible", timeout: 5000 });
+  assert.equal(await app.locator("#ul-analytics").getAttribute("aria-expanded"), "true");
+  assert.match(await app.locator("#ul-analytics").innerText(),/پنهان کردن نمودارها/,"analytics trigger should clearly describe expanded charts");
+  assert.equal(await app.locator("#ul-analytics-panel").evaluate(el => getComputedStyle(el).position),"static");
+  assert.equal(await app.locator("#ul-analysis-body .ul-gauge-svg").count(),5,"all gauges should use semicircular SVG");
+  assert.equal(await app.locator("#ul-analysis-body .ul-donut").count(),1,"lead source donut should appear");
+  assert.match(await app.locator("#ul-analysis-body").innerText(),/توزیع مراحل فروش/,"funnel section must show empty state if no stages exist");
+  assert.equal(await app.locator("#ul-analytics-panel").evaluate(el => el.closest("#leads")?.id),"leads");
+  assert.equal(await app.locator("#ul-analysis-body .ul-gauge").count(), 5);
+  assert.match(await app.locator("#ul-analysis-body").innerText(), /داده کافی نیست/);
+  await app.locator("#ul-close").click();
+  assert.equal(await app.locator("#ul-analytics-panel").isVisible(),false);
+  console.log("PASS unified leads manager filters and embedded analytics panel");
+
+  mkdirSync("artifacts", {recursive:true});
+  // Visual role previews with synthetic records only. Never connect to production.
+  const preview = await app.evaluate(() => {
+    const entries = {
+      leads: [
+        {id:"d-a",owner_auth_id:"expert-a",company_name:"فروشگاه نمونه الف",phone:"09120000001",sales_stage:"تماس اولیه",lead_status:"در حال پیگیری",created_at:"2026-11-20"},
+        {id:"d-b",owner_auth_id:"expert-b",company_name:"فروشگاه نمونه ب",phone:"09120000002",sales_stage:"مذاکره",lead_status:"در حال پیگیری",created_at:"2026-11-19"}
+      ],
+      collaboration_requests: [
+        {id:"c-a",owner_auth_id:"expert-a",company:"شرکت نمونه تجاری",phone:"09120000003",request_type:"commercial",sales_stage:"نیازسنجی",request_status:"جدید",created_at:"2026-11-20"},
+        {id:"c-b",owner_auth_id:"expert-b",company:"شرکت نمونه دوم",phone:"09120000004",request_type:"commercial",sales_stage:"ارسال تعرفه",request_status:"در حال پیگیری",created_at:"2026-11-20"},
+        {id:"h-a",owner_auth_id:"expert-a",company:"درخواست استخدام نمونه",request_type:"employment",created_at:"2026-11-20"}
+      ],
+      profiles: [
+        {id:"expert-a",display_name:"کارشناس اول",username:"first"},
+        {id:"expert-b",display_name:"کارشناس دوم",username:"second"}
+      ]
+    };
+    const db={from(table){
+      const filters=[];
+      let pending=null;
+      const q={select(){return q},eq(field,value){filters.push([field,value]);return q},order(){return q},limit(){return q},update(payload){pending=payload;return q},delete(){pending='DELETE';return q},
+        maybeSingle(){const matched=(entries[table]||[]).find(row=>filters.every(([field,value])=>String(row[field])===String(value)));
+          if(matched&&pending==='DELETE')entries[table].splice(entries[table].indexOf(matched),1);
+          else if(matched&&pending)Object.assign(matched,pending);
+          return Promise.resolve({data:matched?{id:matched.id}:null,error:null});
+        },then(resolve,reject){
+        let data=(entries[table]||[]).filter(row=>filters.every(([field,value])=>String(row[field])===String(value)));
+        return Promise.resolve({data,error:null}).then(resolve,reject);
+      }};
+      return q;
+    }};
+    window.__unifiedPreviewDb=db;
+    return true;
+  });
+  assert.equal(preview,true);
+  await app.setViewportSize({width:1672,height:941});
+  await app.evaluate(() => {const toast=document.getElementById("notification");if(toast)toast.style.display="none";});
+  await app.evaluate(() => {
+    window.ManagerNegarUnifiedLeads.mount(document.getElementById("unifiedLeadsMount"),{
+      supabase:window.__unifiedPreviewDb,userId:"manager",isManager:true,
+      onOpenRequest:id=>{window.__openedUnified={source:"commercial",id}},onOpenDirect:id=>{window.__openedUnified={source:"direct",id}}
+    });
+  });
+  await app.locator("#ul-status").filter({hasText:"۴ لید"}).waitFor({state:"visible",timeout:5000});
+  assert.equal(await app.locator("#ul-rows tr").count(),4);
+  assert.equal(await app.locator("#ul-owner").isVisible(),true);
+  assert.match(await app.locator(".header-title").innerText(),/لیدها/);
+  const cardRect=await app.locator(".ul-stat").first().boundingBox();
+  const iconRect=await app.locator(".ul-stat-icon").first().boundingBox();
+  assert.ok(cardRect && iconRect && iconRect.y>=cardRect.y && iconRect.y+iconRect.height<=cardRect.y+cardRect.height,"KPI icon must remain fully inside card");
+  assert.equal(await app.locator("#ul-export").isVisible(),true);
+  assert.equal(await app.locator(".ul-table th").count(),12);
+  assert.equal(await app.locator('#ul-rows tr[data-record-key="direct:d-a"] [data-edit="stage"]').inputValue(),"تماس اولیه","existing legacy stage stays selected");
+  assert.equal(await app.locator('#ul-rows [data-inline-open]').count(),0,"no row requires clicking Edit");
+  assert.equal(await app.locator('#ul-rows [data-inline-save]').count(),4,"every row shows Save by default");
+  assert.equal(await app.locator('#ul-rows [data-inline-cancel]').count(),4,"every row shows Cancel by default");
+  assert.equal(await app.locator('#ul-rows [data-inline-delete]').count(),4,"every row shows Delete by default");
+  assert.equal(await app.locator('#ul-rows [data-edit="monthlyShipments"]').count(),4,"monthly shipments dropdown exists for both sources");
+  assert.equal(await app.locator('#ul-rows [data-edit="contactName"]').count(),4,"contact person inline input is present");
+  assert.equal(await app.locator('#ul-rows [data-edit="industry"]').count(),4,"industry inline input is present");
+  // Regression: rows must stay fully inside the leads frame without any horizontal scroll.
+  const verifyNoHorizontalOverflow=async(width,height)=>{
+    await app.setViewportSize({width,height});
+    const fit=await app.evaluate(()=>{
+      const mount=document.getElementById("unifiedLeadsMount");
+      const frame=mount.querySelector(".ul-data-panel");
+      const table=mount.querySelector(".ul-table-scroll");
+      const rows=[...mount.querySelectorAll("#ul-rows tr[data-record-key]")];
+      const a=frame.getBoundingClientRect(),b=table.getBoundingClientRect();
+      return {screen:innerWidth,bodyOverflow:document.documentElement.scrollWidth>innerWidth+2,
+        tableOverflow:table.scrollWidth>table.clientWidth+2,
+        cardOverflow:rows.some(row=>{const x=row.getBoundingClientRect();return x.left<b.left-2||x.right>b.right+2}),
+        frameOverflow:a.right>innerWidth+2,rows:rows.length};
+    });
+    assert.equal(fit.tableOverflow,false,"table has horizontal overflow at "+width+": "+JSON.stringify(fit));
+    assert.equal(fit.cardOverflow,false,"lead card escapes its frame at "+width+": "+JSON.stringify(fit));
+    assert.equal(fit.frameOverflow,false,"leads panel escapes viewport at "+width+": "+JSON.stringify(fit));
+    if(width>=1100)assert.equal(fit.bodyOverflow,false,"desktop body has horizontal scrollbar: "+JSON.stringify(fit));
+  };
+  await verifyNoHorizontalOverflow(1366,900);
+  await app.screenshot({path:"artifacts/unified-leads-responsive-desktop.png",fullPage:true});
+  await verifyNoHorizontalOverflow(980,900);
+  await app.screenshot({path:"artifacts/unified-leads-responsive-compact.png",fullPage:true});
+  await verifyNoHorizontalOverflow(390,844);
+  await app.screenshot({path:"artifacts/unified-leads-responsive-mobile.png",fullPage:true});
+  await app.setViewportSize({width:1672,height:941});
+  await app.screenshot({path:"artifacts/unified-leads-manager.png",fullPage:true});
+  await app.locator("#ul-owner").selectOption("expert-a");
+  assert.equal(await app.locator("#ul-rows tr").count(),2,"manager expert filter should show one owner's records");
+  assert.equal(await app.locator("#ul-analytics-panel").isVisible(),true,"charts open on load");
+  assert.match(await app.locator("#ul-analysis-body").innerText(),/۱ از ۲/);
+  await app.locator("#ul-close").click();
+  await app.locator("#ul-owner").selectOption("");
+  await app.locator("#ul-analytics").click();
+  assert.equal(await app.locator("#ul-analysis-body .ul-funnel").count(),1,"funnel appears for synthetic leads with stages");
+  await app.screenshot({path:"artifacts/unified-leads-manager-charts.png",fullPage:true});
+  await app.locator("#ul-close").click();
+  await app.evaluate(() => {document.getElementById("sidebarUsername").textContent="کارشناس اول";document.getElementById("headerUsername").textContent="کارشناس اول";});
+  await app.evaluate(() => {
+    window.ManagerNegarUnifiedLeads.mount(document.getElementById("unifiedLeadsMount"),{
+      supabase:window.__unifiedPreviewDb,userId:"expert-a",isManager:false,
+      onOpenRequest:id=>{window.__openedUnified={source:"commercial",id}},onOpenDirect:id=>{window.__openedUnified={source:"direct",id}}
+    });
+  });
+  await app.locator("#ul-status").filter({hasText:"۲ لید"}).waitFor({state:"visible",timeout:5000});
+  // Both source types must edit and save *in the same row* without navigation.
+  for (const [key,stage,status] of [["commercial:c-a","مذاکره","در حال پیگیری"],["direct:d-a","2","در حال پیگیری"]]) {
+    const row=app.locator('#ul-rows tr[data-record-key="'+key+'"]');
+    assert.equal(await row.locator("[data-inline-open]").count(),0,"no edit trigger");
+    assert.equal(await row.locator("[data-inline-save]").isDisabled(),true,"save disabled until change");
+    await row.locator('[data-edit="stage"]').selectOption(stage);
+    await row.locator('[data-edit="status"]').selectOption(status);
+    await row.locator('[data-edit="nextAction"]').selectOption(key.startsWith("direct:")?"ارسال پروپوزال":"تماس مجدد");
+    await row.locator('[data-edit="monthlyShipments"]').selectOption("2000 تا 5000");
+    await row.locator('[data-edit="contactName"]').fill("فرد تست");
+    await row.locator('[data-edit="industry"]').fill("صنعت تست");
+    // Jalali enhancement hides the native date input: update its underlying value as the date-picker does.
+    await row.locator('[data-edit="followupRaw"]').evaluate(input=>{
+      input.value="2026-11-23";
+      input.dispatchEvent(new Event("input",{bubbles:true}));
+      input.dispatchEvent(new Event("change",{bubbles:true}));
+    });
+    await row.locator("[data-inline-save]").click();
+    await app.locator("#ul-status").filter({hasText:"ذخیره شد"}).waitFor({state:"visible",timeout:5000});
+    assert.equal(await row.locator("[data-edit='stage']").count(),1,"row stays editable after save");
+    assert.equal(await row.locator("[data-inline-save]").isDisabled(),true,"save resets to clean state");
+    assert.match(await row.innerText(), key.startsWith("direct:")?/ارسال پروپوزال/:/تماس مجدد/);
+    assert.equal(await row.locator('[data-edit="monthlyShipments"]').inputValue(),"2000 تا 5000","shipment choice persists after save");
+    assert.equal(await row.locator('[data-edit="contactName"]').inputValue(),"فرد تست","contact persists after save");
+    assert.equal(await row.locator('[data-edit="industry"]').inputValue(),"صنعت تست","industry persists after save");
+    assert.equal(await app.evaluate(()=>window.__openedUnified??null),null,"inline save must never navigate to original page");
+  }
+  const beforeCancel=await app.locator('#ul-rows tr[data-record-key="commercial:c-a"]').innerText();
+
+  await app.locator('#ul-rows tr[data-record-key="commercial:c-a"] [data-edit="nextAction"]').selectOption("ارسال تعرفه");
+  await app.locator('#ul-rows tr[data-record-key="commercial:c-a"] [data-inline-cancel]').click();
+  assert.equal(await app.locator('#ul-rows tr[data-record-key="commercial:c-a"] [data-edit="nextAction"]').inputValue(),"تماس مجدد","cancel restores previous action");
+  assert.equal(await app.locator('#ul-rows tr[data-record-key="commercial:c-a"] [data-inline-save]').isDisabled(),true,"cancel resets dirty state");
+  // Confirm is mandatory before a real delete; dismissal must leave original row intact.
+  app.once("dialog",dialog=>dialog.dismiss());
+  await app.locator('#ul-rows tr[data-record-key="commercial:c-a"] [data-inline-delete]').click();
+  assert.equal(await app.locator('#ul-rows tr').count(),2,"cancelled deletion must preserve original record");
+
+  assert.equal(await app.locator("#ul-rows tr").count(),2);
+  assert.equal(await app.locator("#ul-owner").isVisible(),false,"expert must not have cross-owner filter");
+  assert.equal(await app.locator("#ul-rows").innerText().then(t=>t.includes("فروشگاه نمونه ب")),false,"another expert's lead must be excluded");
+  await app.screenshot({path:"artifacts/unified-leads-expert.png",fullPage:true});
+  assert.equal(await app.locator("#ul-analytics-panel").isVisible(),true,"expert charts open by default");
+  await app.screenshot({path:"artifacts/unified-leads-expert-charts.png",fullPage:true});
+  await app.locator("#ul-close").click();
+  await app.evaluate(() => {document.getElementById("sidebarUsername").textContent="Test Manager";document.getElementById("headerUsername").textContent="Test Manager";});
+  console.log("PASS role-separated synthetic leads and visual screenshot previews");
+
+  await app.locator(".nav-item").filter({ hasText: "تنظیمات" }).click();
+
 
   // Regression coverage for the settings panel: content must remain rendered, not merely have a visible wrapper.
   await app.locator("#settings-user-tab").waitFor({ state: "visible", timeout: 5000 });

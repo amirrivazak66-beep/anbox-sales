@@ -65,6 +65,27 @@ try {
   if (!phase3.includes("const report=host.querySelector('.p3-wrap')")) errors.push("Phase 3 print must select the report by class");
   if (phase3.includes("$('.p3-wrap')")) errors.push("Phase 3 print uses the ID-only selector helper for a class");
   if (!phase3.includes("const body=report.innerHTML")) errors.push("Phase 3 print body is not built from the report wrapper");
+  // Unified leads must preserve source records and enforce expert ownership in the view model.
+  const unifiedFile = join(root, "scripts/unified-leads.js");
+  const unifiedScript = readFileSync(unifiedFile, "utf8");
+  const unifiedCheck = spawnSync(process.execPath, ["--check", unifiedFile], { encoding: "utf8" });
+  if (unifiedCheck.status !== 0) errors.push("unified-leads.js: syntax error " + (unifiedCheck.stderr || unifiedCheck.stdout));
+  else {
+    const scope = { window: {} };
+    runInNewContext(unifiedScript, scope);
+    const normalize = scope.window.ManagerNegarUnifiedLeads.normalizeRows;
+    const direct = [{id:"d1",owner_auth_id:"expert-a",company_name:"Direct A",phone:"1"},{id:"d2",owner_auth_id:"expert-b",company_name:"Direct B",phone:"2"}];
+    const requests = [{id:"c1",owner_auth_id:"expert-a",request_type:"commercial",company:"Commercial A",phone:"3"},{id:"c2",owner_auth_id:"expert-b",request_type:"commercial",company:"Commercial B",phone:"4"},{id:"c3",owner_auth_id:"expert-a",request_type:"employment",company:"Employment A"}];
+    const profiles = [{id:"expert-a",display_name:"A"},{id:"expert-b",display_name:"B"}];
+    const personal = normalize(direct,requests,profiles,false,"expert-a");
+    assert.deepEqual(JSON.parse(JSON.stringify(personal.map(x=>x.id).sort())),["c1","d1"],"expert sees only owned direct and commercial requests");
+    const managerial = normalize(direct,requests,profiles,true,"manager");
+    assert.equal(managerial.length,4,"manager sees two direct and two commercial records without employment");
+    assert.equal(direct.length,2,"source records remain intact");
+    assert.ok(!unifiedScript.includes(".insert(")&&!unifiedScript.includes(".upsert("),"unified view must never duplicate lead records");
+    assert.ok(unifiedScript.includes("global.confirm(")&&unifiedScript.includes(".delete().eq('id',r.id)")&&unifiedScript.includes("query=query.eq('owner_auth_id',userId)"),"delete requires confirmation, original row ID, and expert ownership");
+    assert.ok(unifiedScript.includes(".update(payload).eq('id',r.id)")&&unifiedScript.includes("if(!isManager)query=query.eq('owner_auth_id',userId)"),"inline update must target the original ID and scope expert edits to ownership");
+  }
   const dashboard = readFileSync(join(root, "dashboard.html"), "utf8");
   const csvParserMatch = dashboard.match(/function parseCsvRows\(text\)\{[^\r\n]*\}/);
   if (!csvParserMatch) {
