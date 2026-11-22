@@ -44,7 +44,7 @@ function mount(host,{supabase,userId,isManager=false,onOpenRequest=()=>{},onOpen
   <div class="ul-filters">
    <label class="ul-search-field"><span>⌕</span><input type="search" id="ul-search" placeholder="جستجوی سریع ..." aria-label="جستجوی لید"></label>
    <label class="ul-filter-field"><span>منبع لید</span><select id="ul-source" aria-label="فیلتر منبع لید"><option value="">همه منابع</option><option value="commercial">درخواست همکاری</option><option value="direct">لید مستقیم</option></select></label>
-   <label class="ul-filter-field ul-owner-filter" '+(isManager?'':'hidden')+'><span>کارشناس</span><select id="ul-owner" aria-label="فیلتر کارشناس"><option value="">همه کارشناسان</option></select></label>
+   <label class="ul-filter-field ul-owner-filter" ${isManager?"":"hidden"}><span>کارشناس</span><select id="ul-owner" aria-label="فیلتر کارشناس"><option value="">همه کارشناسان</option></select></label>
    <label class="ul-filter-field"><span>وضعیت پیگیری</span><select id="ul-status-filter" aria-label="فیلتر وضعیت"><option value="">همه وضعیت‌ها</option></select></label>
    <label class="ul-filter-field"><span>مرحله فروش</span><select id="ul-stage" aria-label="فیلتر مرحله فروش"><option value="">همه مراحل</option></select></label>
    <label class="ul-filter-field ul-time"><span>بازه زمانی</span><select id="ul-date" aria-label="بازه زمانی"><option value="all">همه زمان‌ها</option><option value="30">۳۰ روز گذشته</option><option value="90">۹۰ روز گذشته</option></select></label>
