@@ -183,7 +183,7 @@ try {
   await app.evaluate(() => {
     window.ManagerNegarUnifiedLeads.mount(document.getElementById("unifiedLeadsMount"),{
       supabase:window.__unifiedPreviewDb,userId:"manager",isManager:true,
-      onOpenRequest:()=>{},onOpenDirect:()=>{}
+      onOpenRequest:id=>{window.__openedUnified={source:"commercial",id}},onOpenDirect:id=>{window.__openedUnified={source:"direct",id}}
     });
   });
   await app.locator("#ul-status").filter({hasText:"۴ لید"}).waitFor({state:"visible",timeout:5000});
@@ -210,10 +210,15 @@ try {
   await app.evaluate(() => {
     window.ManagerNegarUnifiedLeads.mount(document.getElementById("unifiedLeadsMount"),{
       supabase:window.__unifiedPreviewDb,userId:"expert-a",isManager:false,
-      onOpenRequest:()=>{},onOpenDirect:()=>{}
+      onOpenRequest:id=>{window.__openedUnified={source:"commercial",id}},onOpenDirect:id=>{window.__openedUnified={source:"direct",id}}
     });
   });
   await app.locator("#ul-status").filter({hasText:"۲ لید"}).waitFor({state:"visible",timeout:5000});
+  await app.locator('#ul-rows button[data-source="commercial"][data-id="c-a"]').click();
+  assert.deepEqual(await app.evaluate(()=>window.__openedUnified),{source:"commercial",id:"c-a"},"commercial lead must link to its original request ID");
+  await app.locator('#ul-rows button[data-source="direct"][data-id="d-a"]').click();
+  assert.deepEqual(await app.evaluate(()=>window.__openedUnified),{source:"direct",id:"d-a"},"direct lead must link to its original ID");
+
   assert.equal(await app.locator("#ul-rows tr").count(),2);
   assert.equal(await app.locator("#ul-owner").isVisible(),false,"expert must not have cross-owner filter");
   assert.equal(await app.locator("#ul-rows").innerText().then(t=>t.includes("فروشگاه نمونه ب")),false,"another expert's lead must be excluded");
