@@ -28,3 +28,12 @@ jobs:
         run: npx playwright install --with-deps chromium
       - name: Run browser smoke checks
         run: node scripts/browser-smoke.mjs
+
+      - name: Upload role preview screenshots
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: unified-leads-role-previews
+          path: artifacts/unified-leads-*.png
+          if-no-files-found: ignore
+          retention-days: 14
