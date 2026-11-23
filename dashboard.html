@@ -40,9 +40,38 @@ body{font-family:Tahoma,'Segoe UI',sans-serif;background:linear-gradient(135deg,
 @keyframes fadeUp{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:translateY(0)}}
 @keyframes fadeIn{from{opacity:0}to{opacity:1}}
 @keyframes pop{from{opacity:0;transform:scale(.96)}to{opacity:1;transform:scale(1)}}
-.login-container{display:flex;align-items:center;justify-content:center;min-height:100vh;padding:20px}
-.login-box{background:var(--card);backdrop-filter:blur(22px);-webkit-backdrop-filter:blur(22px);padding:44px;border-radius:22px;border:1px solid var(--bd);box-shadow:0 24px 60px rgba(0,0,0,.5),inset 0 1px 0 rgba(255,255,255,.06);width:100%;max-width:410px;animation:pop .5s ease}
-.login-logo{text-align:center;margin-bottom:14px;filter:drop-shadow(0 6px 18px rgba(59,130,246,.35))}.brand-mark{display:block;width:58px;height:58px;margin:0 auto}.brand-mark-small{display:block;width:32px;height:32px;flex-shrink:0}.login-subtitle{text-align:center;color:var(--txt2);font-size:12px;line-height:1.8;margin-top:-20px;margin-bottom:28px}
+.login-container{display:flex;align-items:center;justify-content:center;min-height:100vh;padding:24px;background:radial-gradient(ellipse at 19% 77%,#124275 0%,transparent 51%),linear-gradient(137deg,#041328,#091d37 60%,#06162b)}
+.login-layout{display:grid;grid-template-columns:minmax(0,440px) minmax(0,560px);align-items:center;gap:clamp(25px,5vw,76px);width:min(100%,1076px)}
+#loginPage .login-box{width:100%;padding:clamp(23px,4vw,44px);border:1px solid #57bdf2;border-radius:24px;color:#eff8ff;background:linear-gradient(145deg,#0d2d49,#081a31 55%,#0a223b);box-shadow:inset 0 0 24px #14648a5c,0 24px 60px #0007}
+#loginPage .form-label{color:#c4d8ee}
+#loginPage .form-input{color:#eff8ff;background:#081d35;border-color:#426b91}
+#loginPage .form-input:focus{border-color:#63ddff}
+#loginPage .form-input::placeholder{color:#8aa4c0}
+#loginPage .login-button{background:linear-gradient(145deg,#0666ed,#064ce1)}
+.login-home{display:flex;align-items:center;justify-content:center;gap:9px;width:fit-content;max-width:100%;min-height:44px;margin:18px auto 0;padding:7px 15px;border:1px solid #68d7ff;border-radius:999px;background:#081d35;color:#e1f6ff;font-size:14px;text-decoration:none}
+.login-home:hover{background:#103553}
+.login-home:focus-visible,#loginPage .login-button:focus-visible{outline:2px solid #75e7ff;outline-offset:3px}
+.login-home svg{width:19px;height:19px;flex:none}
+.login-art{min-width:0}
+.login-art svg{display:block;width:100%;height:auto;overflow:visible;direction:ltr}
+.login-art .line{stroke-dasharray:1;animation:login-trace 1.65s ease both}
+.login-art .float-panel{animation:login-rise 2.8s ease-in-out}
+.login-art .bar{transform-box:fill-box;transform-origin:bottom center;animation:login-grow .8s var(--wait) cubic-bezier(.2,.8,.25,1) both}
+.login-art .needle{transform-origin:121px 235px;animation:login-sweep 1.2s .3s ease-out both}
+@keyframes login-trace{from{stroke-dashoffset:1}to{stroke-dashoffset:0}}
+@keyframes login-rise{50%{transform:translateY(-8px)}}
+@keyframes login-grow{from{transform:scaleY(.12)}to{transform:scaleY(1)}}
+@keyframes login-sweep{from{transform:rotate(-75deg)}to{transform:rotate(0)}}
+@media(max-width:700px){
+  .login-layout{grid-template-columns:minmax(0,440px);justify-content:center}
+  .login-art{display:none}
+}
+@media(prefers-reduced-motion:reduce){
+  .login-art .line,.login-art .float-panel,.login-art .bar,.login-art .needle{animation:none}
+  #loginPage .login-button{transition:none}
+  #loginPage .login-button:hover{transform:none}
+}
+.login-logo{text-align:center;margin-bottom:14px;filter:drop-shadow(0 6px 18px rgba(59,130,246,.35))}.brand-mark{display:block;width:58px;height:58px;margin:0 auto}.brand-mark-small{display:block;width:32px;height:32px;flex-shrink:0}
 .login-title{text-align:center;font-size:27px;font-weight:800;letter-spacing:-.5px;background:linear-gradient(135deg,#fff,#93c5fd);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:30px}
 .form-group{margin-bottom:18px}
 .form-label{display:block;font-size:13px;font-weight:600;margin-bottom:8px;color:var(--txt2)}
@@ -341,20 +370,53 @@ html[data-theme="light"] .card:hover{box-shadow:0 12px 28px #24456918}
 </head>
 <body>
 <div id="loginPage" class="login-container">
+<div class="login-layout">
 <div class="login-box">
 <div class="login-logo"><svg class="brand-mark" viewBox="0 0 64 64" role="img" aria-label="نشان مدیرنگر"><rect x="3" y="3" width="58" height="58" rx="17" fill="#2563EB"/><path d="M15 45V34M26 45V27M37 45V20M48 45V29" stroke="#FFFFFF" stroke-width="5" stroke-linecap="round"/><path d="M14 22L25 28L37 16L48 21" fill="none" stroke="#34D399" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/><circle cx="48" cy="21" r="3.5" fill="#34D399"/></svg></div>
-<div class="login-title">مدیرنگر</div>
-<div class="login-subtitle">دستیار هوشمند مدیر کسب‌وکار</div>
+<h1 class="login-title">ورود به مدیرنگر</h1>
 <div class="login-error" id="loginError"></div>
 <div class="form-group">
-<label class="form-label">نام کاربری</label>
+<label class="form-label" for="username">نام کاربری</label>
 <input type="text" id="username" class="form-input" placeholder="نام کاربری">
 </div>
 <div class="form-group">
-<label class="form-label">رمز عبور</label>
+<label class="form-label" for="password">رمز عبور</label>
 <input type="password" id="password" class="form-input" placeholder="رمز عبور">
 </div>
 <button class="login-button" onclick="handleLogin()">ورود</button>
+<a class="login-home" href="index.html">
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="m3 10 9-7 9 7M5 9v12h14V9m-9 12v-7h4v7"/></svg>
+  بازگشت به صفحه اصلی
+</a>
+</div>
+<div class="login-art" aria-hidden="true">
+      <svg viewBox="0 0 460 390" aria-hidden="true" focusable="false">
+        <defs>
+          <linearGradient id="login-glass" x2="1" y2="1" gradientUnits="objectBoundingBox"><stop stop-color="#3ebaf0" stop-opacity=".42"/><stop offset="1" stop-color="#0a2648" stop-opacity=".88"/></linearGradient>
+          <linearGradient id="login-chart-fill" x2="0" y2="1"><stop stop-color="#21d9ec" stop-opacity=".5"/><stop offset="1" stop-color="#21d9ec" stop-opacity=".02"/></linearGradient>
+          <filter id="login-chart-light" x="-.3" y="-.5" width="1.6" height="2"><feDropShadow dx="0" dy="0" stdDeviation="5" flood-color="#28d6ff" flood-opacity=".65"/></filter>
+        </defs>
+        <path d="M25 296 123 267l310 13-88 53L25 310Z" fill="url(#login-glass)" stroke="#45c7f0"/>
+        <path d="m25 296 320 24 88-40" fill="none" stroke="#6afaff" stroke-width="2" filter="url(#login-chart-light)"/>
+        <g class="float-panel">
+          <rect x="65" y="47" width="291" height="215" rx="22" fill="url(#login-glass)" stroke="#3b9acb"/>
+          <rect x="86" y="69" width="292" height="208" rx="22" fill="url(#login-glass)" stroke="#5fd4ff"/>
+          <path d="M110 210l48-40 44 13 53-52 43 17 58-47v113H110Z" fill="url(#login-chart-fill)"/>
+          <path d="M110 210l48-40 44 13 53-52 43 17 58-47" class="line" pathLength="1" fill="none" stroke="#57f9f2" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" filter="url(#login-chart-light)"/>
+        </g>
+        <rect x="50" y="184" width="142" height="101" rx="14" fill="url(#login-glass)" stroke="#6bdcff"/>
+        <path d="M83 239a38 38 0 0 1 76 0" fill="none" stroke="#21517d" stroke-width="11" stroke-linecap="round"/>
+        <path d="M83 239a38 38 0 0 1 58-32" fill="none" stroke="#16ddeb" stroke-width="11" stroke-linecap="round"/>
+        <g class="needle"><path d="m121 235 26-22" stroke="#e4faff" stroke-width="3" stroke-linecap="round"/><circle cx="121" cy="235" r="6" fill="#9deeff"/></g>
+        <rect x="281" y="191" width="142" height="98" rx="14" fill="url(#login-glass)" stroke="#6bdcff"/>
+        <g fill="#17a9ed">
+          <rect class="bar" style="--wait:.4s" x="300" y="251" width="19" height="21" rx="3"/>
+          <rect class="bar" style="--wait:.52s" x="326" y="239" width="19" height="33" rx="3"/>
+          <rect class="bar" style="--wait:.64s" x="352" y="224" width="19" height="48" rx="3"/>
+          <rect class="bar" style="--wait:.76s" x="378" y="209" width="19" height="63" rx="3"/>
+        </g>
+      </svg>
+</div>
 </div>
 </div>
 <button class="hamburger" onclick="toggleSidebar()">☰</button>

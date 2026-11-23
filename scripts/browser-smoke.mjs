@@ -151,7 +151,7 @@ try {
   }
 
   // Dashboard: mock Supabase Auth and DB so no production credentials or data are used.
-  const app = await browser.newPage();
+  const app = await browser.newPage({viewport:{width:1280,height:800},reducedMotion:"no-preference"});
   await app.route("https://**/*", (route) => route.abort());
   await app.route("https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2", (route) => route.fulfill({
     status: 200, contentType: "application/javascript", body: mockSupabase
@@ -159,6 +159,24 @@ try {
   await app.goto(base + "/dashboard.html", { waitUntil: "domcontentloaded" });
   assert.match(await app.title(), /مدیرنگر/);
   assert.equal(await app.locator("#loginPage").isVisible(), true);
+  const loginArt = app.locator(".login-art");
+  const motionName = () => loginArt.locator(".line").evaluate(el => getComputedStyle(el).animationName);
+  assert.equal(await loginArt.isVisible(), true);
+  assert.equal(await motionName(), "login-trace");
+  await app.emulateMedia({reducedMotion:"reduce"});
+  assert.equal(await motionName(), "none");
+  for (const width of [320, 390]) {
+    await app.setViewportSize({width,height:844});
+    assert.equal(await loginArt.isVisible(), false);
+    assert.equal(await app.evaluate(() => document.documentElement.scrollWidth), width);
+  }
+  const homeLink = app.getByRole("link", {name:"بازگشت به صفحه اصلی"});
+  await homeLink.focus();
+  await Promise.all([app.waitForURL("**/index.html"), homeLink.press("Enter")]);
+  assert.equal(await app.locator(".hero h1").isVisible(), true);
+  await app.setViewportSize({width:1280,height:800});
+  await app.goto(base + "/dashboard.html", {waitUntil:"domcontentloaded"});
+  console.log("PASS login graphic, reduced motion, mobile layout and keyboard return to homepage");
   await app.locator(".login-button").click();
   assert.match(await app.locator("#loginError").innerText(), /نام کاربری و رمز عبور را وارد کنید/);
   await app.locator("#username").fill("test.manager");
