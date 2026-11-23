@@ -3,125 +3,219 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<meta name="theme-color" content="#071329">
-<title>مدیرنگر | هوش مدیریتی کسب‌وکار</title>
-<meta name="description" content="مدیرنگر؛ هوش مدیریتی برای تصمیم‌های بهتر. نسخه فعلی با تمرکز بر مدیریت تیم فروش، پایش KPI، پیگیری لیدها و تحقق تارگت‌ها ارائه می‌شود.">
+<meta name="theme-color" content="#06152f">
+<meta name="description" content="مدیرنگر؛ مدیریت یکپارچه لیدهای مستقیم و درخواست‌های همکاری، پیگیری فروش، تحلیل عملکرد مدیر و کارشناس در یک محیط هوشمند.">
+<title>مدیرنگر | مدیریت یکپارچه لیدها و پیگیری فروش</title>
 <style>
-:root{--navy:#071329;--navy2:#0b1c3b;--blue:#1769ff;--cyan:#38bdf8;--ink:#13213a;--muted:#61708a;--line:#e7edf6;--paper:#f7f9fd;--green:#19c994;--orange:#ffb454}
-*{box-sizing:border-box}html{scroll-behavior:smooth;scroll-padding-top:90px}body{margin:0;font-family:Tahoma,"Segoe UI",sans-serif;color:var(--ink);background:white;line-height:1.8}a{color:inherit;text-decoration:none}button,input,textarea{font:inherit}button,a{ -webkit-tap-highlight-color:transparent}.wrap{width:min(1180px,calc(100% - 40px));margin:auto}.topbar{height:76px;display:flex;align-items:center;background:#fff;position:sticky;top:0;z-index:50;border-bottom:1px solid #eaf0f8}.nav{display:flex;align-items:center;justify-content:space-between;gap:24px}.brand{display:flex;align-items:center;gap:11px;font-weight:900;font-size:17px;white-space:nowrap}.brand-mark{width:40px;height:40px;border-radius:13px;background:linear-gradient(140deg,#1976ff,#0d3ba7);display:grid;place-items:center;color:white;box-shadow:0 8px 22px #1769ff40;flex-shrink:0}.brand-mark svg{width:27px;height:27px;display:block}.brand small{display:block;font-size:10px;color:#7b89a1;font-weight:500;line-height:1.4}.navlinks{display:flex;align-items:center;gap:26px;font-size:13px;color:#465570}.navlinks a:hover{color:var(--blue)}.nav-actions{display:flex;gap:10px;align-items:center}.btn{display:inline-flex;align-items:center;justify-content:center;gap:9px;border:1px solid transparent;border-radius:12px;padding:12px 18px;font-size:13px;font-weight:800;cursor:pointer;transition:transform .2s,box-shadow .2s,background .2s}.btn:hover{transform:translateY(-2px)}.btn-primary{color:white;background:linear-gradient(110deg,#168cff,#1855ed);box-shadow:0 10px 25px #1769ff35}.btn-outline{border-color:#d6e0f0;background:white;color:#253c61}.menu-toggle{display:none;border:1px solid var(--line);background:white;border-radius:10px;padding:8px 11px}
-.hero{position:relative;overflow:hidden;background:radial-gradient(ellipse at 18% 30%,#123f85 0,transparent 36%),radial-gradient(ellipse at 80% 0%,#123a74 0,transparent 34%),linear-gradient(120deg,#071329,#081a37 60%,#071329);color:white;padding:74px 0 68px;isolation:isolate}.hero:before,.hero:after{content:"";position:absolute;border:1px solid #53b8ff24;border-radius:50%;width:550px;height:550px;z-index:-1;animation:orbit 28s linear infinite}.hero:before{left:-170px;top:-200px}.hero:after{left:70px;top:-130px;width:390px;height:390px;animation-duration:20s}.hero-grid{display:grid;grid-template-columns:1fr 1.03fr;align-items:center;gap:48px}.eyebrow{display:inline-flex;align-items:center;gap:9px;border:1px solid #69b9ff45;background:#ffffff0d;border-radius:99px;padding:7px 13px;color:#b9dcff;font-size:12px;font-weight:700}.pulse{width:7px;height:7px;border-radius:50%;background:#35e3b1;box-shadow:0 0 0 5px #35e3b122}.hero h1{font-size:clamp(32px,4vw,53px);line-height:1.48;letter-spacing:-1.6px;margin:21px 0 16px;font-weight:900}.hero h1 span{color:#54b8ff}.hero-copy{font-size:15px;color:#b8c8e2;max-width:560px;margin:0 0 27px}.hero-ctas{display:flex;flex-wrap:wrap;gap:12px}.hero .btn-outline{background:#ffffff0b;border-color:#7895c5;color:#fff}.hero-points{display:flex;gap:22px;flex-wrap:wrap;margin-top:28px;color:#c4d3eb;font-size:11px}.hero-points span{display:flex;gap:7px;align-items:center}.hero-points b{color:#4ce0b0;font-size:16px}.visual{position:relative;min-width:0;perspective:1000px}.dashboard{background:#f9fbff;color:#17243c;border:1px solid #ffffffb5;border-radius:22px;padding:13px;box-shadow:0 32px 90px #0008;transform:rotateY(5deg) rotateX(1deg);animation:float 6s ease-in-out infinite}.dash-top{display:flex;justify-content:space-between;align-items:center;padding:7px 7px 13px;border-bottom:1px solid #e6edf7;font-size:10px;font-weight:800}.dash-status{color:#0aaf83;background:#e3fff5;padding:4px 9px;border-radius:99px;font-size:9px}.dash-layout{display:grid;grid-template-columns:1.35fr .8fr;gap:10px;padding-top:12px}.dash-card{background:white;border:1px solid #eaf0f8;border-radius:13px;padding:13px;min-width:0}.mini-label{font-size:10px;color:#7b8aa3}.metric{font-size:22px;font-weight:900;margin-top:3px}.positive{color:#0cac80;font-size:10px}.bars{height:120px;display:flex;align-items:end;justify-content:space-around;gap:7px;padding-top:12px}.bars i{display:block;width:11%;border-radius:5px 5px 2px 2px;background:linear-gradient(#42b9ff,#1769ff);animation:grow 1.2s both;transform-origin:bottom}.bars i:nth-child(1){height:35%}.bars i:nth-child(2){height:48%;animation-delay:.1s}.bars i:nth-child(3){height:42%;animation-delay:.2s}.bars i:nth-child(4){height:66%;animation-delay:.3s}.bars i:nth-child(5){height:57%;animation-delay:.4s}.bars i:nth-child(6){height:80%;animation-delay:.5s}.bars i:nth-child(7){height:72%;animation-delay:.6s}.bars i:nth-child(8){height:96%;animation-delay:.7s}.donut{width:94px;height:94px;border-radius:50%;background:conic-gradient(#1769ff 0 74%,#e9f0fb 74%);display:grid;place-items:center;margin:10px auto}.donut:after{content:"۷۴٪";width:69px;height:69px;background:white;border-radius:50%;display:grid;place-items:center;font-weight:900;font-size:17px}.pipeline{display:flex;gap:5px;margin-top:13px}.pipeline i{height:7px;border-radius:99px;background:#dbe6f7;flex:1}.pipeline i:nth-child(-n+4){background:linear-gradient(90deg,#197bff,#47b8ff)}.floating{position:absolute;background:white;color:#1c2a43;box-shadow:0 15px 45px #0003;border:1px solid #e8eff9;border-radius:14px;padding:12px 15px;display:flex;align-items:center;gap:10px;font-size:11px;animation:float 5s ease-in-out infinite}.floating strong{display:block;font-size:14px}.float-a{right:-22px;bottom:25px}.float-b{left:-23px;top:45px;animation-delay:-2s}.float-icon{width:34px;height:34px;border-radius:10px;display:grid;place-items:center;background:#e9f5ff;color:#1769ff;font-size:18px}
-.trust{padding:24px 0;border-bottom:1px solid var(--line)}.trust-row{display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap}.trust-title{font-size:12px;color:#75829a}.trust-chip{font-size:12px;font-weight:800;color:#60708a;background:#f5f8fd;border:1px solid #edf1f8;border-radius:10px;padding:9px 15px}
-.section{padding:82px 0}.section-soft{background:var(--paper)}.section-head{text-align:center;max-width:700px;margin:0 auto 38px}.kicker{color:var(--blue);font-size:12px;font-weight:900;letter-spacing:.2px}.section h2{font-size:clamp(25px,3vw,37px);line-height:1.5;margin:9px 0 12px;letter-spacing:-.7px}.section-head p{margin:0;color:var(--muted);font-size:14px}.feature-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:17px}.feature{border:1px solid #e7edf7;background:white;border-radius:18px;padding:25px;transition:.25s;position:relative;overflow:hidden}.feature:after{content:"";position:absolute;width:100px;height:100px;background:#e9f3ff;border-radius:50%;left:-55px;bottom:-60px;transition:.3s}.feature:hover{transform:translateY(-6px);box-shadow:0 20px 45px #173f7b12;border-color:#bfd8ff}.feature:hover:after{transform:scale(1.5)}.feature-icon{width:48px;height:48px;border-radius:15px;background:linear-gradient(145deg,#e8f4ff,#dceaff);display:grid;place-items:center;color:#1769ff;font-size:23px}.feature h3{font-size:16px;margin:17px 0 7px}.feature p{font-size:12px;color:var(--muted);margin:0}.feature a{display:inline-flex;margin-top:17px;color:var(--blue);font-size:12px;font-weight:800}
-.split{display:grid;grid-template-columns:1fr 1fr;gap:52px;align-items:center}.split h2{margin-top:10px}.split-copy>p{color:var(--muted);font-size:14px}.checklist{list-style:none;padding:0;margin:23px 0;display:grid;gap:13px}.checklist li{display:flex;align-items:flex-start;gap:10px;font-size:13px}.check{flex:0 0 23px;width:23px;height:23px;border-radius:8px;background:#dcfff2;color:#07966e;display:grid;place-items:center;font-weight:900}.analytics-card{background:linear-gradient(145deg,#0a1a36,#102b57);border-radius:24px;padding:25px;color:white;box-shadow:0 25px 60px #0c2b5b30;position:relative;overflow:hidden}.analytics-card:before{content:"";position:absolute;width:280px;height:280px;border:1px solid #3e91ff35;border-radius:50%;left:-100px;top:-110px}.analytics-head{display:flex;justify-content:space-between;align-items:center;font-size:13px;position:relative}.analytics-head span{color:#83a6d8;font-size:10px}.kpi-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;margin-top:23px;position:relative}.kpi{background:#ffffff0d;border:1px solid #ffffff17;border-radius:14px;padding:16px}.kpi label{display:block;color:#b0c4e3;font-size:10px}.kpi strong{display:block;font-size:24px;margin:6px 0}.kpi em{font-style:normal;color:#4fe1b2;font-size:10px}.spark{height:65px;display:flex;align-items:end;gap:5px;margin-top:10px}.spark i{flex:1;border-radius:5px 5px 0 0;background:linear-gradient(#47c4ff,#1769ff);height:var(--h)}
-.process-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;counter-reset:step}.process{padding:22px;border:1px solid #e5ecf7;border-radius:16px;background:white;counter-increment:step}.process:before{content:"0" counter(step);display:grid;place-items:center;width:39px;height:39px;border-radius:12px;background:#eaf3ff;color:#1769ff;font-size:12px;font-weight:900}.process h3{font-size:14px;margin:15px 0 5px}.process p{font-size:12px;color:var(--muted);margin:0}
-.slider-shell{position:relative;max-width:920px;margin:auto}.slide{display:none;grid-template-columns:.8fr 1.2fr;gap:28px;align-items:center;background:white;border:1px solid #e5edf8;border-radius:22px;padding:28px;box-shadow:0 18px 55px #153b7410}.slide.active{display:grid;animation:slidein .45s ease}.slide-art{min-height:210px;border-radius:17px;background:radial-gradient(circle at 25% 30%,#4ec6ff66,transparent 40%),linear-gradient(140deg,#0b1a38,#1557c4);display:grid;place-items:center;color:white;position:relative;overflow:hidden}.slide-art:before,.slide-art:after{content:"";position:absolute;width:180px;height:180px;border:1px solid #ffffff32;border-radius:50%;animation:orbit 20s linear infinite}.slide-art:after{width:130px;height:130px;animation-direction:reverse}.slide-art span{font-size:65px;filter:drop-shadow(0 8px 18px #0005);z-index:1}.slide h3{font-size:21px;margin:7px 0}.slide p{font-size:13px;color:var(--muted)}.slide-controls{display:flex;justify-content:center;align-items:center;gap:13px;margin-top:22px}.arrow{width:38px;height:38px;border:1px solid #dbe5f3;background:white;border-radius:50%;cursor:pointer;color:#1769ff;font-size:20px}.dots{display:flex;gap:7px}.dot{width:8px;height:8px;border:0;border-radius:50%;background:#d5dfef;padding:0;cursor:pointer}.dot.active{background:#1769ff;width:23px;border-radius:99px}
-.video-band{background:linear-gradient(110deg,#0a1731,#0c3472);color:white;border-radius:24px;padding:35px;display:grid;grid-template-columns:1.2fr .8fr;gap:25px;align-items:center;overflow:hidden;position:relative}.video-band h2{font-size:26px;margin:7px 0}.video-band p{color:#c1d0e8;font-size:13px}.video-preview{min-height:180px;border:1px solid #ffffff32;border-radius:18px;background:radial-gradient(circle at 50% 40%,#287fff77,transparent 45%),#ffffff0b;display:grid;place-items:center;position:relative}.play{width:65px;height:65px;border:1px solid #ffffff9c;border-radius:50%;display:grid;place-items:center;background:#ffffff20;color:white;font-size:22px;cursor:pointer;backdrop-filter:blur(10px);transition:.2s}.play:hover{transform:scale(1.1);background:#1769ff}
-.blog-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}.article{border:1px solid #e6edf7;border-radius:17px;overflow:hidden;background:white;transition:.25s}.article:hover{transform:translateY(-5px);box-shadow:0 18px 35px #0e2c5714}.article-art{height:145px;background:linear-gradient(140deg,#0b1a38,#1a66d8);display:grid;place-items:center;color:#fff;font-size:42px;position:relative;overflow:hidden}.article-art:after{content:"";position:absolute;width:170px;height:170px;border:1px solid #ffffff40;border-radius:50%;right:-20px;top:-70px}.article-body{padding:18px}.tag{font-size:10px;color:#1769ff;background:#eaf3ff;border-radius:7px;padding:5px 8px;font-weight:800}.article h3{font-size:14px;line-height:1.8;margin:13px 0 7px}.article p{font-size:12px;color:var(--muted);margin:0}.readmore{display:inline-flex;margin-top:14px;color:#1769ff;font-size:11px;font-weight:900}
-.about-band{display:grid;grid-template-columns:1fr 1fr;gap:40px;align-items:center}.about-box{padding:30px;border:1px solid #e5edf8;border-radius:20px;background:linear-gradient(145deg,#fff,#f4f8ff)}.about-box h3{font-size:17px;margin:0 0 10px}.about-box p{font-size:13px;color:var(--muted);margin:0}.values{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;margin-top:18px}.value{padding:14px;border-radius:12px;background:white;border:1px solid #e8eef7;font-size:12px;font-weight:800}.value span{display:block;color:#1769ff;font-size:20px}
-.contact-grid{display:grid;grid-template-columns:.85fr 1.15fr;gap:24px}.contact-info{background:linear-gradient(145deg,#0a1833,#0f3470);border-radius:20px;padding:27px;color:white}.contact-info h3{font-size:21px;margin:0 0 10px}.contact-info p{font-size:13px;color:#c0d0e9}.contact-item{display:flex;gap:12px;align-items:center;margin-top:21px;font-size:12px;color:#e0eaf9}.contact-symbol{width:39px;height:39px;border-radius:12px;background:#ffffff15;display:grid;place-items:center;color:#78caff;font-size:17px}.contact-form{padding:25px;border:1px solid #e4ebf6;border-radius:20px;background:white}.field{margin-bottom:14px}.field label{display:block;font-size:12px;font-weight:800;margin-bottom:7px}.field input,.field textarea{width:100%;border:1px solid #dce5f1;background:#fbfcff;border-radius:10px;padding:12px 13px;outline:none;font-size:12px}.field input:focus,.field textarea:focus{border-color:#5a9cff;box-shadow:0 0 0 3px #1769ff14}.field textarea{min-height:105px;resize:vertical}.form-note{font-size:10px;color:#8190a6;margin-top:10px}
-.cta{padding:55px 0;background:linear-gradient(110deg,#0a1833,#1049a3);color:white;position:relative;overflow:hidden}.cta:after{content:"↗";position:absolute;font-size:200px;line-height:1;left:6%;top:-35px;color:#ffffff0b;font-weight:900}.cta-inner{display:flex;justify-content:space-between;align-items:center;gap:25px;position:relative;z-index:1}.cta h2{font-size:clamp(23px,3vw,33px);margin:0 0 6px}.cta p{font-size:13px;color:#c4d4ed;margin:0}.footer{background:#061126;color:white;padding:48px 0 20px}.footer-grid{display:grid;grid-template-columns:1.4fr 1fr 1fr 1.2fr;gap:32px}.footer p,.footer a{font-size:11px;color:#9eafca}.footer h4{font-size:13px;margin:0 0 14px}.footer-links{display:grid;gap:9px}.footer a:hover{color:white}.copyright{border-top:1px solid #ffffff15;margin-top:35px;padding-top:18px;color:#7d90ad;font-size:10px;display:flex;justify-content:space-between;gap:15px;flex-wrap:wrap}.reveal{opacity:0;transform:translateY(22px);transition:opacity .65s ease,transform .65s ease}.reveal.visible{opacity:1;transform:none}.toast{position:fixed;bottom:20px;left:20px;z-index:100;background:#092347;color:white;border:1px solid #2b6ab5;border-radius:12px;padding:13px 17px;box-shadow:0 15px 35px #00112a55;display:none;font-size:12px;max-width:min(380px,calc(100% - 40px))}.toast.show{display:block;animation:slidein .25s ease}
-@keyframes float{0%,100%{transform:translateY(0) rotateY(5deg)}50%{transform:translateY(-10px) rotateY(2deg)}}@keyframes orbit{to{transform:rotate(360deg)}}@keyframes grow{from{transform:scaleY(.1);opacity:.3}to{transform:scaleY(1);opacity:1}}@keyframes slidein{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
-@media(prefers-reduced-motion:reduce){*,*:before,*:after{animation-duration:.01ms!important;animation-iteration-count:1!important;scroll-behavior:auto!important;transition-duration:.01ms!important}.reveal{opacity:1;transform:none}}
-@media(max-width:980px){.navlinks{gap:13px}.hero-grid{gap:25px}.hero{padding:55px 0}.float-a{right:-5px}.float-b{left:-5px}.feature-grid{grid-template-columns:repeat(2,1fr)}.process-grid{grid-template-columns:repeat(2,1fr)}.footer-grid{grid-template-columns:repeat(2,1fr)}}
-@media(max-width:720px){.wrap{width:min(100% - 28px,1180px)}.topbar{height:66px}.nav-actions .btn-outline{display:none}.menu-toggle{display:block}.navlinks{display:none;position:absolute;top:65px;right:14px;left:14px;background:white;border:1px solid var(--line);box-shadow:0 18px 35px #122b501c;border-radius:14px;padding:14px;flex-direction:column;align-items:stretch;gap:0}.navlinks.open{display:flex}.navlinks a{padding:10px}.nav-actions .btn{padding:10px 12px;font-size:11px}.brand{font-size:14px}.brand-mark{width:35px;height:35px}.hero{padding:44px 0 53px}.hero-grid{grid-template-columns:1fr}.hero h1{font-size:34px}.hero-copy{font-size:13px}.visual{margin:15px 9px 24px}.dashboard{transform:none}.float-a{right:-8px;bottom:-20px}.float-b{left:-8px;top:-16px}.dash-layout{grid-template-columns:1fr  .7fr}.bars{height:90px}.trust-row{justify-content:center}.trust-title{width:100%;text-align:center}.section{padding:58px 0}.feature-grid,.blog-grid{grid-template-columns:1fr}.split,.video-band,.about-band,.contact-grid{grid-template-columns:1fr;gap:25px}.split>.analytics-card{order:2}.slide,.slide.active{grid-template-columns:1fr;padding:17px}.slide-art{min-height:150px}.slide h3{font-size:18px}.video-band{padding:24px}.video-preview{min-height:145px}.cta-inner{align-items:flex-start;flex-direction:column}.footer-grid{grid-template-columns:1fr 1fr;gap:24px}.footer-grid>div:first-child{grid-column:1/-1}.copyright{flex-direction:column}.section-head{margin-bottom:28px}.kpi strong{font-size:21px}}
-@media(max-width:400px){.hero h1{font-size:29px}.hero-ctas .btn{width:100%}.nav-actions .btn{padding:9px}.footer-grid{grid-template-columns:1fr}.footer-grid>div:first-child{grid-column:auto}.dash-card{padding:9px}.metric{font-size:18px}}
+:root{color-scheme:dark;--bg:#06162e;--bg2:#0b2449;--surface:#0b2347;--surface2:#0d2a54;--blue:#1679ff;--cyan:#24c9fb;--violet:#8e55fb;--line:#3267a1;--text:#f4f8ff;--muted:#abc8ed;--soft:#77a6d8}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth;scroll-padding-top:92px}
+body{margin:0;min-width:320px;color:var(--text);font:14px/1.8 Tahoma,"Segoe UI",Arial,sans-serif;background:radial-gradient(ellipse 90% 28% at 52% 5%,#0b3765 0%,transparent 70%),linear-gradient(175deg,#06152e,#06172e 65%,#041023);overflow-x:hidden}
+a{text-decoration:none;color:inherit}button{font:inherit;cursor:pointer}a,button{-webkit-tap-highlight-color:transparent}
+button:focus-visible,a:focus-visible{outline:3px solid #74c6ff;outline-offset:3px}
+.wrap{width:min(1260px,calc(100% - 48px));margin:auto}
+.site-header{position:sticky;top:0;z-index:100;background:#061832ed;border-bottom:1px solid #3977ba55;backdrop-filter:blur(18px)}
+.nav{height:82px;display:flex;align-items:center;justify-content:space-between;gap:22px}
+.brand{display:flex;align-items:center;gap:12px;font-size:23px;font-weight:900;line-height:1.25;white-space:nowrap}
+.brand-logo{display:grid;place-items:center;border-radius:12px;width:47px;height:47px;background:linear-gradient(155deg,#09b9e511,#08355d88);border:1px solid #0bbbd7;box-shadow:0 0 22px #20beec36}
+.brand-logo svg{width:33px;height:33px;fill:none;stroke:#08e1f7;stroke-linecap:round;stroke-linejoin:round;stroke-width:3}
+.brand small{display:block;font-size:10px;color:#92b4d9;font-weight:500}
+.navlinks{display:flex;align-items:center;gap:30px;font-weight:700;font-size:13px}
+.navlinks a{color:#d9e7fd;transition:color .2s}.navlinks a:hover,.navlinks a:focus-visible{color:#32bfff}
+.nav-btn{min-width:150px}
+.btn{display:inline-flex;justify-content:center;align-items:center;gap:10px;min-height:47px;padding:11px 22px;border-radius:11px;border:1px solid #367acc;font-weight:800;transition:.2s transform,.2s box-shadow,.2s background;white-space:nowrap}
+.btn:hover{transform:translateY(-2px);box-shadow:0 8px 26px #1170e650}
+.btn-primary{color:white;background:linear-gradient(125deg,#2098ff,#0752ea);box-shadow:0 7px 21px #0866e749}
+.btn-secondary{color:#eff7ff;background:linear-gradient(135deg,#112d55,#071a35);border-color:#86b8ff}
+.menu-toggle{display:none;color:white;background:#0c294d;border:1px solid #366cae;border-radius:10px;font-size:23px;width:43px;height:43px}
+.hero{padding:58px 0 70px;position:relative;overflow:hidden}
+.hero:before{content:"";position:absolute;inset:20% -15% auto;width:130%;height:500px;background:radial-gradient(ellipse at center,#0775df3d,transparent 65%);pointer-events:none}
+.hero-grid{position:relative;display:grid;grid-template-columns:1fr 1.17fr;align-items:center;gap:52px}
+.hero-content{max-width:540px}
+.eyebrow{display:inline-flex;align-items:center;gap:7px;border:1px solid #664fde99;background:#1a2e63a8;padding:6px 14px;color:#e4e5ff;border-radius:99px;font-size:12px;font-weight:800}
+.hero h1{margin:20px 0;font-weight:900;font-size:clamp(32px,3.6vw,48px);line-height:1.48;letter-spacing:-1.1px}
+.hero h1 span{color:#29b7ff}
+.hero-copy{font-size:15px;line-height:2.1;color:#c3d7ee;margin:0 0 27px}
+.hero-actions{display:flex;align-items:center;flex-wrap:wrap;gap:12px}
+.hero-visual{min-width:0;position:relative;isolation:isolate;padding:22px 13px 28px 0}
+.hero-visual:before{content:"";position:absolute;inset:7% 3% 5%;border-radius:50%;background:#087cf849;filter:blur(65px);z-index:-1}
+.app-scene{position:relative;transform:perspective(1050px) rotateY(-7deg) rotateX(2deg);transform-origin:center;filter:drop-shadow(0 19px 24px #010b1dc9)}
+.app-preview{border:2px solid #2fa8ff;background:linear-gradient(130deg,#0c305f,#06182f);border-radius:18px;box-shadow:0 0 0 4px #2f86eb22,0 0 30px #168efd8c,0 23px 48px #0008;min-height:356px;overflow:hidden}
+.preview-top{height:53px;border-bottom:1px solid #255e9d;display:flex;align-items:center;justify-content:space-between;padding:0 17px;background:#081e3d}
+.preview-top b{font-size:15px}.preview-top span{font-size:11px;color:#bad4ef}
+.preview-layout{display:grid;grid-template-columns:112px minmax(0,1fr);min-height:305px}
+.preview-side{border-left:1px solid #23518a;background:#071a35;padding:13px 7px;font-size:10px;display:grid;align-content:start;gap:8px}
+.preview-side span{padding:8px 7px;border-radius:6px;color:#bdd2ec}
+.preview-side span.active{background:#146cff;color:#fff}
+.preview-body{padding:12px;min-width:0}
+.preview-mini-nav{display:flex;gap:7px;flex-wrap:wrap;margin-bottom:11px}
+.preview-pill{background:#163b71;border:1px solid #2f6cb0;padding:5px 9px;border-radius:7px;font-size:10px}
+.preview-pill.active{background:#176ef2}
+.preview-record{display:grid;grid-template-columns:1.25fr 1fr 1fr;gap:7px;padding:10px;border:1px solid #3269ae;border-radius:10px;background:#122f58;margin-bottom:11px}
+.preview-record label{display:block;color:#aed0f4;font-size:9px;margin-bottom:4px}
+.preview-field{min-height:26px;border-radius:5px;background:#081b37;border:1px solid #3a76b7;padding:4px 7px;color:#ecf8ff;font-size:10px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.preview-kpis{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:7px}
+.preview-kpi{border:1px solid #28669d;background:#0b2445;border-radius:10px;min-height:105px;text-align:center;padding:9px 4px}
+.preview-kpi small{display:block;font-size:8px;color:#c1d6f4;line-height:1.6}
+.ring{--pct:75;--ring:#20cafa;position:relative;width:56px;height:56px;margin:6px auto;border-radius:50%;background:conic-gradient(var(--ring) calc(var(--pct)*1%),#173859 0);display:grid;place-items:center}
+.ring:after{content:"";position:absolute;inset:7px;background:#0b2445;border-radius:50%}
+.ring b{position:relative;z-index:1;font-size:12px}
+.preview-kpi:nth-child(2) .ring{--ring:#7c55ee;--pct:61}.preview-kpi:nth-child(3) .ring{--ring:#21d998;--pct:87}.preview-kpi:nth-child(4) .ring{--ring:#ffc633;--pct:78}
+.preview-tip{position:absolute;bottom:0;left:0;border:1px solid #4da8f7;border-radius:8px;background:#092349e8;color:#d3ebff;padding:7px 13px;font-size:10px}
+.section{padding:40px 0 28px}
+.section-heading{text-align:center;margin:0 0 28px}
+.section-heading h2{margin:0;font-size:clamp(23px,2.8vw,30px);line-height:1.6;font-weight:900}
+.section-heading p{margin:3px 0;color:#a7c8ed;font-size:13px}
+.section-heading .rule{width:98px;height:2px;background:linear-gradient(90deg,transparent,#26a8ff,transparent);margin:10px auto 0}
+.updates{padding-top:20px}
+.updates-grid{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:11px}
+.feature-card{position:relative;background:linear-gradient(150deg,#0e2d57,#071c37);border:1px solid #356eaa;border-radius:15px;text-align:center;padding:21px 11px;min-height:213px;box-shadow:0 8px 24px #00152a3d}
+.feature-icon{display:grid;place-items:center;width:46px;height:46px;margin:0 auto 12px;border-radius:12px;color:#fff;font-size:25px;background:linear-gradient(135deg,#176fff,#0a3c84);border:1px solid #4aabff;box-shadow:0 3px 16px #137ef44c}
+.feature-card:nth-child(2) .feature-icon,.feature-card:nth-child(6) .feature-icon{background:linear-gradient(135deg,#11cbbd,#087176);border-color:#2eead9}
+.feature-card:nth-child(3) .feature-icon,.feature-card:nth-child(5) .feature-icon{background:linear-gradient(135deg,#9a5ff1,#5635a9);border-color:#ae7dff}
+.feature-card h3{font-size:13px;line-height:1.9;margin:0 0 8px;font-weight:800}
+.feature-card p{color:#a9c6e5;font-size:11px;line-height:2;margin:0}
+.roles-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.role-card{min-height:203px;border-radius:16px;background:linear-gradient(115deg,#0c234a,#0d2b60 58%,#0a2349);border:1px solid #3e8ee9;box-shadow:inset 0 0 16px #145cbd17;padding:24px;display:flex;align-items:center;justify-content:space-between;gap:14px}
+.role-head{display:flex;align-items:center;gap:11px;margin-bottom:8px}
+.role-emblem{display:grid;place-items:center;width:47px;height:47px;background:linear-gradient(140deg,#0b82f2,#144c9f);border:1px solid #4ea8ff;border-radius:50%;font-size:24px;flex:none}
+.role-card.expert .role-emblem{background:linear-gradient(135deg,#8049e3,#3b2280);border-color:#ad88f9}
+.role-card h3{font-size:20px;margin:0}.role-card p{margin:0 0 9px;color:#b2cae9;font-size:12px}
+.role-card ul{list-style:none;margin:0;padding:0}.role-card li{font-size:12px;margin:4px 0;color:#e2eeff}
+.role-card li:before{content:"✓";display:inline-grid;place-items:center;width:17px;height:17px;border-radius:50%;margin-left:8px;background:#1c6cdb;font-weight:bold;font-size:10px}
+.role-art{flex:0 0 100px;height:99px;border:1px solid #3f91ee;border-radius:10px;background:linear-gradient(145deg,#0e4274,#081c41);display:flex;align-items:end;justify-content:space-evenly;padding:11px;box-shadow:0 0 18px #0e88f44a}
+.role-art span{width:19px;border-radius:4px 4px 0 0;background:linear-gradient(#35c9ff,#1557ff);height:35%}.role-art span:nth-child(2){height:55%}.role-art span:nth-child(3){height:80%}
+.analytics-panel{border:1px solid #285d9a;border-radius:17px;background:linear-gradient(145deg,#071c3b,#09234a);display:grid;grid-template-columns:1fr 1.05fr 1.05fr;gap:0;overflow:hidden}
+.analytics-block{min-width:0;padding:18px;border-left:1px solid #19436c}
+.analytics-block:last-child{border-left:0}
+.analytics-block h3{text-align:center;margin:0 0 17px;font-size:13px;color:#dcecff}
+.mini-gauges{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:11px}
+.mini-gauge{text-align:center}.mini-gauge .ring{width:75px;height:75px;--pct:72;--ring:#2bafff;background:conic-gradient(var(--ring) calc(var(--pct)*1%),#183859 0)}
+.mini-gauge .ring:after{inset:10px;background:#092346}.mini-gauge .ring b{font-size:17px}
+.mini-gauge:nth-child(2) .ring{--pct:84;--ring:#27dea9}.mini-gauge:nth-child(3) .ring{--pct:68;--ring:#f9c333}.mini-gauge:nth-child(4) .ring{--pct:59;--ring:#965bff}
+.mini-gauge small{display:block;color:#bed6f3;font-size:10px}
+.bar-chart{height:158px;display:flex;align-items:flex-end;justify-content:center;gap:13px;border-bottom:1px solid #3c6fa6;padding:0 12px 7px;direction:ltr}
+.bar-item{flex:1;max-width:46px;text-align:center;display:flex;flex-direction:column;justify-content:end;align-items:center;height:100%;gap:4px}
+.bar-item b{font-size:10px}.bar-item .bar{width:100%;height:var(--h);min-height:14px;border-radius:7px 7px 0 0;background:linear-gradient(#53c2ff,#215ae6);box-shadow:0 0 14px #1b76e83f}
+.bar-item small{font-size:9px;color:#bdcfee;line-height:1.35;white-space:normal}
+.funnel{display:grid;gap:7px;max-width:235px;margin:auto}
+.funnel-step{margin:auto;display:flex;align-items:center;justify-content:center;height:27px;width:var(--w);background:var(--c);clip-path:polygon(0 0,100% 0,89% 100%,11% 100%);font-size:10px;font-weight:800;color:white}
+.funnel-step:nth-child(1){--w:100%;--c:#168efd}.funnel-step:nth-child(2){--w:85%;--c:#02a68d}.funnel-step:nth-child(3){--w:70%;--c:#b8880a}.funnel-step:nth-child(4){--w:55%;--c:#8e50e3}.funnel-step:nth-child(5){--w:43%;--c:#5130ab}
+.example-note{display:block;text-align:center;color:#82acdf;font-size:10px;margin:9px 0 0}
+.cta-band{position:relative;overflow:hidden;margin:32px 0 24px;padding:26px 32px;min-height:137px;display:flex;justify-content:space-between;align-items:center;gap:20px;border-radius:17px;border:1px solid #328fe5;background:radial-gradient(ellipse at 85% 25%,#1254ac66,transparent 45%),linear-gradient(125deg,#061935,#0b3261,#091a39);box-shadow:inset 0 0 22px #1c7fda2d}
+.cta-band:before{content:"";position:absolute;bottom:-40px;left:15%;width:40%;height:90px;border:2px solid #168bff;transform:rotate(-10deg);border-radius:50%;filter:blur(2px);opacity:.4}
+.cta-band h2{margin:0 0 5px;font-size:25px}.cta-band p{margin:0;font-size:12px;color:#c3d9f4}
+.cta-band .btn{position:relative;z-index:1}
+.footer{padding:27px 0;border-top:1px solid #214573;background:#04132a}
+.footer-inner{display:flex;justify-content:space-between;align-items:center;gap:22px;flex-wrap:wrap}
+.footer .brand{font-size:18px}.footer .brand-logo{width:37px;height:37px}.footer .brand-logo svg{width:27px;height:27px}
+.footer-links{display:flex;align-items:center;gap:25px;color:#b6cdea;font-size:12px}
+.footer-links a:hover{color:#55caff}
+.footer-social{display:flex;gap:10px}.footer-social a{display:grid;place-items:center;width:35px;height:35px;border-radius:50%;background:#10284e;border:1px solid #264773;font-weight:bold}
+#updates,#roles,#analytics{scroll-margin-top:105px}
+@media(max-width:1050px){.updates-grid{grid-template-columns:repeat(3,minmax(0,1fr))}.hero-grid{gap:24px}.hero h1{font-size:33px}.navlinks{gap:15px}.analytics-panel{grid-template-columns:1fr 1fr}.analytics-block:first-child{grid-column:1/-1;border-left:0;border-bottom:1px solid #19436c}.mini-gauges{grid-template-columns:repeat(4,minmax(0,1fr))}}
+@media(max-width:760px){.wrap{width:min(100% - 28px,600px)}.nav{height:70px}.brand{font-size:18px}.brand-logo{width:39px;height:39px}.brand-logo svg{width:28px;height:28px}.nav-btn{min-width:auto;padding:9px 12px;min-height:39px;font-size:11px}.menu-toggle{display:block}.navlinks{display:none;position:absolute;top:69px;right:0;left:0;padding:18px;background:#061a36;border-bottom:1px solid #326db0;box-shadow:0 15px 20px #0008;flex-direction:column;align-items:stretch;gap:5px}.navlinks.open{display:flex}.navlinks a{padding:9px 18px}.hero{padding:34px 0 28px}.hero-grid{grid-template-columns:1fr;gap:15px}.hero-content{max-width:none;text-align:center}.hero h1{font-size:clamp(29px,6vw,39px)}.hero-copy{font-size:13px}.hero-actions{justify-content:center}.hero-visual{max-width:590px;margin:10px auto}.app-scene{transform:none}.updates-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.roles-grid{grid-template-columns:1fr}.analytics-panel{grid-template-columns:1fr}.analytics-block,.analytics-block:first-child{grid-column:auto;border:0;border-bottom:1px solid #19436c}.analytics-block:last-child{border:0}.mini-gauges{grid-template-columns:repeat(4,minmax(0,1fr))}.footer-inner{justify-content:center;text-align:center}.cta-band{padding:25px 20px;flex-direction:column;text-align:center}}
+@media(max-width:420px){.hero h1{font-size:29px}.brand small{font-size:8px}.nav{gap:8px}.hero-actions{flex-direction:column}.hero-actions .btn{width:100%}.updates-grid{gap:9px}.feature-card{padding:16px 8px;min-height:198px}.feature-card h3{font-size:12px}.feature-card p{font-size:10px}.role-card{padding:15px}.role-art{flex-basis:65px;width:65px;height:76px;padding:6px}.preview-layout{grid-template-columns:78px minmax(0,1fr)}.preview-side{font-size:8px}.preview-record{grid-template-columns:1fr 1fr}.preview-record>div:last-child{display:none}.preview-kpis{gap:3px}.preview-kpi{min-height:84px}.ring{width:42px;height:42px}.ring:after{inset:6px}.ring b{font-size:10px}.mini-gauges{grid-template-columns:repeat(2,minmax(0,1fr))}.footer-links{gap:13px;flex-wrap:wrap;justify-content:center}}
+@media(prefers-reduced-motion:reduce){*{scroll-behavior:auto!important;transition:none!important}}
 </style>
 </head>
 <body>
-<header class="topbar">
- <div class="wrap nav">
-  <a class="brand" href="#home" aria-label="مدیرنگر">
-   <span class="brand-mark"><svg viewBox="0 0 64 64" aria-hidden="true"><path d="M13 49V37M25 49V28M37 49V18M49 49V30" stroke="#fff" stroke-width="5" stroke-linecap="round"/><path d="M12 23L25 30L38 16L50 21" fill="none" stroke="#34D399" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/><circle cx="50" cy="21" r="3.5" fill="#34D399"/></svg></span><span>مدیرنگر<small>هوش مدیریتی کسب‌وکار</small></span>
-  </a>
-  <button class="menu-toggle" id="menuToggle" aria-label="باز کردن منو">☰</button>
-  <nav class="navlinks" id="navlinks">
-   <a href="#home">صفحه اصلی</a><a href="#features">امکانات</a><a href="#tour">معرفی نرم‌افزار</a><a href="#blog">وبلاگ</a><a href="#about">درباره ما</a><a href="#contact">تماس با ما</a>
-  </nav>
-  <div class="nav-actions"><a class="btn btn-outline" href="#contact">درخواست دمو</a><a class="btn btn-primary" href="dashboard.html">ورود به داشبورد ↗</a></div>
- </div>
-</header>
-<main>
-<section class="hero" id="home">
- <div class="wrap hero-grid">
-  <div class="hero-text">
-   <div class="eyebrow"><span class="pulse"></span> مرکز فرماندهی تیم فروش شما</div>
-   <h1>تیم فروش را <span>هوشمندانه</span><br>مدیریت کنید</h1>
-   <p class="hero-copy">از توزیع لید تا تحقق تارگت؛ عملکرد کارشناسان، فرصت‌های فروش و گزارش‌ها را در یک نگاه ببینید و با اطمینان تصمیم بگیرید.</p>
-   <div class="hero-ctas"><a class="btn btn-primary" href="dashboard.html">ورود به داشبورد <span>←</span></a><a class="btn btn-outline" href="#tour">▷ مشاهده معرفی نرم‌افزار</a></div>
-   <div class="hero-points"><span><b>✓</b> کنترل عملکرد تیم</span><span><b>✓</b> پایش KPI و تارگت</span><span><b>✓</b> تصمیم‌گیری دقیق‌تر</span></div>
-  </div>
-  <div class="visual" aria-label="پیش‌نمایش مفهومی داشبورد فروش">
-   <div class="dashboard">
-    <div class="dash-top"><span>نمای کلی عملکرد فروش</span><span class="dash-status">● وضعیت پایدار</span></div>
-    <div class="dash-layout">
-     <div class="dash-card"><div class="mini-label">روند عملکرد تیم</div><div class="metric">گزارش فروش</div><div class="positive">نمایش روند در طول زمان ↗</div><div class="bars"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div></div>
-     <div class="dash-card"><div class="mini-label">پیشرفت تارگت</div><div class="donut"></div><div style="text-align:center;font-size:10px;color:#73819a">نمونه نمایشی</div><div class="pipeline"><i></i><i></i><i></i><i></i><i></i></div><div class="mini-label" style="margin-top:8px">قیف فروش</div></div>
-     <div class="dash-card"><div class="mini-label">مدیریت تیم</div><div style="display:flex;gap:7px;align-items:center;margin-top:12px"><span style="background:#dcecff;color:#1769ff;width:28px;height:28px;border-radius:9px;display:grid;place-items:center">◉</span><span style="font-size:10px">عملکرد کارشناسان</span></div><div style="display:flex;gap:7px;align-items:center;margin-top:9px"><span style="background:#dffcf1;color:#0aa77d;width:28px;height:28px;border-radius:9px;display:grid;place-items:center">✓</span><span style="font-size:10px">پیگیری فرصت‌ها</span></div></div>
-     <div class="dash-card"><div class="mini-label">شاخص‌های کلیدی</div><div style="display:flex;align-items:center;gap:7px;margin-top:13px"><span style="font-size:23px;color:#1769ff">◎</span><div><strong style="font-size:13px">KPI</strong><div class="mini-label">پایش شاخص‌ها</div></div></div></div>
+<header class="site-header">
+  <nav class="wrap nav" aria-label="منوی اصلی">
+    <a class="brand" href="#home" aria-label="مدیرنگر، صفحه اصلی">
+      <span class="brand-logo" aria-hidden="true"><svg viewBox="0 0 40 40"><path d="M7 30V21M15 30V13M23 30V7M31 30V17"/><path d="M6 33H34"/></svg></span>
+      <span>مدیرنگر<small>مدیریت لیدها، فروش و توسعه کسب‌وکار</small></span>
+    </a>
+    <div class="navlinks" id="navlinks">
+      <a href="#updates">به‌روزرسانی‌ها</a>
+      <a href="#features">امکانات</a>
+      <a href="#roles">پنل‌های کاربری</a>
+      <a href="#analytics">گزارش‌ها</a>
+      <a href="#contact">تماس با ما</a>
     </div>
-   </div>
-   <div class="floating float-a"><span class="float-icon">↗</span><span>پیگیری هدفمند<strong>اقدام بعدی روشن</strong></span></div>
-   <div class="floating float-b"><span class="float-icon">◉</span><span>همه‌چیز در یک نگاه<strong>دید مدیریتی یکپارچه</strong></span></div>
+    <div style="display:flex;align-items:center;gap:9px">
+      <a class="btn btn-primary nav-btn" href="dashboard.html">ورود به پنل ↗</a>
+      <button type="button" class="menu-toggle" id="menuToggle" aria-expanded="false" aria-controls="navlinks" aria-label="باز کردن منو">☰</button>
+    </div>
+  </nav>
+</header>
+<main id="home">
+<section class="hero">
+ <div class="wrap hero-grid">
+  <div class="hero-content">
+    <span class="eyebrow">✦ نسخه جدید مدیرنگر</span>
+    <h1><span>مدیرنگر؛</span> مدیریت یکپارچه<br> لیدها و پیگیری فروش</h1>
+    <p class="hero-copy">در جدیدترین به‌روزرسانی مدیرنگر، همه‌چیز برای مدیریت هوشمندتر لیدها ساده‌تر و یکپارچه‌تر شده است: مدیریت لیدهای مستقیم و درخواست‌های همکاری، ویرایش مستقیم اطلاعات، گزارش‌ها و نمودارهای تحلیلی پیشرفته و نماهای اختصاصی برای مدیر و کارشناس.</p>
+    <div class="hero-actions">
+      <a class="btn btn-primary" href="dashboard.html">◉ ورود به داشبورد</a>
+      <a class="btn btn-secondary" href="#updates">▦ مشاهده امکانات</a>
+    </div>
+  </div>
+  <div class="hero-visual" aria-label="نمای نمونه از ظاهر داشبورد مدیرنگر">
+    <div class="app-scene">
+      <div class="app-preview">
+        <div class="preview-top"><b>▤ مدیریت لیدها</b><span>مدیرنگر | پیش‌نمایش</span></div>
+        <div class="preview-layout">
+          <aside class="preview-side" aria-hidden="true"><span>▤ داشبورد</span><span class="active">▦ لیدها</span><span>◈ درخواست همکاری</span><span>▤ گزارش‌ها</span><span>▥ تحلیل مدیریتی</span></aside>
+          <div class="preview-body">
+            <div class="preview-mini-nav"><span class="preview-pill active">همه لیدها</span><span class="preview-pill">لید مستقیم</span><span class="preview-pill">درخواست همکاری</span></div>
+            <div class="preview-record"><div><label>شرکت / سازمان</label><div class="preview-field">نمونه شرکت تجاری</div></div><div><label>مرحله فروش</label><div class="preview-field">تماس اولیه ▾</div></div><div><label>اقدام بعدی</label><div class="preview-field">جلسه مذاکره ▾</div></div></div>
+            <div class="preview-kpis">
+              <div class="preview-kpi"><small>توزیع لیدها</small><div class="ring" style="--pct:72"><b>◉</b></div></div>
+              <div class="preview-kpi"><small>پیگیری</small><div class="ring"><b>↗</b></div></div>
+              <div class="preview-kpi"><small>کامل بودن</small><div class="ring"><b>✓</b></div></div>
+              <div class="preview-kpi"><small>تحلیل فروش</small><div class="ring"><b>▥</b></div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <span class="preview-tip">پیش‌نمایش گرافیکی، بدون نمایش داده واقعی مشتریان</span>
   </div>
  </div>
 </section>
-<section class="trust"><div class="wrap trust-row"><span class="trust-title">برای مدیریت حرفه‌ای چرخه فروش طراحی شده است</span><span class="trust-chip">مدیریت تیم</span><span class="trust-chip">قیف فروش</span><span class="trust-chip">KPI و تارگت</span><span class="trust-chip">گزارش مدیریتی</span><span class="trust-chip">پیگیری لیدها</span></div></section>
-<section class="section" id="features"><div class="wrap"><div class="section-head reveal"><span class="kicker">امکانات کلیدی</span><h2>ابزارهای لازم برای مدیریت بهتر فروش</h2><p>از فعالیت روزانه کارشناسان تا نتیجه نهایی تیم؛ اطلاعات پراکنده را به تصویری قابل اقدام تبدیل کنید.</p></div>
- <div class="feature-grid">
-  <article class="feature reveal"><div class="feature-icon">♙</div><h3>مدیریت عملکرد تیم</h3><p>عملکرد کارشناسان را بررسی کنید، شاخص‌ها را مقایسه کنید و نقاط نیازمند توجه را زودتر بشناسید.</p><a href="#tour">بیشتر بدانید ←</a></article>
-  <article class="feature reveal"><div class="feature-icon">⌁</div><h3>قیف فروش و فرصت‌ها</h3><p>مراحل فروش و وضعیت فرصت‌ها را شفاف ببینید تا پیگیری‌ها بین مراحل مختلف گم نشوند.</p><a href="#tour">بیشتر بدانید ←</a></article>
-  <article class="feature reveal"><div class="feature-icon">◎</div><h3>تارگت و KPI</h3><p>هدف‌ها و شاخص‌های کلیدی را کنار عملکرد قرار دهید و فاصله تا هدف را بهتر ارزیابی کنید.</p><a href="#tour">بیشتر بدانید ←</a></article>
-  <article class="feature reveal"><div class="feature-icon">▤</div><h3>گزارش‌های مدیریتی</h3><p>به‌جای مرور پراکنده داده‌ها، گزارش‌هایی برای بررسی وضعیت تیم و تصمیم‌های روزانه داشته باشید.</p><a href="#tour">بیشتر بدانید ←</a></article>
-  <article class="feature reveal"><div class="feature-icon">◷</div><h3>پیگیری و یادآوری</h3><p>فرصت‌های نیازمند اقدام را شناسایی کنید و نظم پیگیری را در چرخه فروش تقویت کنید.</p><a href="#tour">بیشتر بدانید ←</a></article>
-  <article class="feature reveal"><div class="feature-icon">⇄</div><h3>توزیع و کنترل لیدها</h3><p>وضعیت لیدهای تخصیص‌یافته را دنبال کنید و دید روشن‌تری نسبت به جریان ورودی فروش داشته باشید.</p><a href="#tour">بیشتر بدانید ←</a></article>
+<section class="section updates" id="updates">
+ <div class="wrap">
+  <header class="section-heading"><h2>آخرین به‌روزرسانی‌ها</h2><p>مهم‌ترین قابلیت‌های اضافه‌شده در نسخه جدید مدیرنگر</p><div class="rule"></div></header>
+  <div class="updates-grid" id="features">
+   <article class="feature-card"><span class="feature-icon" aria-hidden="true">↗</span><h3>مدیریت یکپارچه<br>لیدهای مستقیم و درخواست همکاری</h3><p>مشاهده و مدیریت لیدها در یک محیط منسجم، بدون ثبت تکراری داده</p></article>
+   <article class="feature-card"><span class="feature-icon" aria-hidden="true">✎</span><h3>ویرایش مستقیم<br>هر لید در همان صفحه</h3><p>تغییر اطلاعات، ثبت پیگیری و ذخیره در همان ردیف</p></article>
+   <article class="feature-card"><span class="feature-icon" aria-hidden="true">♧</span><h3>اطلاعات تکمیلی<br>مشتریان و شرکت‌ها</h3><p>فرد تماس، صنعت، تعداد مرسوله ماهیانه و مراحل پیگیری</p></article>
+   <article class="feature-card"><span class="feature-icon" aria-hidden="true">▥</span><h3>نمودارها و گیج‌های<br>تحلیلی فروش</h3><p>بررسی وضعیت پیگیری، توزیع لیدها و عملکرد کارشناسان</p></article>
+   <article class="feature-card"><span class="feature-icon" aria-hidden="true">▽</span><h3>مراحل فروش فارسی<br>و آمار یکپارچه</h3><p>نمایش عنوان مراحل به‌جای اعداد و حذف شمارش تکراری</p></article>
+   <article class="feature-card"><span class="feature-icon" aria-hidden="true">▣</span><h3>چیدمان جدید<br>بدون اسکرول افقی</h3><p>دسترسی سریع‌تر و نمایش مرتب اطلاعات در هر قاب</p></article>
+  </div>
  </div>
-</div></section>
-<section class="section section-soft"><div class="wrap split">
- <div class="split-copy reveal"><span class="kicker">دید مدیریتی، نه فقط گزارش</span><h2>از «چه اتفاقی افتاد؟»<br>به «قدم بعدی چیست؟» برسید.</h2><p>مدیریت فروش فقط جمع‌کردن اعداد نیست. مدیر باید بتواند عملکرد را با هدف مقایسه کند، گلوگاه‌ها را تشخیص دهد و اقدام بعدی را مشخص کند.</p><ul class="checklist"><li><span class="check">✓</span><span>وضعیت تیم و شاخص‌های مهم را سریع‌تر مرور کنید.</span></li><li><span class="check">✓</span><span>فرصت‌های نیازمند پیگیری را از قلم نیندازید.</span></li><li><span class="check">✓</span><span>جلسات فروش را با داده و اولویت مشخص پیش ببرید.</span></li></ul><a class="btn btn-primary" href="dashboard.html">ورود به پنل مدیریت ←</a></div>
- <div class="analytics-card reveal"><div class="analytics-head"><strong>نمای تحلیلی مدیر فروش</strong><span>نمونه نمایشی</span></div><div class="kpi-grid"><div class="kpi"><label>شاخص‌های کلیدی</label><strong>KPI</strong><em>پایش هدفمند</em></div><div class="kpi"><label>تارگت فروش</label><strong>هدف</strong><em>مقایسه با عملکرد</em></div><div class="kpi"><label>قیف فروش</label><strong>مراحل</strong><em>شفافیت فرصت‌ها</em></div><div class="kpi"><label>اقدام بعدی</label><strong>پیگیری</strong><em>تمرکز بر اولویت</em></div></div><div class="spark"><i style="--h:28%"></i><i style="--h:46%"></i><i style="--h:38%"></i><i style="--h:60%"></i><i style="--h:53%"></i><i style="--h:74%"></i><i style="--h:68%"></i><i style="--h:94%"></i><i style="--h:82%"></i><i style="--h:100%"></i></div></div>
-</div></section>
-<section class="section"><div class="wrap"><div class="section-head reveal"><span class="kicker">روش استفاده</span><h2>از داده تا اقدام، در چهار گام</h2><p>یک روال روشن برای مرور وضعیت فروش و هدایت بهتر تیم.</p></div><div class="process-grid"><article class="process reveal"><h3>وضعیت را ببینید</h3><p>لیدها، مراحل فروش و شاخص‌های مهم را مرور کنید.</p></article><article class="process reveal"><h3>فاصله را تشخیص دهید</h3><p>عملکرد فعلی را با هدف‌ها و انتظارات مقایسه کنید.</p></article><article class="process reveal"><h3>اولویت را تعیین کنید</h3><p>فرصت‌ها و پیگیری‌هایی را که نیازمند توجه‌اند مشخص کنید.</p></article><article class="process reveal"><h3>نتیجه را دنبال کنید</h3><p>اقدام‌ها و تغییرات عملکرد را در بازبینی بعدی بسنجید.</p></article></div></div></section>
-<section class="section section-soft" id="tour"><div class="wrap"><div class="section-head reveal"><span class="kicker">یک نگاه نزدیک‌تر</span><h2>بخش‌های نرم‌افزار را ورق بزنید</h2><p>اسلایدها، تصویری کوتاه از قابلیت‌های ماژول مدیریت فروش در مدیرنگر ارائه می‌کنند.</p></div>
- <div class="slider-shell reveal">
-  <article class="slide active"><div class="slide-art"><span>♙</span></div><div><span class="tag">مدیریت تیم</span><h3>عملکرد هر کارشناس، واضح‌تر از همیشه</h3><p>برای بررسی فعالیت‌ها و شاخص‌های تیم، یک نمای مدیریتی منسجم داشته باشید و موضوعات مهم را برای جلسه فروش آماده کنید.</p><a href="dashboard.html" class="btn btn-primary">ورود به داشبورد ←</a></div></article>
-  <article class="slide"><div class="slide-art"><span>⌁</span></div><div><span class="tag">قیف فروش</span><h3>هیچ مرحله‌ای از مسیر فروش مبهم نماند</h3><p>وضعیت فرصت‌ها را مرحله‌به‌مرحله مرور کنید و تشخیص دهید تمرکز تیم باید روی کدام بخش از فرایند باشد.</p><a href="dashboard.html" class="btn btn-primary">بررسی پنل ←</a></div></article>
-  <article class="slide"><div class="slide-art"><span>◎</span></div><div><span class="tag">تارگت و KPI</span><h3>هدف‌ها را به معیارهای قابل پیگیری تبدیل کنید</h3><p>شاخص‌های مهم و اهداف فروش را در تصمیم‌گیری روزانه وارد کنید و فاصله عملکرد با هدف را بررسی کنید.</p><a href="dashboard.html" class="btn btn-primary">مشاهده پنل ←</a></div></article>
-  <article class="slide"><div class="slide-art"><span>▤</span></div><div><span class="tag">گزارش مدیریتی</span><h3>جلسات فروش را با آمادگی بیشتر برگزار کنید</h3><p>اطلاعات کلیدی را منظم مرور کنید و گفت‌وگوهای تیم را به سمت مسئله، اولویت و اقدام بعدی ببرید.</p><a href="dashboard.html" class="btn btn-primary">ورود به داشبورد ←</a></div></article>
-  <div class="slide-controls"><button class="arrow" id="prevSlide" aria-label="اسلاید قبلی">›</button><div class="dots" id="slideDots"><button class="dot active" aria-label="اسلاید ۱"></button><button class="dot" aria-label="اسلاید ۲"></button><button class="dot" aria-label="اسلاید ۳"></button><button class="dot" aria-label="اسلاید ۴"></button></div><button class="arrow" id="nextSlide" aria-label="اسلاید بعدی">‹</button></div>
+</section>
+<section class="section" id="roles">
+ <div class="wrap">
+  <header class="section-heading"><h2>برای مدیر و کارشناس</h2><p>تجربه‌ای متناسب با نقش شما در سازمان</p><div class="rule"></div></header>
+  <div class="roles-grid">
+   <article class="role-card"><div><div class="role-head"><span class="role-emblem">♛</span><div><h3>پنل مدیر</h3><p>دید کامل مدیریتی و تحلیل تجمیعی تیم فروش</p></div></div><ul><li>مشاهده و مدیریت لیدهای تیم</li><li>فیلترهای پیشرفته و مقایسه عملکرد کارشناسان</li><li>نمودارها و گزارش‌های مدیریتی</li><li>نمایش مراحل فروش با عناوین یکپارچه</li></ul></div><div class="role-art" aria-hidden="true"><span></span><span></span><span></span></div></article>
+   <article class="role-card expert"><div><div class="role-head"><span class="role-emblem">♙</span><div><h3>پنل کارشناس</h3><p>تمرکز بر مدیریت و پیگیری لیدهای اختصاصی</p></div></div><ul><li>مشاهده لیدهای مربوط به خود</li><li>نمودارهای شخصی از عملکرد و پیگیری</li><li>به‌روزرسانی سریع اطلاعات هر لید</li><li>دسترسی به فیلدهای انتخابی و تقویم پیگیری</li></ul></div><div class="role-art" aria-hidden="true"><span></span><span></span><span></span></div></article>
+  </div>
  </div>
-</div></section>
-<section class="section" id="video"><div class="wrap"><div class="video-band reveal"><div><span class="kicker" style="color:#69caff">معرفی نرم‌افزار</span><h2>در چند دقیقه با روش کار آشنا شوید</h2><p>این بخش برای ویدئوی معرفی محصول آماده شده است. پس از آماده‌شدن ویدئو، می‌توان آن را به همین قسمت متصل کرد.</p><a class="btn btn-primary" href="#contact">درخواست جلسه معرفی ←</a></div><div class="video-preview"><button class="play" id="videoPlay" aria-label="نمایش وضعیت ویدئو">▶</button></div></div></div></section>
-<section class="section section-soft" id="blog"><div class="wrap"><div class="section-head reveal"><span class="kicker">وبلاگ فروش</span><h2>ایده‌هایی برای مدیریت بهتر تیم فروش</h2><p>محتواهای آموزشی درباره شاخص‌های فروش، قیف فروش، پیگیری لیدها و رهبری تیم.</p></div><div class="blog-grid">
- <article class="article reveal"><div class="article-art">◎</div><div class="article-body"><span class="tag">مدیریت تیم</span><h3>نقش KPI در ایجاد تمرکز برای کارشناسان فروش</h3><p>چطور شاخص‌های درست به تیم کمک می‌کنند اولویت‌های روشن‌تری داشته باشد؟</p><a href="#contact" class="readmore">ادامه مطلب ←</a></div></article>
- <article class="article reveal"><div class="article-art">⌁</div><div class="article-body"><span class="tag">تحلیل و گزارش</span><h3>چطور گلوگاه‌های قیف فروش را شناسایی کنیم؟</h3><p>با بررسی مرحله‌های فرایند فروش، مسیرهای نیازمند توجه را دقیق‌تر پیدا کنید.</p><a href="#contact" class="readmore">ادامه مطلب ←</a></div></article>
- <article class="article reveal"><div class="article-art">↗</div><div class="article-body"><span class="tag">بهره‌وری فروش</span><h3>۵ راهکار عملی برای بهبود پیگیری لیدها</h3><p>ساختن یک روال ساده و پایدار برای پیگیری فرصت‌ها و جلوگیری از فراموشی.</p><a href="#contact" class="readmore">ادامه مطلب ←</a></div></article>
- </div><p style="text-align:center;color:#8592a7;font-size:10px;margin-top:17px">نمونه‌های نمایشی وبلاگ؛ برای انتشار عمومی باید محتوای نهایی جایگزین شوند.</p></div></section>
-<section class="section" id="about"><div class="wrap about-band"><div class="reveal"><span class="kicker">درباره ما</span><h2>هوش مدیریتی؛ از فروش شروع می‌کنیم</h2><p style="color:var(--muted);font-size:14px">مدیرنگر با این ایده طراحی شده است که مدیران فروش به‌جای اتکا به گزارش‌های پراکنده، بتوانند عملکرد تیم، شاخص‌های کلیدی و مسیر پیگیری فرصت‌ها را منسجم‌تر مدیریت کنند.</p><p style="color:var(--muted);font-size:14px">هدف، جایگزین‌کردن قضاوت مدیر نیست؛ هدف فراهم‌کردن دید بهتر برای تصمیم‌گیری، پیگیری و هدایت تیم است.</p><a class="btn btn-outline" href="#contact">ارتباط با مدیریت ←</a></div><div class="about-box reveal"><h3>نگاه ما به مدیریت فروش</h3><p>شفافیت در شاخص‌ها، نظم در پیگیری و تمرکز بر اقدام‌های مؤثر، پایه‌های یک فرایند فروش قابل مدیریت هستند.</p><div class="values"><div class="value"><span>01</span>شفافیت عملکرد</div><div class="value"><span>02</span>مسئولیت‌پذیری</div><div class="value"><span>03</span>تصمیم مبتنی بر داده</div><div class="value"><span>04</span>بهبود مستمر</div></div></div></div></section>
-<section class="section section-soft" id="contact"><div class="wrap"><div class="section-head reveal"><span class="kicker">تماس با ما</span><h2>برای معرفی نرم‌افزار یا ارتباط با مدیریت</h2><p>پیام خود را ثبت کنید تا مسیر ارتباطی موردنظر شما مشخص باشد.</p></div><div class="contact-grid">
- <aside class="contact-info reveal"><h3>در ارتباط باشیم</h3><p>برای درخواست دمو، پیشنهاد همکاری یا ارسال بازخورد از فرم استفاده کنید. اطلاعات تماس واقعی را می‌توان در نسخه نهایی جایگزین کرد.</p><div class="contact-item"><span class="contact-symbol">✉</span><span><strong>ایمیل</strong><br>آدرس ایمیل پس از تأیید درج می‌شود</span></div><div class="contact-item"><span class="contact-symbol">⌖</span><span><strong>ارتباط با مدیریت</strong><br>درخواست جلسه یا ارسال پیشنهاد</span></div><div class="contact-item"><span class="contact-symbol">◷</span><span><strong>درخواست دمو</strong><br>آشنایی با قابلیت‌های نرم‌افزار</span></div></aside>
- <form class="contact-form reveal" id="contactForm"><div class="field"><label for="fullName">نام و نام خانوادگی</label><input id="fullName" name="fullName" required placeholder="نام شما"></div><div class="field"><label for="email">ایمیل یا شماره تماس</label><input id="email" name="email" required placeholder="راه ارتباطی شما"></div><div class="field"><label for="topic">موضوع پیام</label><input id="topic" name="topic" placeholder="مثلاً درخواست دمو"></div><div class="field"><label for="message">پیام شما</label><textarea id="message" name="message" required placeholder="چطور می‌توانیم کمک کنیم؟"></textarea></div><button class="btn btn-primary" type="submit">آماده‌سازی پیام ←</button><div class="form-note">این فرم در نسخه نمایشی به سرور متصل نیست؛ دکمه پیام را برای ارسال دستی آماده می‌کند و اطلاعاتی در پایگاه داده ذخیره نمی‌شود.</div></form>
- </div></div></section>
-<section class="cta"><div class="wrap cta-inner"><div><h2>آماده‌اید تیم فروش را هوشمندانه‌تر مدیریت کنید؟</h2><p>با دید روشن‌تر به عملکرد، فرصت‌ها و هدف‌های فروش تصمیم بگیرید.</p></div><div style="display:flex;gap:10px;flex-wrap:wrap"><a class="btn btn-primary" href="dashboard.html">ورود به داشبورد ←</a><a class="btn btn-outline" style="background:#ffffff0b;color:white;border-color:#ffffff45" href="#contact">درخواست دمو</a></div></div></section>
+</section>
+<section class="section" id="analytics">
+ <div class="wrap">
+  <header class="section-heading"><h2>داشبورد تحلیلی</h2><p>نگاهی سریع به مهم‌ترین شاخص‌ها و مراحل فروش</p><div class="rule"></div></header>
+  <div class="analytics-panel" role="img" aria-label="پیش‌نمایش نمونه از گیج‌های تحلیلی، عملکرد کارشناسان و قیف مراحل فروش">
+   <div class="analytics-block"><h3>شاخص‌های مدیریتی</h3><div class="mini-gauges"><div class="mini-gauge"><div class="ring"><b>◉</b></div><small>سهم لیدهای تجاری</small></div><div class="mini-gauge"><div class="ring"><b>✓</b></div><small>پیگیری برنامه‌ریزی‌شده</small></div><div class="mini-gauge"><div class="ring"><b>▥</b></div><small>تکمیل اطلاعات</small></div><div class="mini-gauge"><div class="ring"><b>↗</b></div><small>لیدهای مستقیم</small></div></div></div>
+   <div class="analytics-block"><h3>عملکرد کارشناسان</h3><div class="bar-chart" aria-hidden="true"><div class="bar-item"><b>▏</b><div class="bar" style="--h:85%"></div><small>کارشناس ۱</small></div><div class="bar-item"><b>▏</b><div class="bar" style="--h:64%"></div><small>کارشناس ۲</small></div><div class="bar-item"><b>▏</b><div class="bar" style="--h:75%"></div><small>کارشناس ۳</small></div><div class="bar-item"><b>▏</b><div class="bar" style="--h:50%"></div><small>کارشناس ۴</small></div><div class="bar-item"><b>▏</b><div class="bar" style="--h:37%"></div><small>کارشناس ۵</small></div></div></div>
+   <div class="analytics-block"><h3>قیف مراحل فروش</h3><div class="funnel" aria-hidden="true"><div class="funnel-step">لیدسازی</div><div class="funnel-step">تماس اولیه</div><div class="funnel-step">ارسال نرخ‌نامه</div><div class="funnel-step">جلسه مذاکره</div><div class="funnel-step">عقد قرارداد</div></div><span class="example-note">نمونه نمایشی؛ اطلاعات واقعی پس از ورود در داشبورد قرار دارد</span></div>
+  </div>
+  <div class="cta-band" id="contact"><div><h2>آماده شروع هستید؟ ◇</h2><p>با نسخه جدید مدیرنگر، مدیریت لیدها، پیگیری فروش و تحلیل عملکرد تیم را در یک محیط یکپارچه تجربه کنید.</p></div><a class="btn btn-primary" href="dashboard.html">ورود به مدیرنگر ←</a></div>
+ </div>
+</section>
 </main>
-<footer class="footer"><div class="wrap"><div class="footer-grid"><div><a class="brand" href="#home" style="color:white"><span class="brand-mark"><svg viewBox="0 0 64 64" aria-hidden="true"><path d="M13 49V37M25 49V28M37 49V18M49 49V30" stroke="#fff" stroke-width="5" stroke-linecap="round"/><path d="M12 23L25 30L38 16L50 21" fill="none" stroke="#34D399" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/><circle cx="50" cy="21" r="3.5" fill="#34D399"/></svg></span><span>مدیرنگر<small>هوش مدیریتی کسب‌وکار</small></span></a><p style="max-width:300px;margin-top:17px">ابزاری برای پایش عملکرد، مدیریت فرصت‌ها و تصمیم‌گیری بهتر در مسیر فروش.</p></div><div><h4>دسترسی سریع</h4><div class="footer-links"><a href="#home">صفحه اصلی</a><a href="#features">امکانات</a><a href="#tour">معرفی نرم‌افزار</a><a href="#blog">وبلاگ</a></div></div><div><h4>درباره محصول</h4><div class="footer-links"><a href="#about">درباره ما</a><a href="#contact">ارتباط با مدیریت</a><a href="#contact">درخواست دمو</a><a href="dashboard.html">ورود به داشبورد</a></div></div><div><h4>تماس و ارتباط</h4><p>راه‌های ارتباطی رسمی پس از تأیید اطلاعات درج می‌شوند.</p><a class="btn btn-outline" style="color:white;background:#ffffff0a;border-color:#ffffff2b;margin-top:8px" href="#contact">تماس با ما ←</a></div></div><div class="copyright"><span>© مدیرنگر — تمامی حقوق محفوظ است.</span><span>هوش مدیریتی برای تصمیم‌های بهتر کسب‌وکار</span></div></div></footer>
-<div class="toast" id="toast" role="status" aria-live="polite"></div>
+<footer class="footer"><div class="wrap footer-inner"><a class="brand" href="#home"><span class="brand-logo" aria-hidden="true"><svg viewBox="0 0 40 40"><path d="M7 30V21M15 30V13M23 30V7M31 30V17"/><path d="M6 33H34"/></svg></span><span>مدیرنگر<small>مدیریت لیدها، فروش و توسعه کسب‌وکار</small></span></a><div class="footer-links"><a href="#updates">به‌روزرسانی‌ها</a><a href="#features">امکانات</a><a href="#roles">پنل‌ها</a><a href="dashboard.html">ورود به سیستم</a></div><div class="footer-social"><a href="#home" aria-label="بازگشت به بالای صفحه">↑</a></div></div></footer>
 <script>
 (function(){
- const menu=document.getElementById('menuToggle'),nav=document.getElementById('navlinks');
- menu.addEventListener('click',()=>{const open=nav.classList.toggle('open');menu.setAttribute('aria-expanded',String(open));menu.textContent=open?'×':'☰'});
- nav.querySelectorAll('a').forEach(a=>a.addEventListener('click',()=>{nav.classList.remove('open');menu.setAttribute('aria-expanded','false');menu.textContent='☰'}));
- const slides=[...document.querySelectorAll('.slide')],dots=[...document.querySelectorAll('.dot')];let current=0,timer;
- function showSlide(n){current=(n+slides.length)%slides.length;slides.forEach((s,i)=>s.classList.toggle('active',i===current));dots.forEach((d,i)=>d.classList.toggle('active',i===current))}
- document.getElementById('prevSlide').addEventListener('click',()=>{showSlide(current-1);restart()});
- document.getElementById('nextSlide').addEventListener('click',()=>{showSlide(current+1);restart()});
- dots.forEach((d,i)=>d.addEventListener('click',()=>{showSlide(i);restart()}));
- function restart(){clearInterval(timer);timer=setInterval(()=>showSlide(current+1),6500)}restart();
- const observer=new IntersectionObserver(entries=>entries.forEach(e=>{if(e.isIntersecting){e.target.classList.add('visible');observer.unobserve(e.target)}}),{threshold:.12});
- document.querySelectorAll('.reveal').forEach(el=>observer.observe(el));
- const toast=document.getElementById('toast');let toastTimer;
- function notify(message){toast.textContent=message;toast.classList.add('show');clearTimeout(toastTimer);toastTimer=setTimeout(()=>toast.classList.remove('show'),5000)}
- document.getElementById('videoPlay').addEventListener('click',()=>notify('جایگاه ویدئوی معرفی آماده است؛ پس از آماده‌شدن فایل ویدئو به این بخش متصل می‌شود.'));
- document.getElementById('contactForm').addEventListener('submit',e=>{e.preventDefault();const f=new FormData(e.currentTarget);const subject=encodeURIComponent(f.get('topic')||'درخواست ارتباط با مدیرنگر');const body=encodeURIComponent('نام: '+f.get('fullName')+'\nراه ارتباطی: '+f.get('email')+'\nموضوع: '+f.get('topic')+'\n\nپیام:\n'+f.get('message'));notify('فرم به سرور متصل نیست؛ پیام آماده می‌شود تا بتوانید آن را دستی ارسال کنید.');const mail='mailto:?subject='+subject+'&body='+body;setTimeout(()=>{window.location.href=mail},350)});
+ const toggle=document.getElementById('menuToggle');
+ const links=document.getElementById('navlinks');
+ toggle.addEventListener('click',function(){const open=links.classList.toggle('open');toggle.setAttribute('aria-expanded',String(open));toggle.setAttribute('aria-label',open?'بستن منو':'باز کردن منو');});
+ links.querySelectorAll('a').forEach(a=>a.addEventListener('click',()=>{links.classList.remove('open');toggle.setAttribute('aria-expanded','false');}));
+ document.addEventListener('keydown',e=>{if(e.key==='Escape'){links.classList.remove('open');toggle.setAttribute('aria-expanded','false');}});
 })();
 </script>
 </body>
