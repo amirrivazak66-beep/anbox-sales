@@ -9,12 +9,19 @@ const root = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const server = createServer((req, res) => {
   const pathname = new URL(req.url || "/", "http://127.0.0.1").pathname;
   const relative = pathname === "/" ? "index.html" : pathname.slice(1);
-  if (!["index.html", "dashboard.html", "scripts/unified-leads.js"].includes(relative)) {
+  const types = {
+    "index.html": "text/html; charset=utf-8",
+    "dashboard.html": "text/html; charset=utf-8",
+    "scripts/unified-leads.js": "application/javascript; charset=utf-8",
+    "assets/landing.css": "text/css; charset=utf-8",
+    "assets/vazirmatn.woff2": "font/woff2",
+  };
+  if (!Object.hasOwn(types, relative)) {
     res.writeHead(404); res.end("Not found"); return;
   }
   try {
     const body = readFileSync(join(root, relative));
-    res.writeHead(200, { "content-type": relative.endsWith(".js") ? "application/javascript; charset=utf-8" : "text/html; charset=utf-8", "cache-control": "no-store" });
+    res.writeHead(200, { "content-type": types[relative], "cache-control": "no-store" });
     res.end(body);
   } catch {
     res.writeHead(404); res.end("Not found");
@@ -76,48 +83,72 @@ try {
   await new Promise((resolveListen) => server.listen(0, "127.0.0.1", resolveListen));
   const address = server.address();
   const base = `http://127.0.0.1:${address.port}`;
-  browser = await chromium.launch({ headless: true });
+  browser = await chromium.launch({ headless: true, executablePath: process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE });
 
   // Approved public homepage: branding, six updates, role panels, illustrations, links, and responsive layout.
   const landing = await browser.newPage({viewport:{width:1440,height:900}});
   const landingErrors=[];
   landing.on("pageerror",e=>landingErrors.push(e.message));
+  await landing.route("https://**/*", route => route.abort());
   await landing.goto(base + "/", {waitUntil:"domcontentloaded"});
   assert.match(await landing.title(),/مدیرنگر/);
   assert.equal(await landing.locator(".brand").first().isVisible(),true);
-  assert.match(await landing.locator(".hero h1").innerText(),/مدیریت یکپارچه/);
+  assert.match(await landing.locator(".hero h1").innerText(),/مرکز فرماندهی/);
   assert.equal(await landing.locator(".feature-card").count(),6,"approved landing must display all six latest updates");
   assert.equal(await landing.locator(".role-card").count(),2,"manager and expert cards are visible");
-  assert.equal(await landing.locator(".analytics-block").count(),3,"dashboard overview preview has three panels");
-  assert.equal(await landing.locator("#animatedDashboardPreview").count(),1,"animated hero preview should render");
-  assert.equal(await landing.locator(".preview-bar").count(),4,"preview shows animated vector bars");
-  assert.equal(await landing.locator(".preview-gauge-ring").count(),4,"preview shows sharp CSS-powered ring gauges");
-  assert.equal(await landing.locator(".preview-metric").count(),4,"preview shows sample KPI cards");
-  assert.match(await landing.locator(".preview-tip").innerText(),/داده‌ها واقعی نیستند/,"clearly mark sample KPI data");
-  const animation=await landing.locator(".app-scene").evaluate(el=>getComputedStyle(el).animationName);
-  assert.match(animation,/preview-float/,"desktop preview should float gently");
-  const stageBefore=await landing.locator("#previewStage").innerText();
-  await landing.waitForTimeout(3900);
-  const stageAfter=await landing.locator("#previewStage").innerText();
-  assert.notEqual(stageAfter,stageBefore,"sample stage and progress should rotate automatically");
+  assert.equal(await landing.locator(".analytics-block").count(),6);
+  assert.equal(await landing.locator("#animatedDashboardPreview tbody tr").count(),4);
+  assert.equal(await landing.locator(".hero-visual .gauge").count(),4);
+  assert.equal(await landing.locator(".analytics-panel .gauge").count(),4);
+  assert.match(await landing.locator(".preview-tip").innerText(),/نمونه نمایشی/);
+  await landing.waitForFunction(() => document.querySelector(".hero-visual").classList.contains("is-visible"));
+  const scene = landing.locator(".app-scene");
+  assert.equal(await scene.evaluate(el => getComputedStyle(el).animationName), "preview-float");
+  assert.equal(await scene.evaluate(el => getComputedStyle(el).animationPlayState), "running");
+  await landing.emulateMedia({reducedMotion:"reduce"});
+  assert.equal(await scene.evaluate(el => getComputedStyle(el).animationName), "none");
+  await landing.emulateMedia({reducedMotion:"no-preference"});
 
   assert.equal(await landing.locator('.hero-actions a[href="dashboard.html"]').count(),1,"hero CTA leads to existing dashboard");
   assert.equal(await landing.locator('.footer a[href="dashboard.html"]').count(),1,"footer entry remains available");
   assert.match(await landing.locator(".example-note").innerText(),/نمونه نمایشی/,"do not represent demo gauges as actual customer data");
+  mkdirSync("artifacts", {recursive:true});
+  assert.ok(await landing.evaluate(async () => {
+    const faces = await document.fonts.load("400 16px Vazirmatn", "مدیرنگر");
+    return faces.length > 0 && faces.every(face => face.status === "loaded");
+  }), "the Persian font loads locally");
   for(const width of [1440,1024,768,390]){
     await landing.setViewportSize({width,height:900});
     const layout=await landing.evaluate(()=>({width:innerWidth,documentWidth:document.documentElement.scrollWidth,features:document.querySelectorAll(".feature-card").length,hero:document.querySelector(".hero-grid").getBoundingClientRect().width}));
     assert.ok(layout.documentWidth<=layout.width+2,"homepage should have no horizontal scroll at "+width+": "+JSON.stringify(layout));
     assert.equal(layout.features,6);
+    await landing.screenshot({path:`artifacts/landing-${width}.png`,fullPage:true,animations:"disabled"});
   }
   await landing.setViewportSize({width:390,height:844});
   await landing.locator("#menuToggle").click();
   assert.equal(await landing.locator("#navlinks").evaluate(el=>el.classList.contains("open")),true);
   await landing.locator('#navlinks a[href="#updates"]').click();
   assert.equal(await landing.locator("#navlinks").evaluate(el=>el.classList.contains("open")),false,"mobile menu closes after navigation");
-  assert.deepEqual(landingErrors,[],"homepage should have no script errors");
+  assert.deepEqual(landingErrors,[], "homepage should have no script errors");
+  await landing.route("https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2", route => route.fulfill({
+    status: 200, contentType: "application/javascript", body: mockSupabase
+  }));
+  await landing.locator(".hero-actions a[href='dashboard.html']").click();
+  await landing.waitForURL("**/dashboard.html");
+  assert.equal(await landing.locator("#loginPage").isVisible(), true);
   console.log("PASS approved homepage sections, navigation, responsive widths, dashboard CTA");
   await landing.close();
+
+  if (process.env.LANDING_BASELINE_HTML) {
+    const before = await browser.newPage({viewport:{width:1440,height:900},reducedMotion:"reduce"});
+    await before.route(base + "/", route => route.fulfill({
+      contentType: "text/html; charset=utf-8",
+      body: readFileSync(process.env.LANDING_BASELINE_HTML, "utf8")
+    }));
+    await before.goto(base + "/", {waitUntil:"domcontentloaded"});
+    await before.screenshot({path:"artifacts/landing-before-1440.png",fullPage:true,timeout:15000});
+    await before.close();
+  }
 
   // Dashboard: mock Supabase Auth and DB so no production credentials or data are used.
   const app = await browser.newPage();

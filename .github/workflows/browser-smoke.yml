@@ -18,6 +18,8 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
       - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
@@ -27,7 +29,21 @@ jobs:
       - name: Install Chromium
         run: npx playwright install --with-deps chromium
       - name: Run browser smoke checks
-        run: node scripts/browser-smoke.mjs
+        run: |
+          if [ "${{ github.event_name }}" = 'pull_request' ]; then
+            git show HEAD^1:index.html > "$RUNNER_TEMP/landing-before.html"
+            export LANDING_BASELINE_HTML="$RUNNER_TEMP/landing-before.html"
+          fi
+          node scripts/browser-smoke.mjs
+
+      - name: Upload landing screenshots
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: landing-preview-screenshots
+          path: artifacts/landing-*.png
+          if-no-files-found: ignore
+          retention-days: 14
 
       - name: Verify isolated PR61 preview URL and login adapter
         run: |
