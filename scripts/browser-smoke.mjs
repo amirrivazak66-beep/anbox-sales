@@ -168,6 +168,7 @@ try {
   for (const width of [320, 390]) {
     await app.setViewportSize({width,height:844});
     assert.equal(await loginArt.isVisible(), false);
+    assert.equal(await app.locator(".hamburger").isVisible(), false);
     assert.equal(await app.evaluate(() => document.documentElement.scrollWidth), width);
   }
   const homeLink = app.getByRole("link", {name:"بازگشت به صفحه اصلی"});
