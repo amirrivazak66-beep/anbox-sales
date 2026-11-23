@@ -37,31 +37,64 @@ button:focus-visible,a:focus-visible{outline:3px solid #74c6ff;outline-offset:3p
 .hero h1 span{color:#29b7ff}
 .hero-copy{font-size:15px;line-height:2.1;color:#c3d7ee;margin:0 0 27px}
 .hero-actions{display:flex;align-items:center;flex-wrap:wrap;gap:12px}
-.hero-visual{min-width:0;position:relative;isolation:isolate;padding:22px 13px 28px 0}
-.hero-visual:before{content:"";position:absolute;inset:7% 3% 5%;border-radius:50%;background:#087cf849;filter:blur(65px);z-index:-1}
-.app-scene{position:relative;transform:perspective(1050px) rotateY(-7deg) rotateX(2deg);transform-origin:center;filter:drop-shadow(0 19px 24px #010b1dc9)}
-.app-preview{border:2px solid #2fa8ff;background:linear-gradient(130deg,#0c305f,#06182f);border-radius:18px;box-shadow:0 0 0 4px #2f86eb22,0 0 30px #168efd8c,0 23px 48px #0008;min-height:356px;overflow:hidden}
-.preview-top{height:53px;border-bottom:1px solid #255e9d;display:flex;align-items:center;justify-content:space-between;padding:0 17px;background:#081e3d}
+
+.hero-visual{min-width:0;position:relative;isolation:isolate;padding:32px 8px 38px 0}
+.hero-visual:before{content:"";position:absolute;inset:6% -2% 0;border-radius:50%;background:radial-gradient(circle,#167af370,transparent 68%);filter:blur(48px);z-index:-1;animation:preview-halo 6s ease-in-out infinite alternate}
+.hero-visual:after{content:"";pointer-events:none;position:absolute;z-index:-1;inset:auto 1% 18px 1%;height:20px;background:#009cffa0;border-radius:50%;filter:blur(24px);animation:preview-halo 4s ease-in-out infinite alternate}
+.app-scene{position:relative;transform:perspective(1150px) rotateY(-5deg) rotateX(1.5deg);transform-origin:center;filter:drop-shadow(0 25px 24px #000b);animation:preview-float 7s ease-in-out infinite}
+.app-preview{position:relative;border:1.5px solid #53bdff;background:linear-gradient(145deg,#0b3064,#06162f);border-radius:18px;box-shadow:0 0 0 4px #2d90ed1c,0 0 30px #128cff80,0 25px 55px #000a;min-height:448px;overflow:hidden}
+.app-preview:after{content:"";position:absolute;inset:-100% auto -100% -70%;width:18%;background:linear-gradient(90deg,transparent,#c5efff16,transparent);transform:rotate(20deg);pointer-events:none;animation:preview-shine 11s ease-in-out infinite}
+.preview-top{height:50px;border-bottom:1px solid #2565a3;display:flex;align-items:center;justify-content:space-between;padding:0 16px;background:#071a39}
 .preview-top b{font-size:15px}.preview-top span{font-size:11px;color:#bad4ef}
-.preview-layout{display:grid;grid-template-columns:112px minmax(0,1fr);min-height:305px}
-.preview-side{border-left:1px solid #23518a;background:#071a35;padding:13px 7px;font-size:10px;display:grid;align-content:start;gap:8px}
-.preview-side span{padding:8px 7px;border-radius:6px;color:#bdd2ec}
-.preview-side span.active{background:#146cff;color:#fff}
-.preview-body{padding:12px;min-width:0}
-.preview-mini-nav{display:flex;gap:7px;flex-wrap:wrap;margin-bottom:11px}
-.preview-pill{background:#163b71;border:1px solid #2f6cb0;padding:5px 9px;border-radius:7px;font-size:10px}
-.preview-pill.active{background:#176ef2}
-.preview-record{display:grid;grid-template-columns:1.25fr 1fr 1fr;gap:7px;padding:10px;border:1px solid #3269ae;border-radius:10px;background:#122f58;margin-bottom:11px}
-.preview-record label{display:block;color:#aed0f4;font-size:9px;margin-bottom:4px}
-.preview-field{min-height:26px;border-radius:5px;background:#081b37;border:1px solid #3a76b7;padding:4px 7px;color:#ecf8ff;font-size:10px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.preview-kpis{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:7px}
-.preview-kpi{border:1px solid #28669d;background:#0b2445;border-radius:10px;min-height:105px;text-align:center;padding:9px 4px}
-.preview-kpi small{display:block;font-size:8px;color:#c1d6f4;line-height:1.6}
-.ring{--pct:75;--ring:#20cafa;position:relative;width:56px;height:56px;margin:6px auto;border-radius:50%;background:conic-gradient(var(--ring) calc(var(--pct)*1%),#173859 0);display:grid;place-items:center}
-.ring:after{content:"";position:absolute;inset:7px;background:#0b2445;border-radius:50%}
-.ring b{position:relative;z-index:1;font-size:12px}
-.preview-kpi:nth-child(2) .ring{--ring:#7c55ee;--pct:61}.preview-kpi:nth-child(3) .ring{--ring:#21d998;--pct:87}.preview-kpi:nth-child(4) .ring{--ring:#ffc633;--pct:78}
-.preview-tip{position:absolute;bottom:0;left:0;border:1px solid #4da8f7;border-radius:8px;background:#092349e8;color:#d3ebff;padding:7px 13px;font-size:10px}
+.preview-live{display:inline-flex;align-items:center;gap:5px;border:1px solid #17d8b46b;border-radius:99px;padding:2px 8px;color:#62e9ce;font-size:9px;font-weight:700}
+.preview-live:before{content:"";width:6px;height:6px;border-radius:50%;background:#2bf7b8;box-shadow:0 0 10px #2bf7b8;animation:preview-blink 2.5s ease-in-out infinite}
+.preview-layout{display:grid;grid-template-columns:112px minmax(0,1fr);min-height:396px}
+.preview-side{border-left:1px solid #23518a;background:#071830;padding:15px 8px;font-size:10px;display:grid;align-content:start;gap:8px}
+.preview-side span{padding:9px 6px;border-radius:7px;color:#bdd2ec;transition:background .5s,transform .5s,color .5s}
+.preview-side span.active{background:#176bf1;color:#fff;box-shadow:0 0 13px #1b7cff70;transform:translateX(-2px)}
+.preview-body{padding:14px 13px 12px;min-width:0}
+.preview-mini-nav{display:flex;gap:7px;flex-wrap:wrap;margin-bottom:12px}
+.preview-pill{background:#12315f;border:1px solid #2f6cb0;padding:4px 10px;border-radius:7px;font-size:10px;transition:background .45s,box-shadow .45s}
+.preview-pill.active{background:#176ef2;box-shadow:0 2px 11px #176fff80}
+.preview-record{display:grid;grid-template-columns:1.2fr 1fr 1fr;gap:7px;padding:11px;border:1px solid #3775ba;border-radius:11px;background:#102b54;margin-bottom:11px;transition:border-color .5s,box-shadow .5s}
+.preview-record.pulse{border-color:#29c6ff;box-shadow:0 0 18px #21a4ff48}
+.preview-record label{display:block;color:#b3d4f6;font-size:10px;margin-bottom:4px}
+.preview-field{min-height:29px;border-radius:6px;background:#081a36;border:1px solid #376eaf;padding:5px 7px;color:#ecf8ff;font-size:11px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;transition:color .4s,box-shadow .4s}
+.preview-field.is-changing{color:#63e8ff;box-shadow:0 0 10px #1e93ff70}
+.preview-metrics{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:7px;margin-bottom:11px}
+.preview-metric{padding:7px 3px;background:#082343;border:1px solid #275a91;border-radius:9px;text-align:center;min-width:0}
+.preview-metric span{display:block;font-size:9px;color:#a8c8ee}
+.preview-metric strong{display:block;font-size:19px;line-height:1.5;color:white}
+.preview-metric em{font-size:8px;color:#43debe;font-style:normal}
+.preview-lower{display:grid;grid-template-columns:1.1fr 1fr;gap:9px}
+.preview-chart-card{border:1px solid #2c629e;background:#08203e;border-radius:11px;padding:9px;min-width:0;min-height:145px}
+.preview-chart-card h4{font-size:11px;margin:0 0 9px;color:#c6e4ff;font-weight:700}
+.preview-bars{height:106px;display:flex;align-items:end;gap:9px;justify-content:space-around;direction:ltr}
+.preview-bar-item{flex:1;min-width:0;display:flex;flex-direction:column;align-items:center;justify-content:end;height:100%;gap:4px}
+.preview-bar-item span{font-size:8px;color:#aacbea;white-space:nowrap}
+.preview-bar{display:block;width:100%;max-width:36px;height:var(--bar-height);background:linear-gradient(#68cdff,#1677ff 65%,#1a4dd0);border-radius:6px 6px 0 0;box-shadow:0 0 12px #1685ff55;transform-origin:bottom;animation:preview-grow 1.4s cubic-bezier(.3,.9,.3,1) both}
+.preview-bar-item:nth-child(2) .preview-bar{animation-delay:.2s}.preview-bar-item:nth-child(3) .preview-bar{animation-delay:.35s}.preview-bar-item:nth-child(4) .preview-bar{animation-delay:.5s}
+.preview-gauges{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:7px}
+.preview-gauge{text-align:center;padding:2px 0 0;min-width:0}
+.preview-gauge-ring{--pct:72;--ring:#21cafe;position:relative;width:55px;height:55px;margin:0 auto 4px;border-radius:50%;background:conic-gradient(var(--ring) calc(var(--pct) * 1%),#173c60 0);display:grid;place-items:center;transition:background .45s;animation:preview-spin-in 1.6s ease-out both}
+.preview-gauge-ring:after{content:"";position:absolute;inset:8px;background:#092447;border-radius:50%}
+.preview-gauge-ring b{position:relative;z-index:1;font-size:12px;letter-spacing:-.5px}
+.preview-gauge small{display:block;font-size:8px;color:#b8d3f2;line-height:1.4}
+.preview-gauge:nth-child(2) .preview-gauge-ring{--pct:85;--ring:#24dba7}.preview-gauge:nth-child(3) .preview-gauge-ring{--pct:61;--ring:#a075ff}.preview-gauge:nth-child(4) .preview-gauge-ring{--pct:77;--ring:#f4bc34}
+.preview-activity{display:flex;align-items:center;gap:6px;margin-top:8px;padding:6px 9px;background:#123963a3;border:1px solid #2c719f;border-radius:8px;color:#bddaf4;font-size:9px;min-height:27px;transition:background .5s}
+.preview-activity:before{content:"";width:6px;height:6px;flex:none;background:#2ae4ba;border-radius:50%;box-shadow:0 0 8px #18cdb0}
+.preview-tip{position:absolute;bottom:0;left:0;border:1px solid #4da8f7;border-radius:8px;background:#092349ed;color:#d3ebff;padding:6px 10px;font-size:10px}
+@keyframes preview-float{0%,100%{transform:perspective(1150px) rotateY(-5deg) rotateX(1.5deg) translateY(0)}50%{transform:perspective(1150px) rotateY(-3deg) rotateX(1deg) translateY(-9px)}}
+@keyframes preview-halo{from{opacity:.52;transform:scale(.92)}to{opacity:1;transform:scale(1.07)}}
+@keyframes preview-shine{0%,55%,100%{left:-80%}75%{left:140%}}
+@keyframes preview-grow{from{transform:scaleY(.05);opacity:.4}to{transform:scaleY(1);opacity:1}}
+@keyframes preview-blink{50%{opacity:.4}}
+@keyframes preview-spin-in{from{transform:rotate(-70deg) scale(.7);opacity:.4}to{transform:rotate(0) scale(1);opacity:1}}
+@media(max-width:760px){.app-scene{transform:none;animation:preview-mobile-float 7s ease-in-out infinite}.hero-visual{padding:18px 0 25px}.app-preview{min-height:420px}}
+@keyframes preview-mobile-float{0%,100%{transform:translateY(0)}50%{transform:translateY(-5px)}}
+@media(max-width:420px){.preview-layout{grid-template-columns:78px minmax(0,1fr)}.preview-side{font-size:8px;padding:9px 4px}.preview-side span{padding:7px 2px}.preview-top{padding:0 9px}.preview-top b{font-size:12px}.preview-top span{font-size:9px}.preview-body{padding:8px 6px}.preview-record{grid-template-columns:1fr 1fr;padding:6px}.preview-record>div:last-child{display:none}.preview-record label{font-size:8px}.preview-field{font-size:9px}.preview-pill{font-size:8px;padding:4px 6px}.preview-mini-nav{gap:3px}.preview-metrics{gap:3px}.preview-metric strong{font-size:14px}.preview-metric span{font-size:7px}.preview-lower{gap:5px}.preview-chart-card{padding:5px}.preview-chart-card h4{font-size:9px}.preview-bars{gap:2px}.preview-gauge-ring{width:45px;height:45px}.preview-gauge-ring:after{inset:7px}.preview-gauge-ring b{font-size:10px}.preview-gauge small{font-size:7px}}
+@media(prefers-reduced-motion:reduce){.app-scene,.hero-visual:before,.hero-visual:after,.app-preview:after,.preview-bar,.preview-gauge-ring,.preview-live:before{animation:none!important}}
+.ring{--pct:75;--ring:#20cafa;position:relative;width:56px;height:56px;margin:6px auto;border-radius:50%;background:conic-gradient(var(--ring) calc(var(--pct) * 1%),#173859 0);display:grid;place-items:center}.ring:after{content:"";position:absolute;inset:7px;background:#0b2445;border-radius:50%}.ring b{position:relative;z-index:1;font-size:12px}.mini-gauge .ring{width:75px;height:75px}.mini-gauge .ring:after{inset:10px;background:#092346}.mini-gauge .ring b{font-size:17px}
 .section{padding:40px 0 28px}
 .section-heading{text-align:center;margin:0 0 28px}
 .section-heading h2{margin:0;font-size:clamp(23px,2.8vw,30px);line-height:1.6;font-weight:900}
@@ -151,26 +184,53 @@ button:focus-visible,a:focus-visible{outline:3px solid #74c6ff;outline-offset:3p
       <a class="btn btn-secondary" href="#updates">▦ مشاهده امکانات</a>
     </div>
   </div>
-  <div class="hero-visual" aria-label="نمای نمونه از ظاهر داشبورد مدیرنگر">
+  <div class="hero-visual" aria-label="پیش‌نمایش متحرک و نمایشی داشبورد مدیرنگر">
     <div class="app-scene">
-      <div class="app-preview">
-        <div class="preview-top"><b>▤ مدیریت لیدها</b><span>مدیرنگر | پیش‌نمایش</span></div>
+      <div class="app-preview" id="animatedDashboardPreview">
+        <div class="preview-top"><b>▤ مدیریت لیدها</b><span class="preview-live">دموی تعاملی</span><span>مدیرنگر</span></div>
         <div class="preview-layout">
-          <aside class="preview-side" aria-hidden="true"><span>▤ داشبورد</span><span class="active">▦ لیدها</span><span>◈ درخواست همکاری</span><span>▤ گزارش‌ها</span><span>▥ تحلیل مدیریتی</span></aside>
+          <aside class="preview-side" aria-label="بخش‌های نمایشی داشبورد">
+            <span>▤ داشبورد</span><span class="active">▦ لیدها</span><span>◈ درخواست همکاری</span><span>▤ گزارش‌ها</span><span>▥ تحلیل مدیریتی</span>
+          </aside>
           <div class="preview-body">
-            <div class="preview-mini-nav"><span class="preview-pill active">همه لیدها</span><span class="preview-pill">لید مستقیم</span><span class="preview-pill">درخواست همکاری</span></div>
-            <div class="preview-record"><div><label>شرکت / سازمان</label><div class="preview-field">نمونه شرکت تجاری</div></div><div><label>مرحله فروش</label><div class="preview-field">تماس اولیه ▾</div></div><div><label>اقدام بعدی</label><div class="preview-field">جلسه مذاکره ▾</div></div></div>
-            <div class="preview-kpis">
-              <div class="preview-kpi"><small>توزیع لیدها</small><div class="ring" style="--pct:72"><b>◉</b></div></div>
-              <div class="preview-kpi"><small>پیگیری</small><div class="ring"><b>↗</b></div></div>
-              <div class="preview-kpi"><small>کامل بودن</small><div class="ring"><b>✓</b></div></div>
-              <div class="preview-kpi"><small>تحلیل فروش</small><div class="ring"><b>▥</b></div></div>
+            <div class="preview-mini-nav" aria-label="دسته‌بندی لیدها"><span class="preview-pill active">همه لیدها</span><span class="preview-pill">لید مستقیم</span><span class="preview-pill">درخواست همکاری</span></div>
+            <div class="preview-record" id="previewLeadCard">
+              <div><label>شرکت / سازمان</label><div class="preview-field">شرکت نمونه تجاری</div></div>
+              <div><label>مرحله فروش</label><div class="preview-field" id="previewStage">تماس اولیه ▾</div></div>
+              <div><label>اقدام بعدی</label><div class="preview-field" id="previewAction">جلسه مذاکره ▾</div></div>
             </div>
+            <div class="preview-metrics" aria-label="آمار صرفاً نمایشی">
+              <div class="preview-metric"><span>همه لیدها</span><strong>۲۱۴</strong><em>نمایشی</em></div>
+              <div class="preview-metric"><span>لید مستقیم</span><strong>۸۴</strong><em>نمونه</em></div>
+              <div class="preview-metric"><span>درخواست همکاری</span><strong>۱۳۰</strong><em>نمونه</em></div>
+              <div class="preview-metric"><span>پیگیری فعال</span><strong>۶۸٪</strong><em>نمونه</em></div>
+            </div>
+            <div class="preview-lower">
+              <div class="preview-chart-card">
+                <h4>▥ عملکرد کارشناسان</h4>
+                <div class="preview-bars" role="img" aria-label="نمودار میله‌ای نمونه برای عملکرد کارشناسان">
+                  <div class="preview-bar-item"><div class="preview-bar" style="--bar-height:78%"></div><span>۱</span></div>
+                  <div class="preview-bar-item"><div class="preview-bar" style="--bar-height:61%"></div><span>۲</span></div>
+                  <div class="preview-bar-item"><div class="preview-bar" style="--bar-height:88%"></div><span>۳</span></div>
+                  <div class="preview-bar-item"><div class="preview-bar" style="--bar-height:49%"></div><span>۴</span></div>
+                </div>
+              </div>
+              <div class="preview-chart-card">
+                <h4>◉ شاخص‌های فروش</h4>
+                <div class="preview-gauges" aria-label="گیج‌های نمونه">
+                  <div class="preview-gauge"><div class="preview-gauge-ring" style="--pct:72"><b>۷۲٪</b></div><small>سهم لیدها</small></div>
+                  <div class="preview-gauge"><div class="preview-gauge-ring" style="--pct:85"><b>۸۵٪</b></div><small>پیگیری</small></div>
+                  <div class="preview-gauge"><div class="preview-gauge-ring" style="--pct:61"><b>۶۱٪</b></div><small>تکمیل اطلاعات</small></div>
+                  <div class="preview-gauge"><div class="preview-gauge-ring" style="--pct:77"><b>۷۷٪</b></div><small>عملکرد</small></div>
+                </div>
+              </div>
+            </div>
+            <div class="preview-activity" id="previewActivity" aria-live="off">نمایش نمونه‌ای از مدیریت یکپارچه لیدها و پیگیری فروش</div>
           </div>
         </div>
       </div>
     </div>
-    <span class="preview-tip">پیش‌نمایش گرافیکی، بدون نمایش داده واقعی مشتریان</span>
+    <span class="preview-tip">نمایش گرافیکی و انیمیشنی؛ داده‌ها واقعی نیستند</span>
   </div>
  </div>
 </section>
@@ -211,6 +271,45 @@ button:focus-visible,a:focus-visible{outline:3px solid #74c6ff;outline-offset:3p
 <footer class="footer"><div class="wrap footer-inner"><a class="brand" href="#home"><span class="brand-logo" aria-hidden="true"><svg viewBox="0 0 40 40"><path d="M7 30V21M15 30V13M23 30V7M31 30V17"/><path d="M6 33H34"/></svg></span><span>مدیرنگر<small>مدیریت لیدها، فروش و توسعه کسب‌وکار</small></span></a><div class="footer-links"><a href="#updates">به‌روزرسانی‌ها</a><a href="#features">امکانات</a><a href="#roles">پنل‌ها</a><a href="dashboard.html">ورود به سیستم</a></div><div class="footer-social"><a href="#home" aria-label="بازگشت به بالای صفحه">↑</a></div></div></footer>
 <script>
 (function(){
+ const preview=document.getElementById('animatedDashboardPreview');
+ if(preview){
+   const stage=document.getElementById('previewStage');
+   const action=document.getElementById('previewAction');
+   const activity=document.getElementById('previewActivity');
+   const card=document.getElementById('previewLeadCard');
+   const tabs=[...preview.querySelectorAll('.preview-pill')];
+   const sidebar=[...preview.querySelectorAll('.preview-side span')];
+   const samples=[
+     {stage:'تماس اولیه ▾',action:'جلسه مذاکره ▾',note:'لیست لیدهای مستقیم و درخواست‌های همکاری'},
+     {stage:'ارسال نرخ‌نامه ▾',action:'پیگیری قرارداد ▾',note:'ویرایش و پیگیری هر لید بدون خروج از صفحه'},
+     {stage:'عقد قرارداد ▾',action:'ثبت نتیجه پیگیری ▾',note:'نمایش مراحل فروش با عنوان‌های فارسی'}
+   ];
+   let step=0;
+   const motion=window.matchMedia('(prefers-reduced-motion: reduce)');
+   const advance=()=>{
+     if(motion.matches||document.hidden)return;
+     step=(step+1)%samples.length;
+     const sample=samples[step];
+     tabs.forEach((tab,i)=>tab.classList.toggle('active',i===step));
+     sidebar.forEach((tab,i)=>tab.classList.toggle('active',i===([1,2,4][step])));
+     stage.textContent=sample.stage;
+     action.textContent=sample.action;
+     activity.textContent=sample.note;
+     card.classList.add('pulse');
+     stage.classList.add('is-changing');
+     action.classList.add('is-changing');
+     window.setTimeout(()=>{card.classList.remove('pulse');stage.classList.remove('is-changing');action.classList.remove('is-changing');},850);
+   };
+   let timer=null,visible=true;
+   const sync=()=>{if(timer){clearInterval(timer);timer=null}if(!motion.matches&&!document.hidden&&visible)timer=setInterval(advance,3600)};
+   const observer=('IntersectionObserver' in window)?new IntersectionObserver(entries=>{visible=entries[0]?.isIntersecting??true;sync()},{threshold:.15}):null;
+   if(observer)observer.observe(preview);
+   preview.addEventListener('mouseenter',()=>{visible=false;sync()});
+   preview.addEventListener('mouseleave',()=>{visible=true;sync()});
+   document.addEventListener('visibilitychange',sync);
+   if(motion.addEventListener)motion.addEventListener('change',sync);
+   sync();
+ }
  const toggle=document.getElementById('menuToggle');
  const links=document.getElementById('navlinks');
  toggle.addEventListener('click',function(){const open=links.classList.toggle('open');toggle.setAttribute('aria-expanded',String(open));toggle.setAttribute('aria-label',open?'بستن منو':'باز کردن منو');});
