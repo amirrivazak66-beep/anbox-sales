@@ -78,18 +78,34 @@ try {
   const base = `http://127.0.0.1:${address.port}`;
   browser = await chromium.launch({ headless: true });
 
-  // Public landing page: brand, slider, responsive navigation.
-  const landing = await browser.newPage();
-  await landing.goto(base + "/", { waitUntil: "domcontentloaded" });
-  assert.match(await landing.title(), /مدیرنگر/);
-  assert.equal(await landing.locator(".brand").first().isVisible(), true);
-  assert.match(await landing.locator(".brand").first().innerText(), /مدیرنگر/);
-  await landing.locator("#nextSlide").click();
-  assert.equal(await landing.locator(".slide.active").innerText().then(t => t.includes("قیف فروش")), true);
-  await landing.setViewportSize({ width: 390, height: 844 });
+  // Approved public homepage: branding, six updates, role panels, illustrations, links, and responsive layout.
+  const landing = await browser.newPage({viewport:{width:1440,height:900}});
+  const landingErrors=[];
+  landing.on("pageerror",e=>landingErrors.push(e.message));
+  await landing.goto(base + "/", {waitUntil:"domcontentloaded"});
+  assert.match(await landing.title(),/مدیرنگر/);
+  assert.equal(await landing.locator(".brand").first().isVisible(),true);
+  assert.match(await landing.locator(".hero h1").innerText(),/مدیریت یکپارچه/);
+  assert.equal(await landing.locator(".feature-card").count(),6,"approved landing must display all six latest updates");
+  assert.equal(await landing.locator(".role-card").count(),2,"manager and expert cards are visible");
+  assert.equal(await landing.locator(".analytics-block").count(),3,"dashboard overview preview has three panels");
+  assert.equal(await landing.locator('.hero-actions a[href="dashboard.html"]').count(),1,"hero CTA leads to existing dashboard");
+  assert.equal(await landing.locator('.footer a[href="dashboard.html"]').count(),1,"footer entry remains available");
+  assert.match(await landing.locator(".example-note").innerText(),/نمونه نمایشی/,"do not represent demo gauges as actual customer data");
+  for(const width of [1440,1024,768,390]){
+    await landing.setViewportSize({width,height:900});
+    const layout=await landing.evaluate(()=>({width:innerWidth,documentWidth:document.documentElement.scrollWidth,features:document.querySelectorAll(".feature-card").length,hero:document.querySelector(".hero-grid").getBoundingClientRect().width}));
+    assert.ok(layout.documentWidth<=layout.width+2,"homepage should have no horizontal scroll at "+width+": "+JSON.stringify(layout));
+    assert.equal(layout.features,6);
+  }
+  await landing.setViewportSize({width:390,height:844});
   await landing.locator("#menuToggle").click();
-  assert.equal(await landing.locator("#navlinks").evaluate(el => el.classList.contains("open")), true);
-  console.log("PASS landing brand, slider and mobile navigation");
+  assert.equal(await landing.locator("#navlinks").evaluate(el=>el.classList.contains("open")),true);
+  await landing.locator('#navlinks a[href="#updates"]').click();
+  assert.equal(await landing.locator("#navlinks").evaluate(el=>el.classList.contains("open")),false,"mobile menu closes after navigation");
+  assert.deepEqual(landingErrors,[],"homepage should have no script errors");
+  console.log("PASS approved homepage sections, navigation, responsive widths, dashboard CTA");
+  await landing.close();
 
   // Dashboard: mock Supabase Auth and DB so no production credentials or data are used.
   const app = await browser.newPage();
