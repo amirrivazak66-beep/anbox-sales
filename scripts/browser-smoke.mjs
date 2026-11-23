@@ -89,6 +89,18 @@ try {
   assert.equal(await landing.locator(".feature-card").count(),6,"approved landing must display all six latest updates");
   assert.equal(await landing.locator(".role-card").count(),2,"manager and expert cards are visible");
   assert.equal(await landing.locator(".analytics-block").count(),3,"dashboard overview preview has three panels");
+  assert.equal(await landing.locator("#animatedDashboardPreview").count(),1,"animated hero preview should render");
+  assert.equal(await landing.locator(".preview-bar").count(),4,"preview shows animated vector bars");
+  assert.equal(await landing.locator(".preview-gauge-ring").count(),4,"preview shows sharp CSS-powered ring gauges");
+  assert.equal(await landing.locator(".preview-metric").count(),4,"preview shows sample KPI cards");
+  assert.match(await landing.locator(".preview-tip").innerText(),/داده‌ها واقعی نیستند/,"clearly mark sample KPI data");
+  const animation=await landing.locator(".app-scene").evaluate(el=>getComputedStyle(el).animationName);
+  assert.match(animation,/preview-float/,"desktop preview should float gently");
+  const stageBefore=await landing.locator("#previewStage").innerText();
+  await landing.waitForTimeout(3900);
+  const stageAfter=await landing.locator("#previewStage").innerText();
+  assert.notEqual(stageAfter,stageBefore,"sample stage and progress should rotate automatically");
+
   assert.equal(await landing.locator('.hero-actions a[href="dashboard.html"]').count(),1,"hero CTA leads to existing dashboard");
   assert.equal(await landing.locator('.footer a[href="dashboard.html"]').count(),1,"footer entry remains available");
   assert.match(await landing.locator(".example-note").innerText(),/نمونه نمایشی/,"do not represent demo gauges as actual customer data");
